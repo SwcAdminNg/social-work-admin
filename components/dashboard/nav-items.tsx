@@ -13,10 +13,12 @@ export type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType;
+  adminOnly?: boolean;
 };
 
 export const dashboardNavItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: IconGrid },
+  { label: "Course Management", href: "/dashboard/course-management", icon: IconBookOpen, adminOnly: true },
   { label: "My Profile", href: "/dashboard/profile", icon: IconUserCircle },
   { label: "Enrolled Courses", href: "/dashboard/courses", icon: IconBookOpen },
   { label: "Reviews", href: "/dashboard/reviews", icon: IconStar },

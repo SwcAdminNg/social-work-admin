@@ -1,5 +1,6 @@
 "use client";
 
+import { Toaster } from "sonner";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./DashboardHeader";
@@ -28,6 +29,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <Sidebar />
         <Content>{children}</Content>
       </div>
+      <Toaster position="top-right" richColors closeButton />
     </SidebarProvider>
   );
 }

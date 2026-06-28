@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { IconLogoMark } from "@/components/auth/shared/icons";
 import { dashboardNavItems } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
@@ -14,7 +15,10 @@ function isActive(pathname: string, href: string) {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { mobileOpen, setMobileOpen, collapsed, toggleCollapsed } = useSidebar();
+  const isAdmin = session?.user?.userType === "ADMIN";
+  const visibleNavItems = dashboardNavItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <>
@@ -66,7 +70,7 @@ export function Sidebar() {
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto px-3 py-5">
           <ul className="flex flex-col gap-1 list-none m-0 p-0">
-            {dashboardNavItems.map(({ label, href, icon: Icon }) => {
+            {visibleNavItems.map(({ label, href, icon: Icon }) => {
               const active = isActive(pathname, href);
               return (
                 <li key={href}>

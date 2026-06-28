@@ -1,4 +1,24 @@
-const API_BASE_URL = process.env.API_BASE_URL ?? "http://localhost:8000/api/v1";
+const API_BASE_URL = process.env.API_BASE_URL ?? "http://localhost:8000";
+
+export interface ApiEnvelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: {
+    page: number;
+    page_size: number;
+    total_items: number;
+    total_pages: number;
+    has_next: boolean;
+    has_previous: boolean;
+  };
+}
+
+export interface ApiValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
+}
 
 export class ApiError extends Error {
   status: number;
@@ -17,7 +37,10 @@ type RequestOptions = Omit<RequestInit, "body"> & {
   token?: string;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { body, token, headers, ...rest } = options;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
