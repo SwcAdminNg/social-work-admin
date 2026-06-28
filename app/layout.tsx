@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/generic/ThemeProvider";
 import ThemeToggle from "@/components/generic/ThemeToggle";
+import AuthSessionProvider from "@/components/generic/AuthSessionProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -24,10 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`}>
-        <ThemeProvider>
-          {children}
-          <ThemeToggle />
-        </ThemeProvider>
+        <AuthSessionProvider>
+          <ThemeProvider>
+            {children}
+            <ThemeToggle />
+          </ThemeProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

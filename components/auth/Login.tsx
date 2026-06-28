@@ -2,23 +2,42 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { AuthPageShell } from "./shared/AuthPageShell";
 import { FloatingInput } from "./shared/FloatingInput";
 import { PasswordToggle } from "./shared/PasswordToggle";
 import { IconArrowRight, IconCheck, IconLock, IconMail, IconSpinner } from "./shared/icons";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    // Simulate async login
-    setTimeout(() => setLoading(false), 1800);
+
+    const result = await signIn("credentials", {
+      identifier,
+      password,
+      keepLoggedIn: keepLoggedIn ? "true" : "false",
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError("Invalid username/email or password.");
+      setLoading(false);
+      return;
+    }
+
+    router.push(searchParams.get("callbackUrl") ?? "/dashboard");
   };
 
   return (
@@ -38,15 +57,25 @@ export default function Login() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-        {/* Email */}
+        {/* Error message */}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3.5 py-2.5 text-[0.83rem] font-medium text-red-700 dark:text-red-400"
+          >
+            {error}
+          </p>
+        )}
+
+        {/* Identifier */}
         <FloatingInput
-          id="email"
-          label="Email address"
-          type="email"
-          value={email}
-          onChange={setEmail}
+          id="identifier"
+          label="Username or email"
+          type="text"
+          value={identifier}
+          onChange={setIdentifier}
           icon={<IconMail />}
-          autoComplete="email"
+          autoComplete="username"
           required
         />
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { getPageTitle } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
 import { IconBell, IconLogout, IconMenu } from "./icons";
@@ -112,14 +112,15 @@ export function DashboardHeader() {
         </div>
 
         {/* Logout */}
-        <Link
-          href="/login"
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/login" })}
           aria-label="Logout"
           title="Logout"
-          className="w-10 h-10 flex items-center justify-center rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 no-underline transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
         >
           <IconLogout />
-        </Link>
+        </button>
       </div>
     </header>
   );
