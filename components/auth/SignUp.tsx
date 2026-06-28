@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { AuthPageShell } from "./shared/AuthPageShell";
 import { FloatingInput } from "./shared/FloatingInput";
@@ -26,8 +26,30 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const requiredFields: [string, React.RefObject<HTMLInputElement | null>][] = [
+      [firstName, firstNameRef],
+      [lastName, lastNameRef],
+      [username, usernameRef],
+      [email, emailRef],
+      [password, passwordRef],
+      [confirmPassword, confirmPasswordRef],
+    ];
+    const firstEmpty = requiredFields.find(([value]) => !value.trim());
+    if (firstEmpty) {
+      firstEmpty[1].current?.focus();
+      return;
+    }
+
     setLoading(true);
     // Simulate async registration
     setTimeout(() => setLoading(false), 1800);
@@ -53,6 +75,7 @@ export default function SignUp() {
         {/* First / Last name */}
         <div className="grid grid-cols-2 gap-3">
           <FloatingInput
+            ref={firstNameRef}
             id="firstName"
             label="First name"
             type="text"
@@ -63,6 +86,7 @@ export default function SignUp() {
             required
           />
           <FloatingInput
+            ref={lastNameRef}
             id="lastName"
             label="Last name"
             type="text"
@@ -76,6 +100,7 @@ export default function SignUp() {
 
         {/* Username */}
         <FloatingInput
+          ref={usernameRef}
           id="username"
           label="Username"
           type="text"
@@ -88,6 +113,7 @@ export default function SignUp() {
 
         {/* Email */}
         <FloatingInput
+          ref={emailRef}
           id="email"
           label="Email address"
           type="email"
@@ -111,6 +137,7 @@ export default function SignUp() {
 
         {/* Password */}
         <FloatingInput
+          ref={passwordRef}
           id="password"
           label="Password"
           type={showPassword ? "text" : "password"}
@@ -129,6 +156,7 @@ export default function SignUp() {
 
         {/* Confirm password */}
         <FloatingInput
+          ref={confirmPasswordRef}
           id="confirmPassword"
           label="Confirm password"
           type={showConfirmPassword ? "text" : "password"}

@@ -4,6 +4,7 @@ import { login } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { AuthPageShell } from "./shared/AuthPageShell";
 import { FloatingInput } from "./shared/FloatingInput";
@@ -15,8 +15,21 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!password) {
+      passwordRef.current?.focus();
+      return;
+    }
+    if (!confirmPassword) {
+      confirmPasswordRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
     // Simulate resetting password
     setTimeout(() => {
@@ -76,6 +89,7 @@ export default function ResetPassword() {
       {/* Form */}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <FloatingInput
+          ref={passwordRef}
           id="password"
           label="New password"
           type={showPassword ? "text" : "password"}
@@ -93,6 +107,7 @@ export default function ResetPassword() {
         />
 
         <FloatingInput
+          ref={confirmPasswordRef}
           id="confirmPassword"
           label="Confirm new password"
           type={showConfirmPassword ? "text" : "password"}

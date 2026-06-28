@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -19,9 +19,22 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const identifierRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!identifier.trim()) {
+      identifierRef.current?.focus();
+      return;
+    }
+    if (!password) {
+      passwordRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
 
     const result = await signIn("credentials", {
@@ -69,6 +82,7 @@ export default function Login() {
 
         {/* Identifier */}
         <FloatingInput
+          ref={identifierRef}
           id="identifier"
           label="Username or email"
           type="text"
@@ -81,6 +95,7 @@ export default function Login() {
 
         {/* Password */}
         <FloatingInput
+          ref={passwordRef}
           id="password"
           label="Password"
           type={showPassword ? "text" : "password"}

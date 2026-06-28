@@ -1,18 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 
-export function FloatingInput({
-  id,
-  label,
-  type,
-  value,
-  onChange,
-  icon,
-  suffix,
-  autoComplete,
-  required,
-}: {
+export const FloatingInput = forwardRef<HTMLInputElement, {
   id: string;
   label: string;
   type: string;
@@ -22,7 +12,17 @@ export function FloatingInput({
   suffix?: React.ReactNode;
   autoComplete?: string;
   required?: boolean;
-}) {
+}>(function FloatingInput({
+  id,
+  label,
+  type,
+  value,
+  onChange,
+  icon,
+  suffix,
+  autoComplete,
+  required,
+}, ref) {
   const [focused, setFocused] = useState(false);
   const lifted = focused || value.length > 0;
 
@@ -41,6 +41,7 @@ export function FloatingInput({
 
       {/* Input */}
       <input
+        ref={ref}
         id={id}
         type={type}
         value={value}
@@ -87,4 +88,4 @@ export function FloatingInput({
       )}
     </div>
   );
-}
+});

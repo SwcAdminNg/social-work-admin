@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { AuthPageShell } from "./shared/AuthPageShell";
 import { FloatingInput } from "./shared/FloatingInput";
@@ -11,8 +11,16 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
+  const emailRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email.trim()) {
+      emailRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
     // Simulate sending reset link
     setTimeout(() => {
@@ -82,6 +90,7 @@ export default function ForgotPassword() {
       {/* Form */}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <FloatingInput
+          ref={emailRef}
           id="email"
           label="Email address"
           type="email"
