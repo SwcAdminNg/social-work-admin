@@ -29,16 +29,18 @@ export function ItemRow({
   dispatch,
   onRequestRefresh,
   documentUploadCredentials,
+  defaultExpanded = false,
 }: {
   item: CourseItem;
   dispatch: React.Dispatch<CourseEditorAction>;
   onRequestRefresh?: () => void;
   documentUploadCredentials?: { upload_url: string; storage_key: string };
+  defaultExpanded?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   });
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [title, setTitle] = useState(item.title);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);

@@ -23,6 +23,7 @@ export function CourseCurriculumTab({
   const [documentUploadCredentials, setDocumentUploadCredentials] = useState<
     Record<string, DocumentUploadCredentials>
   >({});
+  const [newlyCreatedItemId, setNewlyCreatedItemId] = useState<string | null>(null);
 
   async function handleAddSection() {
     setAddingSection(true);
@@ -42,6 +43,7 @@ export function CourseCurriculumTab({
   function handleItemCreated(sectionId: string, result: CreateItemResult) {
     const { video_upload, document_upload, ...item } = result;
     dispatch({ type: "ADD_ITEM", sectionId, item });
+    setNewlyCreatedItemId(item.id);
     if (document_upload) {
       setDocumentUploadCredentials((prev) => ({ ...prev, [item.id]: document_upload }));
     }
@@ -64,6 +66,7 @@ export function CourseCurriculumTab({
           onRefresh={onRefresh}
           onItemCreated={handleItemCreated}
           documentUploadCredentials={documentUploadCredentials}
+          newlyCreatedItemId={newlyCreatedItemId}
         />
       )}
 

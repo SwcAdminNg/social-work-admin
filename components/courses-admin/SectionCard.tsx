@@ -20,6 +20,7 @@ export function SectionCard({
   onRefresh,
   onItemCreated,
   documentUploadCredentials,
+  newlyCreatedItemId,
 }: {
   course: CourseDetail;
   section: CourseSection;
@@ -27,6 +28,7 @@ export function SectionCard({
   onRefresh: () => void;
   onItemCreated: (sectionId: string, result: CreateItemResult) => void;
   documentUploadCredentials: Record<string, { upload_url: string; storage_key: string }>;
+  newlyCreatedItemId: string | null;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: section.id,
@@ -131,6 +133,7 @@ export function SectionCard({
             dispatch={dispatch}
             onRefresh={onRefresh}
             documentUploadCredentials={documentUploadCredentials}
+            newlyCreatedItemId={newlyCreatedItemId}
           />
         </div>
       )}

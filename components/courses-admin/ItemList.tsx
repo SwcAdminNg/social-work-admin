@@ -22,12 +22,14 @@ export function ItemList({
   dispatch,
   onRefresh,
   documentUploadCredentials,
+  newlyCreatedItemId,
 }: {
   courseId: string;
   section: CourseSection;
   dispatch: React.Dispatch<CourseEditorAction>;
   onRefresh: () => void;
   documentUploadCredentials: Record<string, { upload_url: string; storage_key: string }>;
+  newlyCreatedItemId: string | null;
 }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -74,6 +76,7 @@ export function ItemList({
               dispatch={dispatch}
               onRequestRefresh={onRefresh}
               documentUploadCredentials={documentUploadCredentials[item.id]}
+              defaultExpanded={item.id === newlyCreatedItemId}
             />
           ))}
         </div>

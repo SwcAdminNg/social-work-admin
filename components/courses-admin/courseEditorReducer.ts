@@ -73,8 +73,18 @@ export function courseEditorReducer(state: CourseDetail, action: CourseEditorAct
       return mapSections(state, (s) => (s.id === action.sectionId ? { ...s, items: action.items } : s));
 
     case "ADD_ITEM":
+      const item = { ...action.item };
+      if (item.item_type === "QUIZ" && !item.quiz) {
+        item.quiz = {
+          id: item.id,
+          title: item.title,
+          description: "",
+          passing_score_percentage: 70,
+          questions: [],
+        };
+      }
       return mapSections(state, (s) =>
-        s.id === action.sectionId ? { ...s, items: [...s.items, action.item] } : s
+        s.id === action.sectionId ? { ...s, items: [...s.items, item] } : s
       );
 
     case "UPDATE_ITEM":

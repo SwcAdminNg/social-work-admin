@@ -22,12 +22,14 @@ export function SectionList({
   onRefresh,
   onItemCreated,
   documentUploadCredentials,
+  newlyCreatedItemId,
 }: {
   course: CourseDetail;
   dispatch: React.Dispatch<CourseEditorAction>;
   onRefresh: () => void;
   onItemCreated: (sectionId: string, result: CreateItemResult) => void;
   documentUploadCredentials: Record<string, { upload_url: string; storage_key: string }>;
+  newlyCreatedItemId: string | null;
 }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -68,6 +70,7 @@ export function SectionList({
               onRefresh={onRefresh}
               onItemCreated={onItemCreated}
               documentUploadCredentials={documentUploadCredentials}
+              newlyCreatedItemId={newlyCreatedItemId}
             />
           ))}
         </div>
