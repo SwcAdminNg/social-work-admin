@@ -23,19 +23,18 @@ export const dashboardNavItems: NavItem[] = [
     adminOnly: true,
   },
   {
-    label: "Payments",
-    href: "/dashboard/payments",
-    icon: IconReceipt,
-    adminOnly: true,
-  },
-  {
     label: "User Management",
     href: "/dashboard/user-management",
     icon: IconUsers,
     adminOnly: true,
   },
+  {
+    label: "Payments",
+    href: "/dashboard/payments",
+    icon: IconReceipt,
+    adminOnly: true,
+  },
   { label: "Reviews", href: "/dashboard/reviews", icon: IconStar },
-  { label: "Order History", href: "/dashboard/orders", icon: IconReceipt },
   { label: "Settings", href: "/dashboard/settings", icon: IconSettings },
 ];
 
