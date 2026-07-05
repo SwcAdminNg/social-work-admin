@@ -14,10 +14,11 @@ import { PublishControl } from "./PublishControl";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { CourseDetailsTab } from "./CourseDetailsTab";
 import { CourseCurriculumTab } from "./CourseCurriculumTab";
+import { CourseTransactionsTab } from "./CourseTransactionsTab";
 
 const VIDEO_POLL_INTERVAL_MS = 5000;
 
-type Tab = "details" | "curriculum";
+type Tab = "details" | "curriculum" | "sales";
 
 export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail }) {
   const router = useRouter();
@@ -109,6 +110,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
         {([
           { key: "details", label: "Details" },
           { key: "curriculum", label: "Curriculum" },
+          { key: "sales", label: "Sales & Transactions" },
         ] as const).map(({ key, label }) => (
           <button
             key={key}
@@ -125,13 +127,17 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
         ))}
       </div>
 
-      {tab === "details" ? (
+      {tab === "details" && (
         <CourseDetailsTab
           course={course}
           onUpdated={(fields) => dispatch({ type: "UPDATE_COURSE_FIELDS", fields })}
         />
-      ) : (
+      )}
+      {tab === "curriculum" && (
         <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
+      )}
+      {tab === "sales" && (
+        <CourseTransactionsTab courseId={course.id} />
       )}
 
       <ConfirmDialog

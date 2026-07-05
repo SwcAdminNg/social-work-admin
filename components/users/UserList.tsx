@@ -15,6 +15,7 @@ import { ChangeRoleModal } from "./ChangeRoleModal";
 import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import { toast } from "sonner";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import Link from "next/link";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "Never logged in";
@@ -160,6 +161,14 @@ function UserActions({
             </DropdownMenu.Item>
           )}
           <DropdownMenu.Separator className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+          <DropdownMenu.Item asChild>
+            <Link
+              href={`/dashboard/user-management/${user.id}`}
+              className="w-full flex text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+            >
+              View Profile
+            </Link>
+          </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <button
               className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"

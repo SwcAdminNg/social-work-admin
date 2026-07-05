@@ -22,6 +22,7 @@ export function CreateCourseForm() {
   const [materialIncludes, setMaterialIncludes] = useState<string[]>([]);
   const [requirements, setRequirements] = useState<string[]>([]);
   const [isFree, setIsFree] = useState(true);
+  const [isExclusive, setIsExclusive] = useState(false);
   const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -41,6 +42,7 @@ export function CreateCourseForm() {
         is_free: isFree,
         price: isFree ? null : price ? Number(price) : null,
         thumbnail_url: null,
+        is_exclusive: isExclusive,
       });
       toast.success("Course created as a draft.");
       router.push(`/dashboard/course-management/${course.id}`);
@@ -103,6 +105,15 @@ export function CreateCourseForm() {
             placeholder="e.g. 15000"
           />
         )}
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+        <ToggleField
+          label="Exclusive Course"
+          hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
+          checked={isExclusive}
+          onChange={setIsExclusive}
+        />
       </div>
 
       <button

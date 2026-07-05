@@ -27,6 +27,7 @@ export function CourseDetailsTab({
   const [materialIncludes, setMaterialIncludes] = useState<string[]>(course.material_includes);
   const [requirements, setRequirements] = useState<string[]>(course.requirements);
   const [isFree, setIsFree] = useState(course.is_free);
+  const [isExclusive, setIsExclusive] = useState(course.is_exclusive);
   const [price, setPrice] = useState(course.price != null ? String(course.price) : "");
   const [thumbnailUrl, setThumbnailUrl] = useState(course.thumbnail_url ?? "");
   const [saving, setSaving] = useState(false);
@@ -47,6 +48,7 @@ export function CourseDetailsTab({
         is_free: isFree,
         price: isFree ? null : price ? Number(price) : null,
         thumbnail_url: thumbnailUrl || null,
+        is_exclusive: isExclusive,
       };
       const updated = await updateCourse(course.id, payload);
       onUpdated(updated);
@@ -92,6 +94,15 @@ export function CourseDetailsTab({
             onChange={(v) => setPrice(v.replace(/[^0-9.]/g, ""))}
           />
         )}
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+        <ToggleField
+          label="Exclusive Course"
+          hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
+          checked={isExclusive}
+          onChange={setIsExclusive}
+        />
       </div>
 
       <button

@@ -23,7 +23,14 @@ export function CourseCard({
       </div>
       <div className="flex flex-col gap-2.5 p-4 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <PublishedBadge isPublished={course.is_published} />
+          <div className="flex items-center gap-2">
+            <PublishedBadge isPublished={course.is_published} />
+            {course.is_exclusive && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300">
+                Exclusive
+              </span>
+            )}
+          </div>
           <span className="text-xs font-semibold text-gray-400 dark:text-gray-600">
             {course.is_free ? "Free" : course.price != null ? `₦${course.price.toLocaleString()}` : "Paid"}
           </span>

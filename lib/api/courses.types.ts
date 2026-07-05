@@ -36,6 +36,7 @@ export interface Course {
   thumbnail_url: string | null;
   instructor_id: string;
   is_published: boolean;
+  is_exclusive: boolean;
 }
 
 export interface CourseVideo {
@@ -113,9 +114,10 @@ export interface CreateCoursePayload {
   is_free: boolean;
   price: number | null;
   thumbnail_url: string | null;
+  is_exclusive: boolean;
 }
 
-export type UpdateCoursePayload = Partial<CreateCoursePayload>;
+export type UpdateCoursePayload = Partial<CreateCoursePayload> & { is_exclusive?: boolean };
 
 export interface CreateSectionPayload {
   title: string;

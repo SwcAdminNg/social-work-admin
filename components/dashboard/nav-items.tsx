@@ -23,6 +23,12 @@ export const dashboardNavItems: NavItem[] = [
     adminOnly: true,
   },
   {
+    label: "Payments",
+    href: "/dashboard/payments",
+    icon: IconReceipt,
+    adminOnly: true,
+  },
+  {
     label: "User Management",
     href: "/dashboard/user-management",
     icon: IconUsers,
