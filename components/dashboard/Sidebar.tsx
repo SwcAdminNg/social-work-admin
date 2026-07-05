@@ -16,9 +16,12 @@ function isActive(pathname: string, href: string) {
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { mobileOpen, setMobileOpen, collapsed, toggleCollapsed } = useSidebar();
+  const { mobileOpen, setMobileOpen, collapsed, toggleCollapsed } =
+    useSidebar();
   const isAdmin = session?.user?.userType === "ADMIN";
-  const visibleNavItems = dashboardNavItems.filter((item) => !item.adminOnly || isAdmin);
+  const visibleNavItems = dashboardNavItems.filter(
+    (item) => !item.adminOnly || isAdmin,
+  );
 
   return (
     <>
@@ -27,7 +30,9 @@ export function Sidebar() {
         onClick={() => setMobileOpen(false)}
         aria-hidden="true"
         className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
       />
 
@@ -47,12 +52,14 @@ export function Sidebar() {
             <div className="w-9 h-9 rounded-xl bg-[#2D6A4F] flex items-center justify-center flex-shrink-0">
               <IconLogoMark />
             </div>
-            <div className={`leading-tight transition-opacity duration-200 whitespace-nowrap ${collapsed ? "lg:opacity-0 lg:w-0" : "opacity-100"}`}>
+            <div
+              className={`leading-tight transition-opacity duration-200 whitespace-nowrap ${collapsed ? "lg:opacity-0 lg:w-0" : "opacity-100"}`}
+            >
               <p className="text-gray-900 dark:text-white font-bold text-[0.9rem]">
                 Social Work Nigeria
               </p>
               <p className="text-[#2D6A4F] dark:text-[#52b788] text-[0.6rem] uppercase tracking-widest font-semibold">
-                Consultancy
+                ADMIN PANEL
               </p>
             </div>
           </Link>
@@ -90,7 +97,9 @@ export function Sidebar() {
                     <span className="flex-shrink-0">
                       <Icon />
                     </span>
-                    <span className={`whitespace-nowrap transition-opacity duration-200 ${collapsed ? "lg:hidden" : ""}`}>
+                    <span
+                      className={`whitespace-nowrap transition-opacity duration-200 ${collapsed ? "lg:hidden" : ""}`}
+                    >
                       {label}
                     </span>
                   </Link>
@@ -106,7 +115,9 @@ export function Sidebar() {
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="hidden lg:flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-xl text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/70 hover:text-gray-900 dark:hover:text-gray-200 transition-colors cursor-pointer"
         >
-          <span className={`flex-shrink-0 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}>
+          <span
+            className={`flex-shrink-0 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
+          >
             <IconChevronsLeft />
           </span>
           <span className={collapsed ? "hidden" : ""}>Collapse</span>
@@ -122,7 +133,11 @@ export function Sidebar() {
             <span className="flex-shrink-0">
               <IconLogout />
             </span>
-            <span className={`whitespace-nowrap ${collapsed ? "lg:hidden" : ""}`}>Logout</span>
+            <span
+              className={`whitespace-nowrap ${collapsed ? "lg:hidden" : ""}`}
+            >
+              Logout
+            </span>
           </Link>
         </div>
       </aside>
