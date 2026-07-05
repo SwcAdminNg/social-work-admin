@@ -3,7 +3,8 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getUserTransactions, getUserCourses, getUserCards, getUserDetails } from "@/lib/api/customer-support";
+import { getUserTransactions, getUserCourses, getUserCards } from "@/lib/api/customer-support";
+import { getUserDetails } from "@/lib/api/users";
 import { IconReceipt, IconBookOpen, IconLock } from "@/components/dashboard/icons";
 import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -72,7 +73,7 @@ export default function UserProfilePage() {
 
       <div className="flex flex-col gap-2 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.full_name : "User Profile"}
+          {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.username : "User Profile"}
         </h1>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
           {user?.email && (

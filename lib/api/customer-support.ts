@@ -4,7 +4,6 @@ import type {
   TransactionReadDTO,
   SavedCardResponse,
   CourseTransactionReadDTO,
-  UserReadDTO,
 } from "./payments.types";
 import type { Course } from "./courses.types";
 
@@ -97,11 +96,4 @@ export async function getCourseTransactions(
     page_size: res.meta?.page_size || limit,
     total_pages: res.meta?.total_pages || 1,
   };
-}
-
-export async function getUserDetails(
-  userId: string
-): Promise<UserReadDTO> {
-  const res = await request<UserReadDTO>(`/users/${userId}`);
-  return res.data;
 }

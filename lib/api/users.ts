@@ -211,3 +211,21 @@ export async function updateCurrentUser(
 
   return payload as ApiResponse<User>;
 }
+
+export async function getUserDetails(userId: string): Promise<User> {
+  const path = `/api/users/${userId}`;
+  const res = await fetch(path);
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return (payload as ApiResponse<User>).data;
+}
