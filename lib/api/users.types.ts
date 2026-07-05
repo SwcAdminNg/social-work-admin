@@ -27,3 +27,27 @@ export interface UsersApiResponse {
     has_previous: boolean;
   };
 }
+
+export interface InviteAdminRequestDTO {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  phone_number?: string | null;
+  platform: "NG" | "COM";
+}
+
+export interface AdminInviteResponseDTO {
+  user: User;
+}
+
+export interface AcceptAdminInviteRequestDTO {
+  token: string;
+  password?: string;
+  confirm_password?: string;
+}
+
+export interface ApiResponse<T> {
+  message: string;
+  data: T;
+}

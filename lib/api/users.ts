@@ -1,5 +1,11 @@
 import { ApiError } from "./client";
-import { UsersApiResponse } from "./users.types";
+import {
+  UsersApiResponse,
+  InviteAdminRequestDTO,
+  AdminInviteResponseDTO,
+  AcceptAdminInviteRequestDTO,
+  ApiResponse,
+} from "./users.types";
 
 export type GetUsersParams = {
   page?: number;
@@ -38,4 +44,56 @@ export async function getUsers(
   }
 
   return payload as UsersApiResponse;
+}
+
+export async function inviteAdmin(
+  data: InviteAdminRequestDTO,
+): Promise<ApiResponse<AdminInviteResponseDTO>> {
+  const path = `/api/admin/invite`;
+  const res = await fetch(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<AdminInviteResponseDTO>;
+}
+
+export async function acceptAdminInvite(
+  data: AcceptAdminInviteRequestDTO,
+): Promise<ApiResponse<{ message: string }>> {
+  const path = `/api/admin/accept-invite`;
+  const res = await fetch(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<{ message: string }>;
 }

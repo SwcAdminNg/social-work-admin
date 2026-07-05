@@ -10,6 +10,7 @@ import { Pagination } from "@/components/generic/ui/Pagination";
 import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconSearch, IconUsers } from "@/components/dashboard/icons";
+import { InviteAdminModal } from "./InviteAdminModal";
 
 const PAGE_SIZE = 10;
 
@@ -93,6 +94,7 @@ export function UserList() {
   const [userType, setUserType] = React.useState("all");
   const [search, setSearch] = React.useState("");
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isInviteModalOpen, setIsInviteModalOpen] = React.useState(false);
 
   const queryParams = {
     page,
@@ -148,13 +150,21 @@ export function UserList() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          User Management
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          A list of all the users in your account including their name, title, email and role.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            User Management
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            A list of all the users in your account including their name, title, email and role.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsInviteModalOpen(true)}
+          className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors shadow-sm shrink-0"
+        >
+          Invite Admin
+        </button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -225,6 +235,11 @@ export function UserList() {
       {meta && meta.total_pages > 1 && (
         <Pagination currentPage={page} totalPages={meta.total_pages} onPageChange={setPage} />
       )}
+
+      <InviteAdminModal 
+        isOpen={isInviteModalOpen} 
+        onClose={() => setIsInviteModalOpen(false)} 
+      />
     </div>
   );
 }
