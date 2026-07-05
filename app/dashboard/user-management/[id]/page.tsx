@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getUserTransactions, getUserCourses, getUserCards } from "@/lib/api/customer-support";
+import { getUserTransactions, getUserCourses, getUserCards, getUserDetails } from "@/lib/api/customer-support";
 import { IconReceipt, IconBookOpen, IconLock } from "@/components/dashboard/icons";
 import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
@@ -57,7 +57,10 @@ export default function UserProfilePage() {
     enabled: tab === "cards",
   });
 
-  const user = txData?.items?.[0]?.user;
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["user_details", userId],
+    queryFn: () => getUserDetails(userId),
+  });
 
   return (
     <div className="flex flex-col gap-6">
