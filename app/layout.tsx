@@ -4,6 +4,7 @@ import "./globals.css";
 import ThemeProvider from "@/components/generic/ThemeProvider";
 import ThemeToggle from "@/components/generic/ThemeToggle";
 import AuthSessionProvider from "@/components/generic/AuthSessionProvider";
+import QueryProvider from "@/components/generic/QueryProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -26,10 +27,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased`}>
         <AuthSessionProvider>
-          <ThemeProvider>
-            {children}
-            <ThemeToggle />
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              {children}
+              <ThemeToggle />
+            </ThemeProvider>
+          </QueryProvider>
         </AuthSessionProvider>
       </body>
     </html>

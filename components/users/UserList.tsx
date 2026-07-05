@@ -2,13 +2,16 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getUsers } from "@/lib/api/users";
-import { User, UsersApiResponse } from "@/lib/api/users.types";
+import { User } from "@/lib/api/users.types";
 import { CustomDropdown } from "@/components/generic/ui/CustomDropdown";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconSearch, IconUsers } from "@/components/dashboard/icons";
+
+const PAGE_SIZE = 10;
 
 const platformOptions = [
   { value: "all", label: "All Platforms" },
@@ -84,10 +87,6 @@ function UserIdentity({ user }: { user: User }) {
 
 export function UserList() {
   const { data: session } = useSession();
-  const [users, setUsers] = React.useState<User[]>([]);
-  const [meta, setMeta] = React.useState<UsersApiResponse["meta"] | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
 
   const [page, setPage] = React.useState(1);
   const [platform, setPlatform] = React.useState("all");
@@ -95,37 +94,23 @@ export function UserList() {
   const [search, setSearch] = React.useState("");
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  React.useEffect(() => {
-    const fetchUsers = async () => {
-      if (!session) return;
+  const queryParams = {
+    page,
+    pageSize: PAGE_SIZE,
+    platform: platform === "all" ? undefined : (platform as "NG" | "COM"),
+    userType: userType === "all" ? undefined : (userType as "USER" | "INSTRUCTOR" | "ADMIN"),
+    search: searchTerm || undefined,
+  };
 
-      setLoading(true);
-      setError(null);
+  const { data, isLoading, isFetching, isError } = useQuery({
+    queryKey: ["users", queryParams],
+    queryFn: () => getUsers(queryParams),
+    enabled: !!session,
+    placeholderData: keepPreviousData,
+  });
 
-      try {
-        const params = {
-          page,
-          platform: platform === "all" ? undefined : (platform as "NG" | "COM"),
-          userType: userType === "all" ? undefined : (userType as "USER" | "INSTRUCTOR" | "ADMIN"),
-          search: searchTerm,
-        };
-        const response = await getUsers(params);
-        setUsers(response.data);
-        setMeta(response.meta);
-      } catch (err) {
-        setError("Failed to fetch users. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const debounceFetch = setTimeout(() => {
-      fetchUsers();
-    }, 500);
-
-    return () => clearTimeout(debounceFetch);
-  }, [session, page, platform, userType, searchTerm]);
+  const users = data?.data ?? [];
+  const meta = data?.meta ?? null;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -211,19 +196,19 @@ export function UserList() {
         </div>
       </div>
 
-      {error && (
+      {isError && (
         <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-400">
-          {error}
+          Failed to fetch users. Please try again later.
         </div>
       )}
 
-      {!error && (
-        <div className={`transition-opacity duration-200 ${loading && users.length > 0 ? "opacity-60" : ""}`}>
+      {!isError && (
+        <div className={`transition-opacity duration-200 ${isFetching && users.length > 0 ? "opacity-60" : ""}`}>
           <DataTable
             columns={columns}
             data={users}
             keyExtractor={(user) => user.id}
-            loading={loading && users.length === 0}
+            loading={isLoading}
             skeletonRows={6}
             cardTitle={(user) => <UserIdentity user={user} />}
             emptyState={
