@@ -71,6 +71,8 @@ export interface CourseQuizQuestion {
 
 export interface CourseQuiz {
   id: string;
+  title: string;
+  description: string;
   passing_score_percentage: number;
   questions: CourseQuizQuestion[];
 }

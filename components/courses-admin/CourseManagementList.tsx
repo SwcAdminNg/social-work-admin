@@ -11,6 +11,7 @@ import { IconBookOpen, IconPlus } from "@/components/dashboard/icons";
 import { CourseCard } from "./CourseCard";
 import { CourseFilters } from "./CourseFilters";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { Pagination } from "@/components/generic/ui/Pagination";
 
 type Tab = "all" | "published" | "draft";
 
@@ -147,32 +148,15 @@ export function CourseManagementList({ initialData }: CourseManagementListProps)
       )}
 
       {result.meta.total_pages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            disabled={!result.meta.has_previous || pending}
-            onClick={() => {
-              setPage(page - 1);
-              fetchWith({ page: page - 1 });
-            }}
-            className="px-3.5 py-2 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-          >
-            Previous
-          </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Page {result.meta.page} of {result.meta.total_pages}
-          </span>
-          <button
-            type="button"
-            disabled={!result.meta.has_next || pending}
-            onClick={() => {
-              setPage(page + 1);
-              fetchWith({ page: page + 1 });
-            }}
-            className="px-3.5 py-2 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-          >
-            Next
-          </button>
+        <div className="mt-4">
+            <Pagination
+                currentPage={page}
+                totalPages={result.meta.total_pages}
+                onPageChange={(p) => {
+                    setPage(p);
+                    fetchWith({ page: p });
+                }}
+            />
         </div>
       )}
 

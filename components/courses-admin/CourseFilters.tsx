@@ -4,8 +4,17 @@ import { useState } from "react";
 import type { ManagedCourseListParams } from "@/lib/api/courses.types";
 import { IconSearch } from "@/components/dashboard/icons";
 import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
+import { CustomDropdown } from "@/components/generic/ui/CustomDropdown";
 
 type FilterValue = Pick<ManagedCourseListParams, "search" | "category" | "level" | "is_free">;
+
+const categoryOptions = [{ value: "all", label: "All Categories" }, ...CATEGORY_OPTIONS];
+const levelOptions = [{ value: "all", label: "All Levels" }, ...LEVEL_OPTIONS];
+const priceOptions = [
+    { value: "all", label: "Free & Paid" },
+    { value: "true", label: "Free only" },
+    { value: "false", label: "Paid only" },
+];
 
 export function CourseFilters({
   value,
@@ -37,50 +46,33 @@ export function CourseFilters({
         />
       </form>
 
-      <select
-        value={value.category ?? ""}
-        onChange={(e) =>
-          onChange({ ...value, category: (e.target.value || undefined) as FilterValue["category"] })
-        }
-        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-      >
-        <option value="">All categories</option>
-        {CATEGORY_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <div className="w-full sm:w-auto">
+        <CustomDropdown
+            options={categoryOptions}
+            value={value.category ?? "all"}
+            onChange={(val) => onChange({ ...value, category: val === "all" ? undefined : (val as FilterValue["category"]) })}
+            ariaLabel="Filter by category"
+        />
+      </div>
 
-      <select
-        value={value.level ?? ""}
-        onChange={(e) =>
-          onChange({ ...value, level: (e.target.value || undefined) as FilterValue["level"] })
-        }
-        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-      >
-        <option value="">All levels</option>
-        {LEVEL_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <div className="w-full sm:w-auto">
+        <CustomDropdown
+            options={levelOptions}
+            value={value.level ?? "all"}
+            onChange={(val) => onChange({ ...value, level: val === "all" ? undefined : (val as FilterValue["level"]) })}
+            ariaLabel="Filter by level"
+        />
+      </div>
 
-      <select
-        value={value.is_free === undefined ? "" : String(value.is_free)}
-        onChange={(e) =>
-          onChange({
-            ...value,
-            is_free: e.target.value === "" ? undefined : e.target.value === "true",
-          })
-        }
-        className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-      >
-        <option value="">Free &amp; paid</option>
-        <option value="true">Free only</option>
-        <option value="false">Paid only</option>
-      </select>
+      <div className="w-full sm:w-auto">
+        <CustomDropdown
+            options={priceOptions}
+            value={value.is_free === undefined ? "all" : String(value.is_free)}
+            onChange={(val) => onChange({ ...value, is_free: val === "all" ? undefined : val === "true" })}
+            ariaLabel="Filter by price"
+        />
+      </div>
     </div>
   );
 }
+
