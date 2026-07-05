@@ -9,6 +9,7 @@ import { IconSpinner } from "@/components/dashboard/icons";
 import { TextField, TextAreaField, SelectField, ToggleField } from "./FormControls";
 import { DynamicStringListInput } from "./DynamicStringListInput";
 import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
+import { ThumbnailUploader } from "./ThumbnailUploader";
 
 export function CourseDetailsTab({
   course,
@@ -65,13 +66,11 @@ export function CourseDetailsTab({
       <TextField label="Title" id="title" value={title} onChange={setTitle} required />
       <TextAreaField label="Description" id="description" value={description} onChange={setDescription} required />
       <TextField label="Prerequisite" id="prerequisite" value={prerequisite} onChange={setPrerequisite} placeholder="Optional" />
-      <TextField
-        label="Thumbnail URL"
-        id="thumbnail_url"
-        value={thumbnailUrl}
-        onChange={setThumbnailUrl}
-        placeholder="https://…"
-        hint="Optional — paste a hosted image URL."
+      
+      <ThumbnailUploader
+        courseId={course.id}
+        currentThumbnail={thumbnailUrl}
+        onThumbnailUploaded={setThumbnailUrl}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

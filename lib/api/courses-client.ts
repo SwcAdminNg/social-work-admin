@@ -268,3 +268,17 @@ export async function deleteQuizQuestion(questionId: string): Promise<void> {
 export async function deleteQuizOption(optionId: string): Promise<void> {
   await request(`/quiz/options/${optionId}`, { method: "DELETE" });
 }
+
+export async function getThumbnailUploadUrl(
+  courseId: string,
+  payload: { file_name: string; content_type: string },
+): Promise<{ upload_url: string; thumbnail_url: string }> {
+  const res = await request<{ upload_url: string; thumbnail_url: string }>(
+    `/manage/${courseId}/thumbnail-upload-url`,
+    {
+      method: "POST",
+      body: payload,
+    },
+  );
+  return res.data;
+}
