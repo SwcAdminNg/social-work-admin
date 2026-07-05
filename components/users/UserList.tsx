@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconSearch, IconUsers } from "@/components/dashboard/icons";
 import { InviteAdminModal } from "./InviteAdminModal";
 import { toast } from "sonner";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "Never logged in";
@@ -117,18 +118,6 @@ function UserIdentity({ user }: { user: User }) {
 
 function UserActions({ user }: { user: User }) {
   const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const menuRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const suspendMutation = useMutation({
     mutationFn: () => suspendUser(user.id),
@@ -158,55 +147,55 @@ function UserActions({ user }: { user: User }) {
   });
 
   return (
-    <div className="relative flex justify-end" ref={menuRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 focus:outline-none"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-      </button>
-      {isOpen && (
-        <div className="absolute right-0 mt-8 w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          className="w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+        >
           {user.is_suspended ? (
-            <button
-              className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-              onClick={() => {
-                unsuspendMutation.mutate();
-                setIsOpen(false);
-              }}
-            >
-              Unsuspend
-            </button>
+            <DropdownMenu.Item asChild>
+              <button
+                className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                onClick={() => unsuspendMutation.mutate()}
+              >
+                Unsuspend
+              </button>
+            </DropdownMenu.Item>
           ) : (
-            <button
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
-              onClick={() => {
-                suspendMutation.mutate();
-                setIsOpen(false);
-              }}
-            >
-              Suspend
-            </button>
+            <DropdownMenu.Item asChild>
+              <button
+                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                onClick={() => suspendMutation.mutate()}
+              >
+                Suspend
+              </button>
+            </DropdownMenu.Item>
           )}
-          <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
-          <div className="px-4 py-1.5 text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Change Role</div>
+          <DropdownMenu.Separator className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+          <DropdownMenu.Label className="px-4 py-1.5 text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">
+            Change Role
+          </DropdownMenu.Label>
           {(["USER", "INSTRUCTOR", "ADMIN"] as const).map(role => (
             role !== user.user_type && (
-              <button
-                key={role}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => {
-                  roleMutation.mutate(role);
-                  setIsOpen(false);
-                }}
-              >
-                Make {role}
-              </button>
+              <DropdownMenu.Item asChild key={role}>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                  onClick={() => roleMutation.mutate(role)}
+                >
+                  Make {role}
+                </button>
+              </DropdownMenu.Item>
             )
           ))}
-        </div>
-      )}
-    </div>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
 
