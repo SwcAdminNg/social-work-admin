@@ -112,15 +112,26 @@ export function AddItemModal({
         };
         xhr.onload = async () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            await finalizeDocument(result.id, {
-              mime_type: file.type,
-              file_size_bytes: file.size,
-            });
-            if (result.document) {
-              result.document.is_uploaded = true;
+            try {
+              await finalizeDocument(result.id, {
+                mime_type: file.type,
+                file_size_bytes: file.size,
+              });
+              if (result.document) {
+                result.document.is_uploaded = true;
+              }
+              onCreated(result);
+              reset();
+              onClose();
+            } catch (error) {
+              toast.error(
+                error instanceof ApiError
+                  ? error.message
+                  : "Failed to finalize upload.",
+              );
+              setSubmitting(false);
+              setUploadProgress(null);
             }
-            onCreated(result);
-            reset();
           } else {
             toast.error("File upload failed.");
             setSubmitting(false);
@@ -136,6 +147,7 @@ export function AddItemModal({
       } else {
         onCreated(result);
         reset();
+        onClose();
       }
     } catch (error) {
       toast.error(
@@ -224,9 +236,9 @@ export function AddItemModal({
                 </button>
               ) : (
                 <div className="flex items-center justify-between gap-3 text-sm px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800">
-                  <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
+                  <div className="font-medium text-gray-800 dark:text-gray-200 truncate flex-1 min-w-0">
                     {file.name}
-                  </span>
+                  </div>
                   <button
                     type="button"
                     onClick={clearFile}
