@@ -9,6 +9,7 @@ import { Pagination } from "@/components/generic/ui/Pagination";
 import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconReceipt } from "@/components/dashboard/icons";
+import Link from "next/link";
 
 const PAGE_SIZE = 20;
 
@@ -69,8 +70,18 @@ export default function PaymentsPage() {
     },
     {
       key: "user",
-      header: "User ID",
-      render: (txn) => <span className="text-sm font-mono text-gray-500 dark:text-gray-400">{txn.user_id.slice(0, 8)}...</span>,
+      header: "User",
+      render: (txn) => (
+        <Link 
+          href={`/dashboard/user-management/${txn.user.id}`}
+          className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
+        >
+          <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
+            {txn.user.full_name || `${txn.user.first_name || ""} ${txn.user.last_name || ""}`.trim() || "User"}
+          </span>
+          <span className="text-xs text-gray-500">{txn.user.email}</span>
+        </Link>
+      ),
     },
     {
       key: "reference",

@@ -3,7 +3,7 @@ export type TransactionType = "COURSE_PURCHASE" | "SUBSCRIPTION" | "DONATION" | 
 
 export interface TransactionReadDTO {
   id: string;
-  user_id: string;
+  user: UserReadDTO;
   amount: number;
   reference: string;
   gateway: string;
@@ -56,8 +56,14 @@ export interface SavedCardResponse {
 export interface UserReadDTO {
   id: string;
   email: string;
-  full_name: string;
+  full_name?: string;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone_number?: string;
   user_type: string;
+  is_active?: boolean;
+  is_suspended?: boolean;
 }
 
 export interface CourseTransactionReadDTO {

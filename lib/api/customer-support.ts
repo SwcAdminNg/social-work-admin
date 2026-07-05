@@ -46,7 +46,7 @@ export async function getUserTransactions(
   const res = await request<TransactionReadDTO[]>(`/users/${userId}/transactions?${query}`);
   return {
     items: res.data,
-    total: res.meta?.total_items || 0,
+    total_items: res.meta?.total_items || 0,
     page: res.meta?.page || page,
     page_size: res.meta?.page_size || limit,
     total_pages: res.meta?.total_pages || 1,
@@ -65,7 +65,7 @@ export async function getUserCourses(
   const res = await request<Course[]>(`/users/${userId}/courses?${query}`);
   return {
     items: res.data,
-    total: res.meta?.total_items || 0,
+    total_items: res.meta?.total_items || 0,
     page: res.meta?.page || page,
     page_size: res.meta?.page_size || limit,
     total_pages: res.meta?.total_pages || 1,
@@ -91,7 +91,7 @@ export async function getCourseTransactions(
   const res = await request<CourseTransactionReadDTO[]>(`/courses/${courseId}/transactions?${query}`);
   return {
     items: res.data,
-    total: res.meta?.total_items || 0,
+    total_items: res.meta?.total_items || 0,
     page: res.meta?.page || page,
     page_size: res.meta?.page_size || limit,
     total_pages: res.meta?.total_pages || 1,

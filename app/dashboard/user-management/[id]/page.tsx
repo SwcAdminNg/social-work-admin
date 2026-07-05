@@ -57,6 +57,8 @@ export default function UserProfilePage() {
     enabled: tab === "cards",
   });
 
+  const user = txData?.items?.[0]?.user;
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -65,9 +67,48 @@ export default function UserProfilePage() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">User Profile</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">ID: {userId}</p>
+      <div className="flex flex-col gap-2 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.full_name : "User Profile"}
+        </h1>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
+          {user?.email && (
+            <div className="flex flex-col">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Email</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{user.email}</span>
+            </div>
+          )}
+          {user?.username && (
+            <div className="flex flex-col">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Username</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">@{user.username}</span>
+            </div>
+          )}
+          {user?.phone_number && (
+            <div className="flex flex-col">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Phone</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{user.phone_number}</span>
+            </div>
+          )}
+          <div className="flex flex-col">
+            <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">User ID</span>
+            <span className="text-sm font-mono text-gray-500 dark:text-gray-400">{userId}</span>
+          </div>
+          {user && (
+            <div className="flex flex-col">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Status</span>
+              <span className="mt-0.5">
+                {user.is_suspended ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">Suspended</span>
+                ) : user.is_active ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">Active</span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400">Inactive</span>
+                )}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start">

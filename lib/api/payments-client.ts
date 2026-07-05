@@ -37,7 +37,7 @@ async function request<T>(
 
 export async function getAdminPayments(
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
 ): Promise<PaginatedResponse<TransactionReadDTO>> {
   const query = new URLSearchParams({
     page: page.toString(),
@@ -46,30 +46,38 @@ export async function getAdminPayments(
   const res = await request<TransactionReadDTO[]>(`/transactions?${query}`);
   return {
     items: res.data,
-    total: res.meta?.total_items || 0,
+    total_items: res.meta?.total_items || 0,
     page: res.meta?.page || page,
     page_size: res.meta?.page_size || pageSize,
     total_pages: res.meta?.total_pages || 1,
   };
 }
 
-export async function getSubscriptionPlans(): Promise<SubscriptionPlanResponse[]> {
-  const res = await request<SubscriptionPlanResponse[]>(`/plans`);
+export async function getSubscriptionPlans(): Promise<
+  SubscriptionPlanResponse[]
+> {
+  const res = await request<SubscriptionPlanResponse[]>(`/plans/all`);
   return res.data;
 }
 
 export async function createSubscriptionPlan(
-  payload: CreateSubscriptionPlanPayload
+  payload: CreateSubscriptionPlanPayload,
 ): Promise<SubscriptionPlanResponse> {
-  const res = await request<SubscriptionPlanResponse>(`/plans`, { method: "POST", body: payload });
+  const res = await request<SubscriptionPlanResponse>(`/plans`, {
+    method: "POST",
+    body: payload,
+  });
   return res.data;
 }
 
 export async function updateSubscriptionPlan(
   planId: string,
-  payload: UpdateSubscriptionPlanPayload
+  payload: UpdateSubscriptionPlanPayload,
 ): Promise<SubscriptionPlanResponse> {
-  const res = await request<SubscriptionPlanResponse>(`/plans/${planId}`, { method: "PATCH", body: payload });
+  const res = await request<SubscriptionPlanResponse>(`/plans/${planId}`, {
+    method: "PATCH",
+    body: payload,
+  });
   return res.data;
 }
 

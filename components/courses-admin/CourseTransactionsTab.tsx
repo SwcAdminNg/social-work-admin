@@ -8,6 +8,7 @@ import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { IconReceipt } from "@/components/dashboard/icons";
+import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
@@ -71,10 +72,15 @@ export function CourseTransactionsTab({ courseId }: { courseId: string }) {
             key: "user", 
             header: "User", 
             render: (t) => (
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">{t.user.full_name}</span>
+              <Link 
+                href={`/dashboard/user-management/${t.user.id}`}
+                className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
+              >
+                <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
+                  {t.user.full_name || `${t.user.first_name || ""} ${t.user.last_name || ""}`.trim() || "User"}
+                </span>
                 <span className="text-xs text-gray-500">{t.user.email}</span>
-              </div>
+              </Link>
             ) 
           },
           { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-bold text-gray-900 dark:text-white">₦{t.amount.toLocaleString()}</span> },
