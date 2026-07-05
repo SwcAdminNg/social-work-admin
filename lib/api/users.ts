@@ -5,6 +5,8 @@ import {
   AdminInviteResponseDTO,
   AcceptAdminInviteRequestDTO,
   ApiResponse,
+  User,
+  ChangeUserRoleRequestDTO,
 } from "./users.types";
 
 export type GetUsersParams = {
@@ -96,4 +98,71 @@ export async function acceptAdminInvite(
   }
 
   return payload as ApiResponse<{ message: string }>;
+}
+
+export async function suspendUser(userId: string): Promise<ApiResponse<User>> {
+  const path = `/api/users/${userId}/suspend`;
+  const res = await fetch(path, {
+    method: "POST",
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<User>;
+}
+
+export async function unsuspendUser(userId: string): Promise<ApiResponse<User>> {
+  const path = `/api/users/${userId}/unsuspend`;
+  const res = await fetch(path, {
+    method: "POST",
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<User>;
+}
+
+export async function changeUserRole(
+  userId: string,
+  data: ChangeUserRoleRequestDTO
+): Promise<ApiResponse<User>> {
+  const path = `/api/users/${userId}/role`;
+  const res = await fetch(path, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<User>;
 }

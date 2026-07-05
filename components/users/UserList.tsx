@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { useSession } from "next-auth/react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getUsers } from "@/lib/api/users";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUsers, suspendUser, unsuspendUser, changeUserRole } from "@/lib/api/users";
 import { User } from "@/lib/api/users.types";
 import { CustomDropdown } from "@/components/generic/ui/CustomDropdown";
 import { Pagination } from "@/components/generic/ui/Pagination";
@@ -11,6 +11,24 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconSearch, IconUsers } from "@/components/dashboard/icons";
 import { InviteAdminModal } from "./InviteAdminModal";
+import { toast } from "sonner";
+
+function formatTimeAgo(dateString?: string) {
+  if (!dateString) return "Never logged in";
+  const date = new Date(dateString);
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " years ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " months ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " days ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " hours ago";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + " minutes ago";
+  return Math.floor(seconds) + " seconds ago";
+}
 
 const PAGE_SIZE = 10;
 
@@ -51,7 +69,15 @@ function PlatformBadge({ platform }: { platform: User["platform"] }) {
   );
 }
 
-function ActiveBadge({ isActive }: { isActive: boolean }) {
+function ActiveBadge({ isActive, isSuspended }: { isActive: boolean; isSuspended?: boolean }) {
+  if (isSuspended) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+        Suspended
+      </span>
+    );
+  }
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide ${
@@ -80,8 +106,106 @@ function UserIdentity({ user }: { user: User }) {
         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
           {user.first_name} {user.last_name}
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+          <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 hidden sm:inline-block">• Last active: {formatTimeAgo(user.last_login_at)}</span>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function UserActions({ user }: { user: User }) {
+  const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const suspendMutation = useMutation({
+    mutationFn: () => suspendUser(user.id),
+    onSuccess: () => {
+      toast.success("User suspended");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const unsuspendMutation = useMutation({
+    mutationFn: () => unsuspendUser(user.id),
+    onSuccess: () => {
+      toast.success("User unsuspended");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const roleMutation = useMutation({
+    mutationFn: (role: "USER" | "INSTRUCTOR" | "ADMIN") => changeUserRole(user.id, { role }),
+    onSuccess: () => {
+      toast.success("Role updated");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  return (
+    <div className="relative flex justify-end" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 focus:outline-none"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-8 w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+          {user.is_suspended ? (
+            <button
+              className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+              onClick={() => {
+                unsuspendMutation.mutate();
+                setIsOpen(false);
+              }}
+            >
+              Unsuspend
+            </button>
+          ) : (
+            <button
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+              onClick={() => {
+                suspendMutation.mutate();
+                setIsOpen(false);
+              }}
+            >
+              Suspend
+            </button>
+          )}
+          <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+          <div className="px-4 py-1.5 text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Change Role</div>
+          {(["USER", "INSTRUCTOR", "ADMIN"] as const).map(role => (
+            role !== user.user_type && (
+              <button
+                key={role}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => {
+                  roleMutation.mutate(role);
+                  setIsOpen(false);
+                }}
+              >
+                Make {role}
+              </button>
+            )
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -144,7 +268,12 @@ export function UserList() {
     {
       key: "status",
       header: "Status",
-      render: (user) => <ActiveBadge isActive={user.is_active} />,
+      render: (user) => <ActiveBadge isActive={user.is_active} isSuspended={user.is_suspended} />,
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (user) => <UserActions user={user} />,
     },
   ];
 

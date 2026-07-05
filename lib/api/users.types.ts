@@ -11,6 +11,7 @@ export interface User {
   platform: "NG" | "COM";
   user_type: "USER" | "INSTRUCTOR" | "ADMIN";
   is_active: boolean;
+  is_suspended?: boolean;
   last_login_at?: string;
 }
 
@@ -50,4 +51,8 @@ export interface AcceptAdminInviteRequestDTO {
 export interface ApiResponse<T> {
   message: string;
   data: T;
+}
+
+export interface ChangeUserRoleRequestDTO {
+  role: "USER" | "INSTRUCTOR" | "ADMIN";
 }
