@@ -11,6 +11,8 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconSearch, IconUsers } from "@/components/dashboard/icons";
 import { InviteAdminModal } from "./InviteAdminModal";
+import { ChangeRoleModal } from "./ChangeRoleModal";
+import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import { toast } from "sonner";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -116,35 +118,15 @@ function UserIdentity({ user }: { user: User }) {
   );
 }
 
-function UserActions({ user }: { user: User }) {
-  const queryClient = useQueryClient();
-
-  const suspendMutation = useMutation({
-    mutationFn: () => suspendUser(user.id),
-    onSuccess: () => {
-      toast.success("User suspended");
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
-  const unsuspendMutation = useMutation({
-    mutationFn: () => unsuspendUser(user.id),
-    onSuccess: () => {
-      toast.success("User unsuspended");
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
-  const roleMutation = useMutation({
-    mutationFn: (role: "USER" | "INSTRUCTOR" | "ADMIN") => changeUserRole(user.id, { role }),
-    onSuccess: () => {
-      toast.success("Role updated");
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
+function UserActions({ 
+  user, 
+  onOpenRoleModal, 
+  onConfirmAction 
+}: { 
+  user: User; 
+  onOpenRoleModal: (user: User) => void;
+  onConfirmAction: (type: "suspend" | "unsuspend", user: User) => void;
+}) {
 
   return (
     <DropdownMenu.Root>
@@ -162,7 +144,7 @@ function UserActions({ user }: { user: User }) {
             <DropdownMenu.Item asChild>
               <button
                 className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
-                onClick={() => unsuspendMutation.mutate()}
+                onClick={() => onConfirmAction("unsuspend", user)}
               >
                 Unsuspend
               </button>
@@ -171,28 +153,21 @@ function UserActions({ user }: { user: User }) {
             <DropdownMenu.Item asChild>
               <button
                 className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
-                onClick={() => suspendMutation.mutate()}
+                onClick={() => onConfirmAction("suspend", user)}
               >
                 Suspend
               </button>
             </DropdownMenu.Item>
           )}
           <DropdownMenu.Separator className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
-          <DropdownMenu.Label className="px-4 py-1.5 text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">
-            Change Role
-          </DropdownMenu.Label>
-          {(["USER", "INSTRUCTOR", "ADMIN"] as const).map(role => (
-            role !== user.user_type && (
-              <DropdownMenu.Item asChild key={role}>
-                <button
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
-                  onClick={() => roleMutation.mutate(role)}
-                >
-                  Make {role}
-                </button>
-              </DropdownMenu.Item>
-            )
-          ))}
+          <DropdownMenu.Item asChild>
+            <button
+              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+              onClick={() => onOpenRoleModal(user)}
+            >
+              Change Role
+            </button>
+          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
@@ -208,6 +183,30 @@ export function UserList() {
   const [search, setSearch] = React.useState("");
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isInviteModalOpen, setIsInviteModalOpen] = React.useState(false);
+  const [roleModalUser, setRoleModalUser] = React.useState<User | null>(null);
+  const [confirmAction, setConfirmAction] = React.useState<{ type: "suspend" | "unsuspend"; user: User } | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const suspendMutation = useMutation({
+    mutationFn: (userId: string) => suspendUser(userId),
+    onSuccess: () => {
+      toast.success("User suspended");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setConfirmAction(null);
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const unsuspendMutation = useMutation({
+    mutationFn: (userId: string) => unsuspendUser(userId),
+    onSuccess: () => {
+      toast.success("User unsuspended");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setConfirmAction(null);
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
 
   const queryParams = {
     page,
@@ -262,7 +261,13 @@ export function UserList() {
     {
       key: "actions",
       header: "",
-      render: (user) => <UserActions user={user} />,
+      render: (user) => (
+        <UserActions 
+          user={user} 
+          onOpenRoleModal={setRoleModalUser} 
+          onConfirmAction={(type, u) => setConfirmAction({ type, user: u })} 
+        />
+      ),
     },
   ];
 
@@ -357,6 +362,31 @@ export function UserList() {
       <InviteAdminModal 
         isOpen={isInviteModalOpen} 
         onClose={() => setIsInviteModalOpen(false)} 
+      />
+      <ChangeRoleModal
+        isOpen={!!roleModalUser}
+        onClose={() => setRoleModalUser(null)}
+        user={roleModalUser}
+      />
+      <ConfirmModal
+        isOpen={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => {
+          if (confirmAction?.type === "suspend") {
+            suspendMutation.mutate(confirmAction.user.id);
+          } else if (confirmAction?.type === "unsuspend") {
+            unsuspendMutation.mutate(confirmAction.user.id);
+          }
+        }}
+        title={confirmAction?.type === "suspend" ? "Suspend User" : "Unsuspend User"}
+        description={
+          confirmAction?.type === "suspend"
+            ? `Are you sure you want to suspend ${confirmAction.user.first_name} ${confirmAction.user.last_name}? They will no longer be able to log in.`
+            : `Are you sure you want to restore ${confirmAction?.user.first_name} ${confirmAction?.user.last_name}'s access?`
+        }
+        confirmText={confirmAction?.type === "suspend" ? "Suspend" : "Unsuspend"}
+        isDestructive={confirmAction?.type === "suspend"}
+        isLoading={suspendMutation.isPending || unsuspendMutation.isPending}
       />
     </div>
   );

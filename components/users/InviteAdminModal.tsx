@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { inviteAdmin } from "@/lib/api/users";
+import { getUsernameSuggestions, checkUsernameAvailability } from "@/lib/api/auth";
 import { InviteAdminRequestDTO } from "@/lib/api/users.types";
+import { Modal } from "@/components/generic/ui/Modal";
 
 interface InviteAdminModalProps {
   isOpen: boolean;
@@ -22,6 +24,55 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
     platform: "NG",
   });
   const [error, setError] = useState<string | null>(null);
+
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  // Fetch suggestions when first_name and last_name are filled
+  React.useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (formData.first_name && formData.last_name) {
+        setIsLoadingSuggestions(true);
+        try {
+          const res = await getUsernameSuggestions(formData.first_name, formData.last_name);
+          const sug = res.data?.suggestions || [];
+          setSuggestions(sug);
+          
+          // Auto select first suggestion if username is empty
+          if (sug.length > 0 && !formData.username) {
+            setFormData((prev) => ({ ...prev, username: sug[0] }));
+            checkAvailability(sug[0]);
+          }
+        } catch (err) {
+          console.error("Failed to fetch suggestions", err);
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      }
+    };
+    
+    const timeoutId = setTimeout(fetchSuggestions, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.first_name, formData.last_name]);
+
+  const checkAvailability = async (username: string) => {
+    if (!username) {
+      setUsernameAvailable(null);
+      return;
+    }
+    setIsCheckingUsername(true);
+    try {
+      const res = await checkUsernameAvailability(username);
+      setUsernameAvailable(res.data?.available ?? null);
+    } catch (err) {
+      console.error("Failed to check username availability", err);
+      setUsernameAvailable(null);
+    } finally {
+      setIsCheckingUsername(false);
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: (data: InviteAdminRequestDTO) => inviteAdmin(data),
@@ -49,6 +100,17 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    if (name === "username") {
+      setUsernameAvailable(null);
+      // Optional: you can debounce this or check onBlur
+    }
+  };
+
+  const handleUsernameBlur = () => {
+    if (formData.username) {
+      checkAvailability(formData.username);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,29 +123,8 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
-      <div 
-        className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      />
-      
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
-        <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            Invite Admin
-          </h3>
-          <button 
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 focus:outline-none"
-          >
-            <span className="sr-only">Close</span>
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+    <Modal isOpen={isOpen} onClose={onClose} title="Invite Admin" maxWidth="md">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && (
             <div className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3.5 py-2.5 text-sm font-medium text-red-700 dark:text-red-400">
               {error}
@@ -122,8 +163,11 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
           </div>
 
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Username
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center justify-between">
+              <span>Username</span>
+              {isCheckingUsername && <span className="text-xs text-gray-500">Checking...</span>}
+              {!isCheckingUsername && usernameAvailable === true && <span className="text-xs text-green-600 dark:text-green-400">Available</span>}
+              {!isCheckingUsername && usernameAvailable === false && <span className="text-xs text-red-600 dark:text-red-400">Not available</span>}
             </label>
             <input
               id="username"
@@ -136,8 +180,33 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
               title="Only lowercase letters, numbers, dots, or underscores."
               value={formData.username}
               onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              onBlur={handleUsernameBlur}
+              className={`w-full rounded-xl border bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] ${
+                usernameAvailable === false
+                  ? "border-red-500 focus:ring-red-500"
+                  : usernameAvailable === true
+                  ? "border-green-500 focus:ring-green-500"
+                  : "border-gray-300 dark:border-gray-700"
+              }`}
             />
+            {suggestions.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {isLoadingSuggestions && <span className="text-xs text-gray-500 py-1">Loading suggestions...</span>}
+                {!isLoadingSuggestions && suggestions.map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, username: sug }));
+                      checkAvailability(sug);
+                    }}
+                    className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -204,7 +273,6 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

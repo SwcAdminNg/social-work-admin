@@ -40,3 +40,50 @@ export interface LoginResponse {
 export function login(payload: LoginPayload) {
   return apiClient.post<LoginResponse>("/auth/login", payload);
 }
+
+export interface UsernameSuggestionsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    suggestions: string[];
+  };
+}
+
+export interface UsernameAvailabilityResponse {
+  success: boolean;
+  message: string;
+  data: {
+    username: string;
+    available: boolean;
+  };
+}
+
+export async function getUsernameSuggestions(firstName: string, lastName: string): Promise<UsernameSuggestionsResponse> {
+  const query = new URLSearchParams({ first_name: firstName, last_name: lastName });
+  const res = await fetch(`/api/auth/username/suggestions?${query.toString()}`);
+  
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message = payload?.message ?? res.statusText;
+    throw new Error(message);
+  }
+
+  return payload as UsernameSuggestionsResponse;
+}
+
+export async function checkUsernameAvailability(username: string): Promise<UsernameAvailabilityResponse> {
+  const query = new URLSearchParams({ username });
+  const res = await fetch(`/api/auth/username/availability?${query.toString()}`);
+  
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message = payload?.message ?? res.statusText;
+    throw new Error(message);
+  }
+
+  return payload as UsernameAvailabilityResponse;
+}

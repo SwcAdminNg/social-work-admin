@@ -1,12 +1,14 @@
-import { EmptyState } from "@/components/dashboard/EmptyState";
-import { IconSettings } from "@/components/dashboard/icons";
+import { UserProfileForm } from "@/components/settings/UserProfileForm";
 
 export default function SettingsPage() {
   return (
-    <EmptyState
-      icon={IconSettings}
-      title="Account settings"
-      description="Password, notification preferences, and account settings will live here."
-    />
+    <div className="space-y-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your account settings and preferences.</p>
+      </div>
+      
+      <UserProfileForm />
+    </div>
   );
 }

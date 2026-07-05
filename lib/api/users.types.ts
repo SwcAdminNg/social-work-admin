@@ -9,7 +9,9 @@ export interface User {
   username: string;
   phone_number: string;
   platform: "NG" | "COM";
+  gender?: "MALE" | "FEMALE" | "OTHER";
   user_type: "USER" | "INSTRUCTOR" | "ADMIN";
+  address?: string;
   is_active: boolean;
   is_suspended?: boolean;
   last_login_at?: string;
@@ -55,4 +57,13 @@ export interface ApiResponse<T> {
 
 export interface ChangeUserRoleRequestDTO {
   role: "USER" | "INSTRUCTOR" | "ADMIN";
+}
+
+export interface UserUpdateDTO {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone_number?: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
+  address?: string;
 }

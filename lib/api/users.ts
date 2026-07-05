@@ -7,6 +7,7 @@ import {
   ApiResponse,
   User,
   ChangeUserRoleRequestDTO,
+  UserUpdateDTO,
 } from "./users.types";
 
 export type GetUsersParams = {
@@ -145,6 +146,50 @@ export async function changeUserRole(
   data: ChangeUserRoleRequestDTO
 ): Promise<ApiResponse<User>> {
   const path = `/api/users/${userId}/role`;
+  const res = await fetch(path, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<User>;
+}
+
+export async function getCurrentUser(): Promise<ApiResponse<User>> {
+  const path = `/api/users/me`;
+  const res = await fetch(path);
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return payload as ApiResponse<User>;
+}
+
+export async function updateCurrentUser(
+  data: UserUpdateDTO
+): Promise<ApiResponse<User>> {
+  const path = `/api/users/me`;
   const res = await fetch(path, {
     method: "PATCH",
     headers: {
