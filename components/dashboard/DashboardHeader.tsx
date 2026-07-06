@@ -48,7 +48,8 @@ export function DashboardHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 h-[72px] flex items-center justify-between gap-3 px-4 sm:px-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+    <>
+      <header className="sticky top-0 z-30 h-[72px] flex items-center justify-between gap-3 px-4 sm:px-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile sidebar trigger */}
         <button
@@ -123,8 +124,9 @@ export function DashboardHeader() {
           <IconLogout />
         </button>
       </div>
-
-      <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
     </header>
-  );
+
+    <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
+  </>
+);
 }
