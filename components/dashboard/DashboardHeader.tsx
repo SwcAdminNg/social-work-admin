@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import { getPageTitle } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
 import { IconBell, IconLogout, IconMenu } from "./icons";
+import { LogoutModal } from "./LogoutModal";
 
 const NOTIFICATIONS = [
   {
@@ -34,6 +34,7 @@ export function DashboardHeader() {
   const title = getPageTitle(pathname);
 
   const [notifOpen, setNotifOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export function DashboardHeader() {
         {/* Logout */}
         <button
           type="button"
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => setLogoutModalOpen(true)}
           aria-label="Logout"
           title="Logout"
           className="w-10 h-10 flex items-center justify-center rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
@@ -122,6 +123,8 @@ export function DashboardHeader() {
           <IconLogout />
         </button>
       </div>
+
+      <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
     </header>
   );
 }

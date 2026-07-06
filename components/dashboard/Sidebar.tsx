@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -7,6 +8,7 @@ import { IconLogoMark } from "@/components/auth/shared/icons";
 import { dashboardNavItems } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
 import { IconChevronsLeft, IconClose, IconLogout } from "./icons";
+import { LogoutModal } from "./LogoutModal";
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";
@@ -18,6 +20,7 @@ export function Sidebar() {
   const { data: session } = useSession();
   const { mobileOpen, setMobileOpen, collapsed, toggleCollapsed } =
     useSidebar();
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const isAdmin = session?.user?.userType === "ADMIN";
   const visibleNavItems = dashboardNavItems.filter(
     (item) => !item.adminOnly || isAdmin,
@@ -125,10 +128,10 @@ export function Sidebar() {
 
         {/* Logout */}
         <div className="px-3 pb-5 border-t border-gray-100 dark:border-gray-800 pt-3 flex-shrink-0">
-          <Link
-            href="/login"
+          <button
+            onClick={() => setLogoutModalOpen(true)}
             title={collapsed ? "Logout" : undefined}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 no-underline transition-colors duration-150"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 no-underline transition-colors duration-150 cursor-pointer"
           >
             <span className="flex-shrink-0">
               <IconLogout />
@@ -138,9 +141,11 @@ export function Sidebar() {
             >
               Logout
             </span>
-          </Link>
+          </button>
         </div>
       </aside>
+
+      <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
     </>
   );
 }
