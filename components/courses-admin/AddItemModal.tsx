@@ -55,6 +55,7 @@ export function AddItemModal({
     setFile(null);
     setIsPreview(false);
     setUploadProgress(null);
+    setSubmitting(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
