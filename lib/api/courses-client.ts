@@ -6,6 +6,9 @@ import type {
   CourseQuizQuestion,
   CourseSection,
   CourseCatalog,
+  CourseReview,
+  ReplyToReviewPayload,
+  HideReviewPayload,
   CreateCatalogPayload,
   CreateCoursePayload,
   CreateItemPayload,
@@ -367,4 +370,82 @@ export async function createCatalog(payload: CreateCatalogPayload): Promise<Cour
   }
   const envelope = data as ApiEnvelope<CourseCatalog>;
   return envelope.data;
+}
+
+// Course Reviews
+
+export async function createCourseReview(
+  courseId: string,
+  payload: { rating: number; review_text?: string }
+): Promise<CourseReview> {
+  const res = await request<CourseReview>(`/${courseId}/reviews`, {
+    method: "POST",
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function getCurrentUserReview(
+  courseId: string
+): Promise<CourseReview> {
+  const res = await request<CourseReview>(`/${courseId}/reviews/me`, {
+    method: "GET",
+  });
+  return res.data;
+}
+
+export async function getCourseReviews(
+  courseId: string,
+  params: { page?: number; limit?: number } = {}
+): Promise<PaginatedResult<CourseReview>> {
+  const res = await request<CourseReview[]>(`/${courseId}/reviews${buildQuery(params)}`, {
+    method: "GET",
+  });
+  return { items: res.data, meta: res.meta! };
+}
+
+export async function getAllReviews(
+  params: { page?: number; limit?: number } = {}
+): Promise<PaginatedResult<CourseReview>> {
+  const res = await request<CourseReview[]>(`/reviews/all${buildQuery(params)}`, {
+    method: "GET",
+  });
+  return { items: res.data, meta: res.meta! };
+}
+
+export async function updateCourseReview(
+  reviewId: string,
+  payload: { rating?: number; review_text?: string }
+): Promise<CourseReview> {
+  const res = await request<CourseReview>(`/reviews/${reviewId}`, {
+    method: "PUT",
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function deleteCourseReview(reviewId: string): Promise<void> {
+  await request(`/reviews/${reviewId}`, { method: "DELETE" });
+}
+
+export async function replyToCourseReview(
+  reviewId: string,
+  payload: ReplyToReviewPayload
+): Promise<CourseReview> {
+  const res = await request<CourseReview>(`/reviews/${reviewId}/reply`, {
+    method: "PATCH",
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function hideCourseReview(
+  reviewId: string,
+  payload: HideReviewPayload
+): Promise<CourseReview> {
+  const res = await request<CourseReview>(`/reviews/${reviewId}/hide`, {
+    method: "PATCH",
+    body: payload,
+  });
+  return res.data;
 }

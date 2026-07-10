@@ -1,12 +1,5 @@
-import { EmptyState } from "@/components/dashboard/EmptyState";
-import { IconStar } from "@/components/dashboard/icons";
+import { ReviewList } from "@/components/reviews/ReviewList";
 
 export default function ReviewsPage() {
-  return (
-    <EmptyState
-      icon={IconStar}
-      title="No reviews yet"
-      description="Reviews you leave for courses and instructors will appear here."
-    />
-  );
+  return <ReviewList />;
 }

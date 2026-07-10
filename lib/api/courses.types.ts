@@ -37,6 +37,8 @@ export interface Course {
   instructor_id: string;
   is_published: boolean;
   is_exclusive: boolean;
+  average_rating?: number;
+  total_reviews?: number;
 }
 
 export interface FeaturedCourse extends Course {
@@ -261,4 +263,36 @@ export interface CreateCatalogPayload {
   categories: CourseCategory[];
   icon_name?: string;
   description?: string;
+}
+
+export interface CourseReview {
+  id: string;
+  course_id: string;
+  user_id: string;
+  rating: number;
+  review_text: string | null;
+  is_hidden: boolean;
+  reply_text: string | null;
+  reply_created_at: string | null;
+  created_at: string;
+  updated_at: string;
+  user: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    [key: string]: any;
+  };
+  course?: {
+    id: string;
+    title: string;
+    slug: string;
+  };
+}
+
+export interface ReplyToReviewPayload {
+  reply_text: string;
+}
+
+export interface HideReviewPayload {
+  is_hidden: boolean;
 }
