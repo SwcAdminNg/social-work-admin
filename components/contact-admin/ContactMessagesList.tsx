@@ -80,7 +80,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 ) : (
                   data.items.map((msg) => (
                     <tr key={msg.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
-                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap" suppressHydrationWarning>
                         {formatDate(msg.created_at)}
                       </td>
                       <td className="px-5 py-4">
