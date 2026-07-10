@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Course } from "@/lib/api/courses.types";
-import { IconBookOpen, IconTrash } from "@/components/dashboard/icons";
+import { IconBookOpen, IconTrash, IconStar } from "@/components/dashboard/icons";
 import { PublishedBadge } from "./StatusBadge";
 import { categoryLabel, levelLabel } from "./constants";
 
@@ -41,6 +41,32 @@ export function CourseCard({
         <p className="text-xs text-gray-500 dark:text-gray-400">
           {categoryLabel(course.category)} &middot; {levelLabel(course.level)}
         </p>
+        {(course.average_rating !== undefined && course.total_reviews !== undefined) && (
+          <div className="flex items-center gap-1 mt-0.5">
+            {course.average_rating > 0 ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
+                  <path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 16.9l-5.9 3.3 1.3-6.5L2.5 9.2l6.6-.7L12 2.5z" />
+                </svg>
+                <span className="text-[0.65rem] font-bold text-gray-700 dark:text-gray-300">
+                  {course.average_rating.toFixed(1)}
+                </span>
+                <span className="text-[0.65rem] text-gray-400 dark:text-gray-500">
+                  ({course.total_reviews})
+                </span>
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 dark:text-gray-600">
+                  <path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 16.9l-5.9 3.3 1.3-6.5L2.5 9.2l6.6-.7L12 2.5z" />
+                </svg>
+                <span className="text-[0.65rem] text-gray-400 dark:text-gray-500">
+                  No reviews
+                </span>
+              </>
+            )}
+          </div>
+        )}
         <div className="flex items-center gap-2 mt-auto pt-2">
           <Link
             href={`/dashboard/course-management/${course.id}`}
