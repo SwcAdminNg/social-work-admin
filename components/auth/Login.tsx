@@ -174,44 +174,6 @@ export default function Login() {
         </button>
       </form>
 
-      {/* Divider */}
-      <div className="flex items-center gap-3 my-6" aria-hidden="true">
-        <div className="flex-1 h-px bg-gray-200 dark:bg-white/8" />
-        <span className="text-[0.75rem] text-gray-400 dark:text-gray-600 font-medium">
-          or
-        </span>
-        <div className="flex-1 h-px bg-gray-200 dark:bg-white/8" />
-      </div>
-
-      {/* Register link */}
-      <p className="text-center text-[0.85rem] text-gray-500 dark:text-gray-400">
-        Don't have an account?{" "}
-        <Link
-          href="/register"
-          className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:text-[#1e4d38] dark:hover:text-white no-underline transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D6A4F] dark:focus-visible:ring-[#52b788] rounded"
-        >
-          Create an account
-        </Link>
-      </p>
-
-      {/* Footer note */}
-      <p className="mt-10 text-center text-[0.72rem] text-gray-400 dark:text-gray-600 leading-relaxed">
-        By signing in, you agree to our{" "}
-        <Link
-          href="/terms-of-service"
-          className="underline hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors duration-150"
-        >
-          Terms of Service
-        </Link>{" "}
-        and{" "}
-        <Link
-          href="/privacy-policy"
-          className="underline hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors duration-150"
-        >
-          Privacy Policy
-        </Link>
-        .
-      </p>
     </AuthPageShell>
   );
 }

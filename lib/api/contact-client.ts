@@ -2,14 +2,32 @@ import { ApiError, ApiEnvelope } from "./client";
 import type { PaginatedResult } from "./courses.types";
 import type { ContactMessage } from "./contact.types";
 
+export interface ContactMessagesFilters {
+  platform?: string;
+  category?: string;
+  search?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
 export async function getContactMessages(
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
+  filters?: ContactMessagesFilters
 ): Promise<PaginatedResult<ContactMessage>> {
-  const search = new URLSearchParams();
-  search.set("page", String(page));
-  search.set("limit", String(limit));
-  const qs = search.toString();
+  const searchParams = new URLSearchParams();
+  searchParams.set("page", String(page));
+  searchParams.set("limit", String(limit));
+  
+  if (filters) {
+    if (filters.platform) searchParams.set("platform", filters.platform);
+    if (filters.category) searchParams.set("category", filters.category);
+    if (filters.search) searchParams.set("search", filters.search);
+    if (filters.start_date) searchParams.set("start_date", filters.start_date);
+    if (filters.end_date) searchParams.set("end_date", filters.end_date);
+  }
+  
+  const qs = searchParams.toString();
   
   const res = await fetch(`/api/contact?${qs}`);
   const isJson = res.headers.get("content-type")?.includes("application/json");
