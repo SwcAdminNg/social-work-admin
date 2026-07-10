@@ -62,7 +62,7 @@ export function BrandPanel() {
               Social Work Nigeria
             </p>
             <p className="text-white/50 text-[0.62rem] uppercase tracking-widest font-medium leading-tight">
-              Consultancy
+              Admin Panel
             </p>
           </div>
         </Link>
@@ -121,7 +121,7 @@ export function MobileBrandLogo() {
           Social Work Nigeria
         </p>
         <p className="text-[#2D6A4F] dark:text-[#52b788] text-[0.62rem] uppercase tracking-widest font-semibold leading-tight">
-          Consultancy
+          Admin Panel
         </p>
       </div>
     </div>
