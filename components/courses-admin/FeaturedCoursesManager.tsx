@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { getFeaturedCourses, setFeaturedCourses } from "@/lib/api/courses-client";
@@ -247,6 +247,21 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
 
   const featuredIds = new Set(featured.map((c) => c.id));
 
+  // ── Fetch fresh data from the public GET endpoint ──
+  // Called on mount (bypasses stale RSC router-cache payloads) and after every save.
+  const refetchFeatured = useCallback(async () => {
+    try {
+      const fresh = await getFeaturedCourses({ page: 1, limit: 50 });
+      setFeatured(fresh.items ?? []);
+    } catch {
+      // Non-fatal: silently keep whatever we already have in state
+    }
+  }, []);
+
+  useEffect(() => {
+    refetchFeatured();
+  }, [refetchFeatured]);
+
   // ── Drag-and-drop ──
   function handleDragStart(i: number) {
     setDragFrom(i);
@@ -288,14 +303,15 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
     startSave(async () => {
       try {
         await setFeaturedCourses({ course_ids: featured.map((c) => c.id) });
-        // Re-fetch the public list so our state reflects what the server persisted
-        const fresh = await getFeaturedCourses({ page: 1, limit: 50 });
-        setFeatured(fresh.items ?? []);
-        setIsDirty(false);
         toast.success("Featured courses updated successfully.");
+        setIsDirty(false);
       } catch (err) {
         toast.error(err instanceof ApiError ? err.message : "Failed to save featured courses.");
+        return; // don't refetch if the save itself failed
       }
+      // Always refetch after a successful save — separated from the PUT try/catch
+      // so a GET failure doesn't roll back the success toast.
+      await refetchFeatured();
     });
   }
 

@@ -11,6 +11,7 @@ import type {
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
   CreateSectionPayload,
+  FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
   ManagedCourseListParams,
@@ -244,7 +245,15 @@ export async function getFeaturedCourses(
   if (params.limit) search.set("limit", String(params.limit));
   const qs = search.toString();
   const path = `/courses/featured${qs ? `?${qs}` : ""}`;
-  return apiClient.get<FeaturedCoursesResponse>(path, token ? { token } : undefined);
+  // Backend returns a standard ApiEnvelope: courses in .data, pagination in .meta
+  const res = await apiClient.get<ApiEnvelope<FeaturedCourse[]>>(path, token ? { token } : undefined);
+  return {
+    items: res.data ?? [],
+    total_items: res.meta?.total_items ?? 0,
+    page: res.meta?.page ?? 1,
+    limit: res.meta?.page_size ?? 50,
+    total_pages: res.meta?.total_pages ?? 1,
+  };
 }
 
 export async function setFeaturedCourses(

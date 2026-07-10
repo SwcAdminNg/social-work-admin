@@ -11,6 +11,7 @@ import type {
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
   CreateSectionPayload,
+  FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
   ManagedCourseListParams,
@@ -302,7 +303,15 @@ export async function getFeaturedCourses(
         : res.statusText;
     throw new ApiError(message, res.status, payload);
   }
-  return payload as FeaturedCoursesResponse;
+  
+  const envelope = payload as ApiEnvelope<FeaturedCourse[]>;
+  return {
+    items: envelope.data ?? [],
+    total_items: envelope.meta?.total_items ?? 0,
+    page: envelope.meta?.page ?? 1,
+    limit: envelope.meta?.page_size ?? 50,
+    total_pages: envelope.meta?.total_pages ?? 1,
+  };
 }
 
 export async function setFeaturedCourses(
