@@ -11,11 +11,13 @@ import type {
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
   CreateSectionPayload,
+  FeaturedCoursesResponse,
   FinalizeDocumentPayload,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
   ReorderSectionsPayload,
+  SetFeaturedCoursesPayload,
   UpdateCoursePayload,
   UpdateItemPayload,
   UpdateQuizOptionPayload,
@@ -231,4 +233,23 @@ export async function deleteQuizQuestion(questionId: string, token: string): Pro
 
 export async function deleteQuizOption(optionId: string, token: string): Promise<void> {
   await apiClient.delete(`/courses/quiz/options/${optionId}`, { token });
+}
+
+export async function getFeaturedCourses(
+  params: { page?: number; limit?: number },
+  token?: string
+): Promise<FeaturedCoursesResponse> {
+  const search = new URLSearchParams();
+  if (params.page) search.set("page", String(params.page));
+  if (params.limit) search.set("limit", String(params.limit));
+  const qs = search.toString();
+  const path = `/courses/featured${qs ? `?${qs}` : ""}`;
+  return apiClient.get<FeaturedCoursesResponse>(path, token ? { token } : undefined);
+}
+
+export async function setFeaturedCourses(
+  payload: SetFeaturedCoursesPayload,
+  token: string
+): Promise<void> {
+  await apiClient.put<ApiEnvelope<null>>("/courses/featured", payload, { token });
 }

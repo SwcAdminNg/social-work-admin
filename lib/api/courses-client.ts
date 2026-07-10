@@ -11,11 +11,13 @@ import type {
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
   CreateSectionPayload,
+  FeaturedCoursesResponse,
   FinalizeDocumentPayload,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
   ReorderSectionsPayload,
+  SetFeaturedCoursesPayload,
   UpdateCoursePayload,
   UpdateItemPayload,
   UpdateQuizOptionPayload,
@@ -281,4 +283,43 @@ export async function getThumbnailUploadUrl(
     },
   );
   return res.data;
+}
+
+export async function getFeaturedCourses(
+  params: { page?: number; limit?: number } = {},
+): Promise<FeaturedCoursesResponse> {
+  const search = new URLSearchParams();
+  if (params.page) search.set("page", String(params.page));
+  if (params.limit) search.set("limit", String(params.limit));
+  const qs = search.toString();
+  const res = await fetch(`/api/courses/featured${qs ? `?${qs}` : ""}`);
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+  if (!res.ok) {
+    const message =
+      payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+  return payload as FeaturedCoursesResponse;
+}
+
+export async function setFeaturedCourses(
+  payload: SetFeaturedCoursesPayload,
+): Promise<void> {
+  const res = await fetch(`/api/courses/featured`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const isJson = res.headers.get("content-type")?.includes("application/json");
+    const data = isJson ? await res.json().catch(() => null) : null;
+    const message =
+      data && typeof data === "object" && "message" in data
+        ? String((data as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message, res.status, data);
+  }
 }

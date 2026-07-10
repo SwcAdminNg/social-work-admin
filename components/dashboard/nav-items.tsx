@@ -3,6 +3,7 @@ import {
   IconGrid,
   IconReceipt,
   IconSettings,
+  IconSparkles,
   IconStar,
   IconUsers,
 } from "./icons";
@@ -20,6 +21,12 @@ export const dashboardNavItems: NavItem[] = [
     label: "Course Management",
     href: "/dashboard/course-management",
     icon: IconBookOpen,
+    adminOnly: true,
+  },
+  {
+    label: "Featured Courses",
+    href: "/dashboard/featured-courses",
+    icon: IconSparkles,
     adminOnly: true,
   },
   {

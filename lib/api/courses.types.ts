@@ -39,6 +39,13 @@ export interface Course {
   is_exclusive: boolean;
 }
 
+export interface FeaturedCourse extends Course {
+  is_featured: boolean;
+  featured_order: number;
+  is_enrolled: boolean;
+  has_access: boolean;
+}
+
 export interface CourseVideo {
   status: VideoStatus;
   playback_url: string | null;
@@ -221,4 +228,18 @@ export interface PaginatedMeta {
 export interface PaginatedResult<T> {
   items: T[];
   meta: PaginatedMeta;
+}
+
+/** Payload for PUT /courses/featured */
+export interface SetFeaturedCoursesPayload {
+  course_ids: string[];
+}
+
+/** Response from GET /courses/featured (flat pagination, not ApiEnvelope) */
+export interface FeaturedCoursesResponse {
+  items: FeaturedCourse[] | null;
+  total_items: number;
+  page: number;
+  limit: number;
+  total_pages: number;
 }

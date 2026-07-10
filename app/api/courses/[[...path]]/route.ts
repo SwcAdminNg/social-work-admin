@@ -7,7 +7,7 @@ type RouteParams = { params: Promise<{ path?: string[] }> };
 async function forward(
   request: NextRequest,
   { params }: RouteParams,
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT",
 ) {
   const session = await auth();
 
@@ -34,7 +34,7 @@ async function forward(
   const backendPath = `/courses${segments.length ? "/" + segments.join("/") : ""}${request.nextUrl.search}`;
 
   let body: unknown;
-  if (method === "POST" || method === "PATCH") {
+  if (method === "POST" || method === "PATCH" || method === "PUT") {
     const text = await request.text();
     body = text ? JSON.parse(text) : undefined;
   }
@@ -48,7 +48,9 @@ async function forward(
           ? await apiClient.post(backendPath, body, options)
           : method === "PATCH"
             ? await apiClient.patch(backendPath, body, options)
-            : await apiClient.delete(backendPath, options);
+            : method === "PUT"
+              ? await apiClient.put(backendPath, body, options)
+              : await apiClient.delete(backendPath, options);
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof ApiError) {
@@ -84,4 +86,8 @@ export async function PATCH(request: NextRequest, ctx: RouteParams) {
 
 export async function DELETE(request: NextRequest, ctx: RouteParams) {
   return forward(request, ctx, "DELETE");
+}
+
+export async function PUT(request: NextRequest, ctx: RouteParams) {
+  return forward(request, ctx, "PUT");
 }
