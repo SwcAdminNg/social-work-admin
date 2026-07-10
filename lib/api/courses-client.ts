@@ -5,6 +5,8 @@ import type {
   CourseQuizOption,
   CourseQuizQuestion,
   CourseSection,
+  CourseCatalog,
+  CreateCatalogPayload,
   CreateCoursePayload,
   CreateItemPayload,
   CreateItemResult,
@@ -331,4 +333,38 @@ export async function setFeaturedCourses(
         : res.statusText;
     throw new ApiError(message, res.status, data);
   }
+}
+
+export async function getCatalogs(): Promise<CourseCatalog[]> {
+  const res = await fetch(`/api/courses/catalogs`);
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+  if (!res.ok) {
+    const message =
+      payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+  const envelope = payload as ApiEnvelope<CourseCatalog[]>;
+  return envelope.data ?? [];
+}
+
+export async function createCatalog(payload: CreateCatalogPayload): Promise<CourseCatalog> {
+  const res = await fetch(`/api/courses/catalogs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const data = isJson ? await res.json().catch(() => null) : null;
+  if (!res.ok) {
+    const message =
+      data && typeof data === "object" && "message" in data
+        ? String((data as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message, res.status, data);
+  }
+  const envelope = data as ApiEnvelope<CourseCatalog>;
+  return envelope.data;
 }

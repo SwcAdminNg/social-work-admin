@@ -5,6 +5,8 @@ import type {
   CourseQuizOption,
   CourseQuizQuestion,
   CourseSection,
+  CourseCatalog,
+  CreateCatalogPayload,
   CreateCoursePayload,
   CreateItemPayload,
   CreateItemResult,
@@ -261,4 +263,9 @@ export async function setFeaturedCourses(
   token: string
 ): Promise<void> {
   await apiClient.put<ApiEnvelope<null>>("/courses/featured", payload, { token });
+}
+
+export async function getCatalogs(token?: string): Promise<CourseCatalog[]> {
+  const res = await apiClient.get<ApiEnvelope<CourseCatalog[]>>("/courses/catalogs", token ? { token } : undefined);
+  return res.data ?? [];
 }

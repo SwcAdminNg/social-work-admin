@@ -6,6 +6,7 @@ import {
   IconSparkles,
   IconStar,
   IconUsers,
+  IconFolder,
 } from "./icons";
 
 export type NavItem = {
@@ -27,6 +28,12 @@ export const dashboardNavItems: NavItem[] = [
     label: "Featured Courses",
     href: "/dashboard/featured-courses",
     icon: IconSparkles,
+    adminOnly: true,
+  },
+  {
+    label: "Course Catalogs",
+    href: "/dashboard/course-catalogs",
+    icon: IconFolder,
     adminOnly: true,
   },
   {

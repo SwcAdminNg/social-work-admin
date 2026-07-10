@@ -243,3 +243,22 @@ export interface FeaturedCoursesResponse {
   limit: number;
   total_pages: number;
 }
+
+export interface CourseCatalog {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  slug: string;
+  categories: CourseCategory[];
+  icon_name?: string | null;
+  description?: string | null;
+  total_courses?: number;
+}
+
+export interface CreateCatalogPayload {
+  name: string;
+  categories: CourseCategory[];
+  icon_name?: string;
+  description?: string;
+}
