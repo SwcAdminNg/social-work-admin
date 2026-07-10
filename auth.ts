@@ -56,12 +56,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt: async ({ token, user }) => {
+    jwt: async ({ token, user, trigger, session }) => {
       if (user) {
         return { ...token, ...user };
       }
 
-      if (!token.keepLoggedIn && Date.now() > token.accessTokenExpires) {
+      if (trigger === "update" && session) {
+        token.accessToken = session.accessToken;
+        token.refreshToken = session.refreshToken;
+        token.accessTokenExpires = session.accessTokenExpires;
+        token.error = undefined;
+      }
+
+      if (Date.now() > token.accessTokenExpires) {
         return { ...token, error: "SessionExpired" };
       }
 
@@ -77,6 +84,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         userType: token.userType,
       };
       session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
+      session.accessTokenExpires = token.accessTokenExpires;
       session.error = token.error;
       return session;
     },

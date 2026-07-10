@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { SidebarProvider, useSidebar } from "./SidebarContext";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./DashboardHeader";
+import { SessionManager } from "@/components/auth/SessionManager";
 
 function Content({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
@@ -30,6 +31,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <Content>{children}</Content>
       </div>
       <Toaster position="top-right" richColors closeButton />
+      <SessionManager />
     </SidebarProvider>
   );
 }

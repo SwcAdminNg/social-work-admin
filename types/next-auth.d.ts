@@ -21,6 +21,8 @@ declare module "next-auth" {
       userType: string;
     };
     accessToken: string;
+    refreshToken: string;
+    accessTokenExpires: number;
     error?: string;
   }
 }
