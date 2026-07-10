@@ -7,6 +7,7 @@ import {
   IconStar,
   IconUsers,
   IconFolder,
+  IconMail,
 } from "./icons";
 
 export type NavItem = {
@@ -34,6 +35,12 @@ export const dashboardNavItems: NavItem[] = [
     label: "Course Catalogs",
     href: "/dashboard/course-catalogs",
     icon: IconFolder,
+    adminOnly: true,
+  },
+  {
+    label: "Contact Messages",
+    href: "/dashboard/contact-messages",
+    icon: IconMail,
     adminOnly: true,
   },
   {
