@@ -9,6 +9,7 @@ import { deleteItem, updateItem } from "@/lib/api/courses-client";
 import type { CourseItem } from "@/lib/api/courses.types";
 import {
   IconChevronDown,
+  IconClock,
   IconDocument,
   IconDocumentText,
   IconDragHandle,
@@ -157,7 +158,8 @@ export function ItemRow({
           </span>
         )}
 
-        <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+        <div className="flex items-center gap-2 flex-shrink-0 ml-2 bg-gray-100/50 dark:bg-gray-800/50 rounded-lg px-2 py-1 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+          <IconClock className="w-3.5 h-3.5 text-gray-400" />
           <input
             type="number"
             min="0"
@@ -165,10 +167,10 @@ export function ItemRow({
             onChange={(e) => setEstimatedMinutes(e.target.value)}
             onBlur={saveEstimatedMinutes}
             placeholder="Time"
-            className="w-14 bg-transparent text-xs font-medium text-gray-600 dark:text-gray-400 focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1 py-0.5 text-right border border-transparent hover:border-gray-300 dark:hover:border-gray-700"
+            className="w-16 bg-transparent text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none placeholder-gray-400"
             title="Estimated minutes"
           />
-          <span className="text-[0.65rem] uppercase font-bold text-gray-400 tracking-wider">min</span>
+          <span className="text-[0.65rem] uppercase font-bold text-gray-400 tracking-wider select-none">min</span>
         </div>
 
         <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0 ml-2">
