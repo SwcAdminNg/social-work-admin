@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { ApiError } from "@/lib/api/client";
 import { createCourse } from "@/lib/api/courses-client";
 import type { CourseCategory, CourseLevel } from "@/lib/api/courses.types";
@@ -15,6 +16,8 @@ import type { CourseInstructorInputDTO, AccessMode } from "@/lib/api/courses.typ
 
 export function CreateCourseForm() {
   const router = useRouter();
+  const { data: session } = useSession();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [prerequisite, setPrerequisite] = useState("");
@@ -27,6 +30,24 @@ export function CreateCourseForm() {
   const [isExclusive, setIsExclusive] = useState(false);
   const [price, setPrice] = useState("");
   const [instructors, setInstructors] = useState<CourseInstructorInputDTO[]>([{ name: "", user_id: null }]);
+
+  useEffect(() => {
+    if (
+      session?.user &&
+      instructors.length === 1 &&
+      !instructors[0].name &&
+      !instructors[0].user_id
+    ) {
+      setInstructors([
+        {
+          name: `${session.user.firstName} ${session.user.lastName}`.trim(),
+          user_id: session.user.id,
+        },
+      ]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user]);
+
   const [accessMode, setAccessMode] = useState<AccessMode>("SELF_PACED");
   const [accessStartDate, setAccessStartDate] = useState("");
   const [accessEndDate, setAccessEndDate] = useState("");

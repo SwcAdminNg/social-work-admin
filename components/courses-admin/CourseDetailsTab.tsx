@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { ApiError } from "@/lib/api/client";
 import { updateCourse } from "@/lib/api/courses-client";
 import type { Course, CourseCategory, CourseLevel } from "@/lib/api/courses.types";
@@ -20,6 +21,8 @@ export function CourseDetailsTab({
   course: Course;
   onUpdated: (fields: Partial<Course>) => void;
 }) {
+  const { data: session } = useSession();
+
   const [title, setTitle] = useState(course.title);
   const [description, setDescription] = useState(course.description);
   const [prerequisite, setPrerequisite] = useState(course.prerequisite ?? "");
@@ -37,6 +40,24 @@ export function CourseDetailsTab({
       ? course.instructors
       : [{ name: "", user_id: null }]
   );
+
+  useEffect(() => {
+    if (
+      session?.user &&
+      (!course.instructors || course.instructors.length === 0) &&
+      instructors.length === 1 &&
+      !instructors[0].name &&
+      !instructors[0].user_id
+    ) {
+      setInstructors([
+        {
+          name: `${session.user.firstName} ${session.user.lastName}`.trim(),
+          user_id: session.user.id,
+        },
+      ]);
+    }
+  }, [session?.user, course.instructors]);
+
   const [accessMode, setAccessMode] = useState<AccessMode>(course.access_mode ?? "SELF_PACED");
   
   // Format dates for datetime-local input (YYYY-MM-DDThh:mm)

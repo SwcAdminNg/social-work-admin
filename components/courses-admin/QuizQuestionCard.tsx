@@ -45,10 +45,24 @@ export function QuizQuestionCard({
   async function toggleAllowMultiple() {
     const next = !question.allow_multiple_answers;
     try {
-      await updateQuizQuestion(question.id, { allow_multiple_answers: next });
-      dispatch({ type: "UPDATE_QUIZ_QUESTION", questionId: question.id, fields: { allow_multiple_answers: next } });
+      const payload: Partial<CourseQuizQuestion> = { allow_multiple_answers: next };
+      if (next) payload.multi_answer_mode = "OR";
+      else payload.multi_answer_mode = null;
+      
+      await updateQuizQuestion(question.id, payload);
+      dispatch({ type: "UPDATE_QUIZ_QUESTION", questionId: question.id, fields: payload });
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update question.");
+    }
+  }
+
+  async function updateMultiAnswerMode(mode: "AND" | "OR") {
+    if (!question.allow_multiple_answers) return;
+    try {
+      await updateQuizQuestion(question.id, { multi_answer_mode: mode });
+      dispatch({ type: "UPDATE_QUIZ_QUESTION", questionId: question.id, fields: { multi_answer_mode: mode } });
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : "Failed to update multi-answer mode.");
     }
   }
 
@@ -137,15 +151,27 @@ export function QuizQuestionCard({
         </button>
       </div>
 
-      <label className="flex items-center gap-2.5 cursor-pointer select-none text-xs font-medium text-gray-500 dark:text-gray-400">
-        <input
-          type="checkbox"
-          checked={question.allow_multiple_answers}
-          onChange={toggleAllowMultiple}
-          className="accent-[#2D6A4F]"
-        />
-        Allow multiple correct answers
-      </label>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none text-xs font-medium text-gray-500 dark:text-gray-400">
+          <input
+            type="checkbox"
+            checked={question.allow_multiple_answers}
+            onChange={toggleAllowMultiple}
+            className="accent-[#2D6A4F]"
+          />
+          Allow multiple correct answers
+        </label>
+        {question.allow_multiple_answers && (
+          <select
+            value={question.multi_answer_mode || "OR"}
+            onChange={(e) => updateMultiAnswerMode(e.target.value as "AND" | "OR")}
+            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+          >
+            <option value="OR">Partial Credit (OR)</option>
+            <option value="AND">All-or-Nothing (AND)</option>
+          </select>
+        )}
+      </div>
 
       {!hasCorrectOption && (
         <p className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 rounded-lg px-3 py-1.5">

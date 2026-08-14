@@ -26,6 +26,7 @@ import type {
   SetFeaturedCoursesPayload,
   UpdateCoursePayload,
   UpdateItemPayload,
+  UpdateAssessmentPayload,
   UpdateQuizOptionPayload,
   UpdateQuizQuestionPayload,
   UpdateSectionPayload,
@@ -182,6 +183,13 @@ export async function updateItem(
   payload: UpdateItemPayload,
 ): Promise<void> {
   await request(`/items/${itemId}`, { method: "PATCH", body: payload });
+}
+
+export async function updateAssessmentSettings(
+  itemId: string,
+  payload: UpdateAssessmentPayload,
+): Promise<void> {
+  await request(`/items/${itemId}/assessment`, { method: "PATCH", body: payload });
 }
 
 export async function deleteItem(itemId: string): Promise<void> {

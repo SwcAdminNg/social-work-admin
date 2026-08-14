@@ -2,7 +2,9 @@ import type {
   Course,
   CourseDetail,
   CourseItem,
-  CourseQuiz,
+  CourseAssessment,
+  CourseQuizSettings,
+  CourseEssaySettings,
   CourseQuizOption,
   CourseQuizQuestion,
   CourseSection,
@@ -19,7 +21,7 @@ export type CourseEditorAction =
   | { type: "ADD_ITEM"; sectionId: string; item: CourseItem }
   | { type: "UPDATE_ITEM"; itemId: string; fields: Partial<CourseItem> }
   | { type: "REMOVE_ITEM"; itemId: string }
-  | { type: "SET_ITEM_QUIZ"; itemId: string; quiz: CourseQuiz }
+  | { type: "UPDATE_ASSESSMENT"; itemId: string; assessment: CourseAssessment }
   | { type: "ADD_QUIZ_QUESTION"; itemId: string; question: CourseQuizQuestion }
   | { type: "UPDATE_QUIZ_QUESTION"; questionId: string; fields: Partial<CourseQuizQuestion> }
   | { type: "REMOVE_QUIZ_QUESTION"; questionId: string }
@@ -39,12 +41,15 @@ function mapItems(
 }
 
 function mapQuestion(item: CourseItem, questionId: string, fn: (q: CourseQuizQuestion) => CourseQuizQuestion): CourseItem {
-  if (!item.quiz) return item;
+  if (!item.assessment?.quiz) return item;
   return {
     ...item,
-    quiz: {
-      ...item.quiz,
-      questions: item.quiz.questions.map((q) => (q.id === questionId ? fn(q) : q)),
+    assessment: {
+      ...item.assessment,
+      quiz: {
+        ...item.assessment.quiz,
+        questions: item.assessment.quiz.questions.map((q) => (q.id === questionId ? fn(q) : q)),
+      },
     },
   };
 }
@@ -74,15 +79,6 @@ export function courseEditorReducer(state: CourseDetail, action: CourseEditorAct
 
     case "ADD_ITEM":
       const item = { ...action.item };
-      if (item.item_type === "QUIZ" && !item.quiz) {
-        item.quiz = {
-          id: item.id,
-          title: item.title,
-          description: "",
-          passing_score_percentage: 70,
-          questions: [],
-        };
-      }
       return mapSections(state, (s) =>
         s.id === action.sectionId ? { ...s, items: [...s.items, item] } : s
       );
@@ -96,63 +92,87 @@ export function courseEditorReducer(state: CourseDetail, action: CourseEditorAct
         items: s.items.filter((i) => i.id !== action.itemId),
       }));
 
-    case "SET_ITEM_QUIZ":
-      return mapItems(state, (item) => (item.id === action.itemId ? { ...item, quiz: action.quiz } : item));
+    case "UPDATE_ASSESSMENT":
+      return mapItems(state, (item) => (item.id === action.itemId ? { ...item, assessment: action.assessment } : item));
 
     case "ADD_QUIZ_QUESTION":
       return mapItems(state, (item) =>
-        item.id === action.itemId && item.quiz
-          ? { ...item, quiz: { ...item.quiz, questions: [...item.quiz.questions, action.question] } }
+        item.id === action.itemId && item.assessment?.quiz
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz: {
+                  ...item.assessment.quiz,
+                  questions: [...item.assessment.quiz.questions, action.question],
+                },
+              },
+            }
           : item
       );
 
     case "UPDATE_QUIZ_QUESTION":
       return mapItems(state, (item) =>
-        item.quiz?.questions.some((q) => q.id === action.questionId)
+        item.assessment?.quiz?.questions.some((q) => q.id === action.questionId)
           ? mapQuestion(item, action.questionId, (q) => ({ ...q, ...action.fields }))
           : item
       );
 
     case "REMOVE_QUIZ_QUESTION":
       return mapItems(state, (item) =>
-        item.quiz
-          ? { ...item, quiz: { ...item.quiz, questions: item.quiz.questions.filter((q) => q.id !== action.questionId) } }
+        item.assessment?.quiz
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz: {
+                  ...item.assessment.quiz,
+                  questions: item.assessment.quiz.questions.filter((q) => q.id !== action.questionId),
+                },
+              },
+            }
           : item
       );
 
     case "ADD_QUIZ_OPTION":
       return mapItems(state, (item) =>
-        item.quiz?.questions.some((q) => q.id === action.questionId)
+        item.assessment?.quiz?.questions.some((q) => q.id === action.questionId)
           ? mapQuestion(item, action.questionId, (q) => ({ ...q, options: [...q.options, action.option] }))
           : item
       );
 
     case "UPDATE_QUIZ_OPTION":
       return mapItems(state, (item) => {
-        if (!item.quiz) return item;
+        if (!item.assessment?.quiz) return item;
         return {
           ...item,
-          quiz: {
-            ...item.quiz,
-            questions: item.quiz.questions.map((q) => ({
-              ...q,
-              options: q.options.map((o) => (o.id === action.optionId ? { ...o, ...action.fields } : o)),
-            })),
+          assessment: {
+            ...item.assessment,
+            quiz: {
+              ...item.assessment.quiz,
+              questions: item.assessment.quiz.questions.map((q) => ({
+                ...q,
+                options: q.options.map((o) => (o.id === action.optionId ? { ...o, ...action.fields } : o)),
+              })),
+            },
           },
         };
       });
 
     case "REMOVE_QUIZ_OPTION":
       return mapItems(state, (item) => {
-        if (!item.quiz) return item;
+        if (!item.assessment?.quiz) return item;
         return {
           ...item,
-          quiz: {
-            ...item.quiz,
-            questions: item.quiz.questions.map((q) => ({
-              ...q,
-              options: q.options.filter((o) => o.id !== action.optionId),
-            })),
+          assessment: {
+            ...item.assessment,
+            quiz: {
+              ...item.assessment.quiz,
+              questions: item.assessment.quiz.questions.map((q) => ({
+                ...q,
+                options: q.options.filter((o) => o.id !== action.optionId),
+              })),
+            },
           },
         };
       });

@@ -10,6 +10,7 @@ import type { CourseItem } from "@/lib/api/courses.types";
 import {
   IconChevronDown,
   IconDocument,
+  IconDocumentText,
   IconDragHandle,
   IconQuiz,
   IconTrash,
@@ -21,8 +22,7 @@ import { VideoStatusBadge } from "./StatusBadge";
 import { VideoUploader } from "./VideoUploader";
 import { DocumentUploader } from "./DocumentUploader";
 import { QuizBuilder } from "./QuizBuilder";
-
-const ITEM_TYPE_ICON = { VIDEO: IconVideo, DOCUMENT: IconDocument, QUIZ: IconQuiz };
+import { EssayBuilder } from "./EssayBuilder";
 
 export function ItemRow({
   item,
@@ -44,7 +44,13 @@ export function ItemRow({
   const [title, setTitle] = useState(item.title);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const TypeIcon = ITEM_TYPE_ICON[item.item_type];
+  
+  let TypeIcon = IconVideo;
+  if (item.item_type === "DOCUMENT") TypeIcon = IconDocument;
+  else if (item.item_type === "ASSESSMENT") {
+    if (item.assessment?.assessment_type === "ESSAY") TypeIcon = IconDocumentText;
+    else TypeIcon = IconQuiz;
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -173,7 +179,12 @@ export function ItemRow({
               }
             />
           )}
-          {item.item_type === "QUIZ" && <QuizBuilder item={item} dispatch={dispatch} />}
+          {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ" && (
+            <QuizBuilder item={item} dispatch={dispatch} />
+          )}
+          {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "ESSAY" && (
+            <EssayBuilder item={item} dispatch={dispatch} />
+          )}
         </div>
       )}
 

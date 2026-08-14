@@ -16,7 +16,10 @@ export type CourseCategory =
   | "LIFESTYLE"
   | "LANGUAGE";
 
-export type CourseItemType = "VIDEO" | "DOCUMENT" | "QUIZ";
+export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT";
+
+export type AssessmentType = "QUIZ" | "ESSAY";
+export type EssaySubmissionMode = "TEXT" | "DOCUMENT";
 
 export type VideoStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 
@@ -93,15 +96,29 @@ export interface CourseQuizQuestion {
   text: string;
   order_index: number;
   allow_multiple_answers: boolean;
+  multi_answer_mode?: "AND" | "OR" | null;
   options: CourseQuizOption[];
 }
 
-export interface CourseQuiz {
-  id: string;
-  title: string;
-  description: string;
-  passing_score_percentage: number;
+export interface CourseQuizSettings {
+  max_attempts: number | null;
+  pass_mark_percentage: number;
+  show_result_to_student: boolean;
   questions: CourseQuizQuestion[];
+}
+
+export interface CourseEssaySettings {
+  question: string;
+  description: string;
+  submission_mode: EssaySubmissionMode;
+}
+
+export interface CourseAssessment {
+  id: string;
+  assessment_type: AssessmentType;
+  due_date: string | null;
+  quiz?: CourseQuizSettings;
+  essay?: CourseEssaySettings;
 }
 
 export interface CourseItem {
@@ -112,7 +129,7 @@ export interface CourseItem {
   is_preview: boolean;
   video: CourseVideo | null;
   document: CourseDocument | null;
-  quiz: CourseQuiz | null;
+  assessment: CourseAssessment | null;
 }
 
 export interface CourseSection {
@@ -168,13 +185,23 @@ export interface CreateItemPayload {
   item_type: CourseItemType;
   order_index: number;
   is_preview: boolean;
-  file_name: string | null;
+  file_name?: string | null;
+  assessment_type?: AssessmentType;
+  due_date?: string | null;
+  quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">>;
+  essay_settings?: CourseEssaySettings;
 }
 
 export interface UpdateItemPayload {
   title?: string;
   order_index?: number;
   is_preview?: boolean;
+}
+
+export interface UpdateAssessmentPayload {
+  due_date?: string | null;
+  quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">> | null;
+  essay_settings?: Partial<CourseEssaySettings> | null;
 }
 
 export interface ReorderItemsPayload {
@@ -214,6 +241,7 @@ export interface CreateQuizQuestionPayload {
   text: string;
   order_index: number;
   allow_multiple_answers: boolean;
+  multi_answer_mode?: "AND" | "OR" | null;
   options: CreateQuizOptionPayload[];
 }
 
@@ -221,6 +249,7 @@ export interface UpdateQuizQuestionPayload {
   text?: string;
   order_index?: number;
   allow_multiple_answers?: boolean;
+  multi_answer_mode?: "AND" | "OR" | null;
 }
 
 export interface UpdateQuizOptionPayload {

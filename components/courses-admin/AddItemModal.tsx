@@ -7,6 +7,7 @@ import { createItem, finalizeDocument } from "@/lib/api/courses-client";
 import type { CourseItemType, CreateItemResult } from "@/lib/api/courses.types";
 import {
   IconDocument,
+  IconDocumentText,
   IconQuiz,
   IconSpinner,
   IconVideo,
@@ -14,14 +15,17 @@ import {
   IconX,
 } from "@/components/dashboard/icons";
 
+type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY";
+
 const ITEM_TYPES: {
-  value: CourseItemType;
+  value: UIItemType;
   label: string;
   icon: React.ComponentType;
 }[] = [
   { value: "VIDEO", label: "Video", icon: IconVideo },
   { value: "DOCUMENT", label: "Document", icon: IconDocument },
   { value: "QUIZ", label: "Quiz", icon: IconQuiz },
+  { value: "ESSAY", label: "Essay", icon: IconDocumentText },
 ];
 
 export function AddItemModal({
@@ -39,7 +43,7 @@ export function AddItemModal({
   onClose: () => void;
   onCreated: (result: CreateItemResult) => void;
 }) {
-  const [itemType, setItemType] = useState<CourseItemType>("VIDEO");
+  const [itemType, setItemType] = useState<UIItemType>("VIDEO");
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
@@ -93,13 +97,53 @@ export function AddItemModal({
 
     setSubmitting(true);
     try {
-      const result = await createItem(_courseId, sectionId, {
+      let actualItemType: CourseItemType = "VIDEO";
+      if (itemType === "DOCUMENT") actualItemType = "DOCUMENT";
+      else if (itemType === "QUIZ" || itemType === "ESSAY") actualItemType = "ASSESSMENT";
+
+      const payload: Parameters<typeof createItem>[2] = {
         title,
-        item_type: itemType,
+        item_type: actualItemType,
         order_index: nextOrderIndex,
         is_preview: isPreview,
         file_name: itemType === "DOCUMENT" ? file!.name : null,
-      });
+      };
+
+      if (itemType === "QUIZ") {
+        payload.assessment_type = "QUIZ";
+        payload.quiz_settings = { max_attempts: null, pass_mark_percentage: 70, show_result_to_student: true };
+      } else if (itemType === "ESSAY") {
+        payload.assessment_type = "ESSAY";
+        payload.essay_settings = { question: title, description: "Write your answer here.", submission_mode: "TEXT" };
+      }
+
+      const result = await createItem(_courseId, sectionId, payload);
+
+      // Backend may not echo the full assessment payload on creation,
+      // inject default state so the UI builder can immediately render.
+      if (itemType === "QUIZ" || itemType === "ESSAY") {
+        if (!result.assessment) {
+          result.assessment = {
+            id: result.id,
+            assessment_type: itemType,
+            due_date: null,
+          };
+          if (itemType === "QUIZ") {
+            result.assessment.quiz = {
+              max_attempts: null,
+              pass_mark_percentage: 70,
+              show_result_to_student: true,
+              questions: [],
+            };
+          } else if (itemType === "ESSAY") {
+            result.assessment.essay = {
+              question: title,
+              description: "Write your answer here.",
+              submission_mode: "TEXT",
+            };
+          }
+        }
+      }
 
       if (itemType === "DOCUMENT" && result.document_upload && file) {
         setUploadProgress(0);
@@ -212,7 +256,9 @@ export function AddItemModal({
                   ? "e.g. Welcome video"
                   : itemType === "DOCUMENT"
                     ? "e.g. Cheat sheet"
-                    : "e.g. Module 1 quiz"
+                    : itemType === "QUIZ"
+                      ? "e.g. Module 1 quiz"
+                      : "e.g. Midterm essay"
               }
               className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
             />
