@@ -45,6 +45,7 @@ export function AddItemModal({
 }) {
   const [itemType, setItemType] = useState<UIItemType>("VIDEO");
   const [title, setTitle] = useState("");
+  const [estimatedMinutes, setEstimatedMinutes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -56,6 +57,7 @@ export function AddItemModal({
   function reset() {
     setItemType("VIDEO");
     setTitle("");
+    setEstimatedMinutes("");
     setFile(null);
     setIsPreview(false);
     setUploadProgress(null);
@@ -101,11 +103,15 @@ export function AddItemModal({
       if (itemType === "DOCUMENT") actualItemType = "DOCUMENT";
       else if (itemType === "QUIZ" || itemType === "ESSAY") actualItemType = "ASSESSMENT";
 
+      const parsedMinutes = parseInt(estimatedMinutes, 10);
+      const minutes = !isNaN(parsedMinutes) && parsedMinutes > 0 ? parsedMinutes : null;
+
       const payload: Parameters<typeof createItem>[2] = {
         title,
         item_type: actualItemType,
         order_index: nextOrderIndex,
         is_preview: isPreview,
+        estimated_minutes: minutes,
         file_name: itemType === "DOCUMENT" ? file!.name : null,
       };
 
@@ -238,30 +244,49 @@ export function AddItemModal({
             ))}
           </div>
 
-          <div className="my-4">
-            <label
-              htmlFor="item-title"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Title
-            </label>
-            <input
-              id="item-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              placeholder={
-                itemType === "VIDEO"
-                  ? "e.g. Welcome video"
-                  : itemType === "DOCUMENT"
-                    ? "e.g. Cheat sheet"
-                    : itemType === "QUIZ"
-                      ? "e.g. Module 1 quiz"
-                      : "e.g. Midterm essay"
-              }
-              className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+            <div>
+              <label
+                htmlFor="item-title"
+                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Title
+              </label>
+              <input
+                id="item-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder={
+                  itemType === "VIDEO"
+                    ? "e.g. Welcome video"
+                    : itemType === "DOCUMENT"
+                      ? "e.g. Cheat sheet"
+                      : itemType === "QUIZ"
+                        ? "e.g. Module 1 quiz"
+                        : "e.g. Midterm essay"
+                }
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="item-estimated-minutes"
+                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Estimated Time (minutes)
+              </label>
+              <input
+                id="item-estimated-minutes"
+                type="number"
+                min="0"
+                value={estimatedMinutes}
+                onChange={(e) => setEstimatedMinutes(e.target.value)}
+                placeholder="Optional"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
           </div>
 
           {itemType === "DOCUMENT" && (

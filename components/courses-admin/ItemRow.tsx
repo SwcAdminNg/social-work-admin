@@ -42,6 +42,7 @@ export function ItemRow({
   });
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [title, setTitle] = useState(item.title);
+  const [estimatedMinutes, setEstimatedMinutes] = useState(item.estimated_minutes ? String(item.estimated_minutes) : "");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   
@@ -70,6 +71,26 @@ export function ItemRow({
     } catch (error) {
       setTitle(item.title);
       toast.error(error instanceof ApiError ? error.message : "Failed to rename item.");
+    }
+  }
+
+  async function saveEstimatedMinutes() {
+    const trimmed = estimatedMinutes.trim();
+    const parsed = parseInt(trimmed, 10);
+    const newVal = !isNaN(parsed) && parsed >= 0 ? parsed : null;
+
+    if (newVal === item.estimated_minutes) {
+      setEstimatedMinutes(item.estimated_minutes ? String(item.estimated_minutes) : "");
+      return;
+    }
+    
+    try {
+      await updateItem(item.id, { estimated_minutes: newVal });
+      dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { estimated_minutes: newVal } });
+      setEstimatedMinutes(newVal ? String(newVal) : "");
+    } catch (error) {
+      setEstimatedMinutes(item.estimated_minutes ? String(item.estimated_minutes) : "");
+      toast.error(error instanceof ApiError ? error.message : "Failed to update estimated time.");
     }
   }
 
@@ -136,7 +157,21 @@ export function ItemRow({
           </span>
         )}
 
-        <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+          <input
+            type="number"
+            min="0"
+            value={estimatedMinutes}
+            onChange={(e) => setEstimatedMinutes(e.target.value)}
+            onBlur={saveEstimatedMinutes}
+            placeholder="Time"
+            className="w-14 bg-transparent text-xs font-medium text-gray-600 dark:text-gray-400 focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1 py-0.5 text-right border border-transparent hover:border-gray-300 dark:hover:border-gray-700"
+            title="Estimated minutes"
+          />
+          <span className="text-[0.65rem] uppercase font-bold text-gray-400 tracking-wider">min</span>
+        </div>
+
+        <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0 ml-2">
           <input type="checkbox" checked={item.is_preview} onChange={togglePreview} className="accent-[#2D6A4F]" />
           Preview
         </label>

@@ -127,6 +127,7 @@ export interface CourseItem {
   item_type: CourseItemType;
   order_index: number;
   is_preview: boolean;
+  estimated_minutes: number | null;
   video: CourseVideo | null;
   document: CourseDocument | null;
   assessment: CourseAssessment | null;
@@ -185,6 +186,7 @@ export interface CreateItemPayload {
   item_type: CourseItemType;
   order_index: number;
   is_preview: boolean;
+  estimated_minutes?: number | null;
   file_name?: string | null;
   assessment_type?: AssessmentType;
   due_date?: string | null;
@@ -196,6 +198,7 @@ export interface UpdateItemPayload {
   title?: string;
   order_index?: number;
   is_preview?: boolean;
+  estimated_minutes?: number | null;
 }
 
 export interface UpdateAssessmentPayload {
