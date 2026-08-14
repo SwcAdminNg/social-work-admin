@@ -111,6 +111,8 @@ export function InstructorsInput({ value, onChange }: InstructorsInputProps) {
                   <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                     <input
                       type="text"
+                      autoComplete="off"
+
                       placeholder="Search accounts..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}

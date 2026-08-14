@@ -42,6 +42,8 @@ export function CourseFilters({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          autoComplete="off"
+
           placeholder="Search courses by title…"
           className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 pl-10 pr-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
         />

@@ -188,6 +188,8 @@ function CoursePicker({ open, featuredIds, onAdd, onClose }: CoursePickerProps) 
           <input
             id="course-picker-search"
             type="text"
+            autoComplete="off"
+
             placeholder="Search published courses…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
