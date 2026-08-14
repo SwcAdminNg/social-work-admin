@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Course } from "@/lib/api/courses.types";
-import { IconBookOpen, IconTrash, IconStar } from "@/components/dashboard/icons";
+import { IconBookOpen, IconTrash, IconStar, IconClock } from "@/components/dashboard/icons";
 import { PublishedBadge } from "./StatusBadge";
 import { categoryLabel, levelLabel } from "./constants";
 
@@ -38,6 +38,29 @@ export function CourseCard({
         <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug line-clamp-2">
           {course.title}
         </h3>
+        
+        {/* Instructors */}
+        {course.instructors && course.instructors.length > 0 && (
+          <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+            {course.instructors[0].name}
+            {course.instructors.length > 1 && (
+              <span className="text-gray-400"> +{course.instructors.length - 1}</span>
+            )}
+          </p>
+        )}
+
+        {/* Timed Access */}
+        {course.access_mode === "SCHEDULED" && (
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-2 py-1 rounded-md w-fit">
+            <IconClock className="w-3.5 h-3.5" />
+            <span>
+              {course.access_start_date ? new Date(course.access_start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : "?"}
+              {" – "}
+              {course.access_end_date ? new Date(course.access_end_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "?"}
+            </span>
+          </div>
+        )}
+
         <p className="text-xs text-gray-500 dark:text-gray-400">
           {categoryLabel(course.category)} &middot; {levelLabel(course.level)}
         </p>

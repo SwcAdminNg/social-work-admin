@@ -20,6 +20,19 @@ export type CourseItemType = "VIDEO" | "DOCUMENT" | "QUIZ";
 
 export type VideoStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 
+export type AccessMode = "SELF_PACED" | "SCHEDULED";
+
+export interface CourseInstructorReadDTO {
+  user_id: string | null;
+  name: string;
+}
+
+export interface CourseInstructorInputDTO {
+  user_id?: string | null;
+  name: string;
+}
+
+
 export interface Course {
   id: string;
   title: string;
@@ -39,6 +52,10 @@ export interface Course {
   is_exclusive: boolean;
   average_rating?: number;
   total_reviews?: number;
+  access_mode: AccessMode;
+  access_start_date: string | null;
+  access_end_date: string | null;
+  instructors: CourseInstructorReadDTO[];
 }
 
 export interface FeaturedCourse extends Course {
@@ -124,6 +141,10 @@ export interface CreateCoursePayload {
   price: number | null;
   thumbnail_url: string | null;
   is_exclusive: boolean;
+  instructors?: CourseInstructorInputDTO[];
+  access_mode?: AccessMode;
+  access_start_date?: string | null;
+  access_end_date?: string | null;
 }
 
 export type UpdateCoursePayload = Partial<CreateCoursePayload> & { is_exclusive?: boolean };
@@ -216,6 +237,8 @@ export interface ManagedCourseListParams {
   is_free?: boolean;
   search?: string;
   is_published?: boolean;
+  instructor_id?: string;
+  instructor_name?: string;
 }
 
 export interface PaginatedMeta {

@@ -10,6 +10,8 @@ import { IconSpinner } from "@/components/dashboard/icons";
 import { TextField, TextAreaField, SelectField, ToggleField } from "./FormControls";
 import { DynamicStringListInput } from "./DynamicStringListInput";
 import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
+import { InstructorsInput } from "./InstructorsInput";
+import type { CourseInstructorInputDTO, AccessMode } from "@/lib/api/courses.types";
 
 export function CreateCourseForm() {
   const router = useRouter();
@@ -24,6 +26,10 @@ export function CreateCourseForm() {
   const [isFree, setIsFree] = useState(true);
   const [isExclusive, setIsExclusive] = useState(false);
   const [price, setPrice] = useState("");
+  const [instructors, setInstructors] = useState<CourseInstructorInputDTO[]>([{ name: "", user_id: null }]);
+  const [accessMode, setAccessMode] = useState<AccessMode>("SELF_PACED");
+  const [accessStartDate, setAccessStartDate] = useState("");
+  const [accessEndDate, setAccessEndDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,6 +49,10 @@ export function CreateCourseForm() {
         price: isFree ? null : price ? Number(price) : null,
         thumbnail_url: null,
         is_exclusive: isExclusive,
+        instructors: instructors.filter((i) => i.name.trim()),
+        access_mode: accessMode,
+        access_start_date: accessMode === "SCHEDULED" && accessStartDate ? new Date(accessStartDate).toISOString() : null,
+        access_end_date: accessMode === "SCHEDULED" && accessEndDate ? new Date(accessEndDate).toISOString() : null,
       });
       toast.success("Course created as a draft.");
       router.push(`/dashboard/course-management/${course.id}`);
@@ -68,6 +78,48 @@ export function CreateCourseForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <SelectField label="Category" id="category" value={category} onChange={setCategory} options={CATEGORY_OPTIONS} required />
         <SelectField label="Level" id="level" value={level} onChange={setLevel} options={LEVEL_OPTIONS} required />
+      </div>
+
+      <InstructorsInput value={instructors} onChange={setInstructors} />
+
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+        <ToggleField
+          label="Scheduled Access"
+          hint="Limit access to this course to a specific date window."
+          checked={accessMode === "SCHEDULED"}
+          onChange={(checked) => setAccessMode(checked ? "SCHEDULED" : "SELF_PACED")}
+        />
+        {accessMode === "SCHEDULED" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="accessStartDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                Access Start Date
+              </label>
+              <input
+                type="datetime-local"
+                id="accessStartDate"
+                value={accessStartDate}
+                onChange={(e) => setAccessStartDate(e.target.value)}
+                required
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="accessEndDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                Access End Date
+              </label>
+              <input
+                type="datetime-local"
+                id="accessEndDate"
+                value={accessEndDate}
+                onChange={(e) => setAccessEndDate(e.target.value)}
+                required
+                min={accessStartDate}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <DynamicStringListInput

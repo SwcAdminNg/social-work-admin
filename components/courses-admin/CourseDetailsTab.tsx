@@ -10,6 +10,8 @@ import { TextField, TextAreaField, SelectField, ToggleField } from "./FormContro
 import { DynamicStringListInput } from "./DynamicStringListInput";
 import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
 import { ThumbnailUploader } from "./ThumbnailUploader";
+import { InstructorsInput } from "./InstructorsInput";
+import type { CourseInstructorInputDTO, AccessMode } from "@/lib/api/courses.types";
 
 export function CourseDetailsTab({
   course,
@@ -30,6 +32,29 @@ export function CourseDetailsTab({
   const [isExclusive, setIsExclusive] = useState(course.is_exclusive);
   const [price, setPrice] = useState(course.price != null ? String(course.price) : "");
   const [thumbnailUrl, setThumbnailUrl] = useState(course.thumbnail_url ?? "");
+  const [instructors, setInstructors] = useState<CourseInstructorInputDTO[]>(
+    course.instructors && course.instructors.length > 0
+      ? course.instructors
+      : [{ name: "", user_id: null }]
+  );
+  const [accessMode, setAccessMode] = useState<AccessMode>(course.access_mode ?? "SELF_PACED");
+  
+  // Format dates for datetime-local input (YYYY-MM-DDThh:mm)
+  const formatForInput = (isoDate: string | null) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    // Pad with leading zeros
+    const YYYY = date.getFullYear();
+    const MM = String(date.getMonth() + 1).padStart(2, "0");
+    const DD = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const mm = String(date.getMinutes()).padStart(2, "0");
+    return `${YYYY}-${MM}-${DD}T${hh}:${mm}`;
+  };
+
+  const [accessStartDate, setAccessStartDate] = useState(formatForInput(course.access_start_date));
+  const [accessEndDate, setAccessEndDate] = useState(formatForInput(course.access_end_date));
+  
   const [saving, setSaving] = useState(false);
 
   async function handleSave(e: React.FormEvent) {
@@ -49,6 +74,10 @@ export function CourseDetailsTab({
         price: isFree ? null : price ? Number(price) : null,
         thumbnail_url: thumbnailUrl || null,
         is_exclusive: isExclusive,
+        instructors: instructors.filter((i) => i.name.trim()),
+        access_mode: accessMode,
+        access_start_date: accessMode === "SCHEDULED" && accessStartDate ? new Date(accessStartDate).toISOString() : null,
+        access_end_date: accessMode === "SCHEDULED" && accessEndDate ? new Date(accessEndDate).toISOString() : null,
       };
       const updated = await updateCourse(course.id, payload);
       onUpdated(updated);
@@ -78,6 +107,48 @@ export function CourseDetailsTab({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <SelectField label="Category" id="category" value={category} onChange={setCategory} options={CATEGORY_OPTIONS} required />
         <SelectField label="Level" id="level" value={level} onChange={setLevel} options={LEVEL_OPTIONS} required />
+      </div>
+
+      <InstructorsInput value={instructors} onChange={setInstructors} />
+
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+        <ToggleField
+          label="Scheduled Access"
+          hint="Limit access to this course to a specific date window."
+          checked={accessMode === "SCHEDULED"}
+          onChange={(checked) => setAccessMode(checked ? "SCHEDULED" : "SELF_PACED")}
+        />
+        {accessMode === "SCHEDULED" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="accessStartDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                Access Start Date
+              </label>
+              <input
+                type="datetime-local"
+                id="accessStartDate"
+                value={accessStartDate}
+                onChange={(e) => setAccessStartDate(e.target.value)}
+                required
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="accessEndDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                Access End Date
+              </label>
+              <input
+                type="datetime-local"
+                id="accessEndDate"
+                value={accessEndDate}
+                onChange={(e) => setAccessEndDate(e.target.value)}
+                required
+                min={accessStartDate}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <DynamicStringListInput label="What you'll learn" values={whatYouWillLearn} onChange={setWhatYouWillLearn} />
