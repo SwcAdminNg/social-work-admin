@@ -9,6 +9,36 @@ import type { CertificateTemplate } from "@/lib/api/certificates.types";
 import { IconSpinner } from "@/components/dashboard/icons";
 import { ToggleField } from "./FormControls";
 
+interface StoredCertificateSettings {
+  certificateEnabled: boolean;
+  templateId: string;
+}
+
+function storageKey(courseId: string): string {
+  return `certificate-settings:${courseId}`;
+}
+
+function readStoredSettings(courseId: string): StoredCertificateSettings | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(storageKey(courseId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed.certificateEnabled !== "boolean" || typeof parsed.templateId !== "string") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredSettings(courseId: string, settings: StoredCertificateSettings): void {
+  try {
+    localStorage.setItem(storageKey(courseId), JSON.stringify(settings));
+  } catch {
+    // Non-fatal — the setting was still saved server-side.
+  }
+}
+
 function FormSection({
   title,
   description,
@@ -33,8 +63,20 @@ export function CourseCertificateTab({ courseId }: { courseId: string }) {
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [certificateEnabled, setCertificateEnabled] = useState(true);
-  const [templateId, setTemplateId] = useState<string>("");
+  const [templateId, setTemplateId] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Server-rendered markup has no access to localStorage, so the first client render must match
+  // it exactly (the defaults above) to avoid a hydration mismatch — the stored value is applied
+  // only after mount, once hydration has already settled.
+  useEffect(() => {
+    const stored = readStoredSettings(courseId);
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating from localStorage, must run post-mount to avoid SSR mismatch
+      setCertificateEnabled(stored.certificateEnabled);
+      setTemplateId(stored.templateId);
+    }
+  }, [courseId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +102,7 @@ export function CourseCertificateTab({ courseId }: { courseId: string }) {
     setSaving(true);
     try {
       await updateCourseCertificateSettings(courseId, { certificate_enabled: enabled });
+      writeStoredSettings(courseId, { certificateEnabled: enabled, templateId });
       toast.success(enabled ? "Certificates enabled for this course." : "Certificates turned off for this course.");
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update certificate settings.");
@@ -80,6 +123,7 @@ export function CourseCertificateTab({ courseId }: { courseId: string }) {
         await updateCourseCertificateSettings(courseId, { clear_template: true });
         toast.success("Certificate template unassigned — using the global default.");
       }
+      writeStoredSettings(courseId, { certificateEnabled, templateId });
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update certificate settings.");
     } finally {
@@ -146,8 +190,8 @@ export function CourseCertificateTab({ courseId }: { courseId: string }) {
           </button>
 
           <p className="text-xs text-gray-400 dark:text-gray-600">
-            There&apos;s no way to read back what&apos;s currently assigned — this form always applies the
-            selection above when you click save.
+            The API doesn&apos;t return what&apos;s currently assigned, so this remembers your last save in this
+            browser only — it won&apos;t reflect changes made elsewhere or on another device.
           </p>
         </FormSection>
       </form>
