@@ -16,7 +16,7 @@ import type {
   CourseQuizQuestion,
   CreateQuizOptionPayload,
 } from "@/lib/api/courses.types";
-import { IconChevronDown, IconPlus, IconSpinner, IconTrash } from "@/components/dashboard/icons";
+import { IconAlertTriangle, IconChevronDown, IconPlus, IconSpinner, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -150,7 +150,12 @@ export function QuizGroupBuilder({
       )}
 
       {quizGroup.sections.map((section) => (
-        <QuizGroupSectionPanel key={section.id} section={section} dispatch={dispatch} />
+        <QuizGroupSectionPanel
+          key={section.id}
+          section={section}
+          maxAttempts={quizGroup.max_attempts}
+          dispatch={dispatch}
+        />
       ))}
 
       {addingSection ? (
@@ -211,9 +216,11 @@ export function QuizGroupBuilder({
 
 function QuizGroupSectionPanel({
   section,
+  maxAttempts,
   dispatch,
 }: {
   section: CourseQuizGroupSection;
+  maxAttempts: number | null;
   dispatch: React.Dispatch<CourseEditorAction>;
 }) {
   const [expanded, setExpanded] = useState(true);
@@ -317,6 +324,17 @@ function QuizGroupSectionPanel({
     );
   };
 
+  // How many attempts this pool can serve before a student is guaranteed to see a
+  // repeated question. "Ask 3 of 3" means the pool IS the ask count — there's nothing
+  // left over to rotate in, so every attempt is identical.
+  const poolSize = section.questions.length;
+  const askCount = section.questions_to_ask ?? poolSize;
+  const noVariety = poolSize > 0 && askCount >= poolSize;
+  const attemptsBeforeRepeat = askCount > 0 ? Math.floor(poolSize / askCount) : 0;
+  const shortfall = maxAttempts != null && !noVariety && attemptsBeforeRepeat < maxAttempts
+    ? maxAttempts * askCount - poolSize
+    : 0;
+
   const handleAddQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
     const filledOptions = draftOptions.filter((o) => o.text.trim());
@@ -392,6 +410,30 @@ function QuizGroupSectionPanel({
           <IconChevronDown />
         </button>
       </div>
+
+      {noVariety ? (
+        <div className="flex items-start gap-2 px-3 pb-3 text-xs text-amber-700 dark:text-amber-400">
+          <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+          <span>
+            Asking all {poolSize} question{poolSize === 1 ? "" : "s"} in the pool — every attempt will be
+            identical. Add more questions (use the duplicate button on a question to spin off a variant) so
+            retakes can draw something different.
+          </span>
+        </div>
+      ) : shortfall > 0 ? (
+        <div className="flex items-start gap-2 px-3 pb-3 text-xs text-amber-700 dark:text-amber-400">
+          <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+          <span>
+            This pool covers {attemptsBeforeRepeat} attempt{attemptsBeforeRepeat === 1 ? "" : "s"} without repeats,
+            but Max Attempts is set to {maxAttempts}. Add {shortfall} more question{shortfall === 1 ? "" : "s"} to
+            avoid repeats across every attempt.
+          </span>
+        </div>
+      ) : maxAttempts != null && poolSize > 0 ? (
+        <div className="px-3 pb-3 text-xs text-gray-400 dark:text-gray-600">
+          Pool covers all {maxAttempts} attempt{maxAttempts === 1 ? "" : "s"} without repeats.
+        </div>
+      ) : null}
 
       {expanded && (
         <div className="border-t border-gray-200 dark:border-gray-800 p-3 flex flex-col gap-3">
