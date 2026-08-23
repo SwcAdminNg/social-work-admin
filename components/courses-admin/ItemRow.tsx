@@ -25,6 +25,7 @@ import { DocumentUploader } from "./DocumentUploader";
 import { QuizBuilder } from "./QuizBuilder";
 import { EssayBuilder } from "./EssayBuilder";
 import { QuizGroupBuilder } from "./QuizGroupBuilder";
+import { FinalAssessmentBadge } from "./FinalAssessmentControls";
 
 const TYPE_SWATCH_STYLES: Record<string, string> = {
   VIDEO: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
@@ -40,9 +41,15 @@ function assessmentSummary(item: CourseItem): string | null {
   const due = assessment.due_date ? `Due ${new Date(assessment.due_date).toLocaleDateString()}` : null;
 
   if (assessment.assessment_type === "ESSAY" && assessment.essay) {
-    return [assessment.essay.submission_mode === "TEXT" ? "Text submission" : "File upload", due]
-      .filter(Boolean)
-      .join(" · ");
+    const parts = [assessment.essay.submission_mode === "TEXT" ? "Text submission" : "File upload"];
+    if (assessment.is_final_assessment) {
+      const attempts = assessment.essay.max_attempts
+        ? `${assessment.essay.max_attempts} attempt${assessment.essay.max_attempts === 1 ? "" : "s"}`
+        : "Unlimited attempts";
+      parts.push(`${assessment.essay.pass_mark_percentage}% pass`, attempts);
+    }
+    parts.push(due ?? "");
+    return parts.filter(Boolean).join(" · ");
   }
 
   const settings = assessment.assessment_type === "QUIZ" ? assessment.quiz : assessment.quiz_group;
@@ -184,6 +191,8 @@ export function ItemRow({
             {summary}
           </span>
         )}
+
+        {item.assessment?.is_final_assessment && <FinalAssessmentBadge />}
 
         {item.video && <VideoStatusBadge status={item.video.status} />}
         {item.document && (

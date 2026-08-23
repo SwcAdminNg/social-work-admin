@@ -111,6 +111,8 @@ export interface CourseEssaySettings {
   question: string;
   description: string;
   submission_mode: EssaySubmissionMode;
+  pass_mark_percentage: number;
+  max_attempts: number | null;
 }
 
 export interface CourseQuizGroupSection {
@@ -133,6 +135,7 @@ export interface CourseAssessment {
   id: string;
   assessment_type: AssessmentType;
   due_date: string | null;
+  is_final_assessment?: boolean;
   quiz?: CourseQuizSettings;
   essay?: CourseEssaySettings;
   quiz_group?: CourseQuizGroupSettings;
@@ -198,6 +201,12 @@ export interface ReorderSectionsPayload {
   sections: { id: string; order_index: number }[];
 }
 
+export type CreateEssaySettingsPayload = Pick<
+  CourseEssaySettings,
+  "question" | "description" | "submission_mode"
+> &
+  Partial<Pick<CourseEssaySettings, "pass_mark_percentage" | "max_attempts">>;
+
 export interface CreateItemPayload {
   title: string;
   item_type: CourseItemType;
@@ -207,8 +216,9 @@ export interface CreateItemPayload {
   file_name?: string | null;
   assessment_type?: AssessmentType;
   due_date?: string | null;
+  is_final_assessment?: boolean;
   quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">>;
-  essay_settings?: CourseEssaySettings;
+  essay_settings?: CreateEssaySettingsPayload;
   quiz_group_settings?: Partial<Omit<CourseQuizGroupSettings, "sections">>;
 }
 
@@ -221,6 +231,7 @@ export interface UpdateItemPayload {
 
 export interface UpdateAssessmentPayload {
   due_date?: string | null;
+  is_final_assessment?: boolean | null;
   quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">> | null;
   essay_settings?: Partial<CourseEssaySettings> | null;
   quiz_group_settings?: Partial<Omit<CourseQuizGroupSettings, "sections">> | null;

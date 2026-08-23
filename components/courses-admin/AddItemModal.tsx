@@ -49,11 +49,14 @@ export function AddItemModal({
   const [estimatedMinutes, setEstimatedMinutes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
+  const [isFinalAssessment, setIsFinalAssessment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
+
+  const isAssessmentType = itemType === "QUIZ" || itemType === "ESSAY" || itemType === "QUIZ_GROUP";
 
   function reset() {
     setItemType("VIDEO");
@@ -61,6 +64,7 @@ export function AddItemModal({
     setEstimatedMinutes("");
     setFile(null);
     setIsPreview(false);
+    setIsFinalAssessment(false);
     setUploadProgress(null);
     setSubmitting(false);
     if (fileInputRef.current) {
@@ -118,12 +122,15 @@ export function AddItemModal({
 
       if (itemType === "QUIZ") {
         payload.assessment_type = "QUIZ";
+        payload.is_final_assessment = isFinalAssessment;
         payload.quiz_settings = { max_attempts: null, pass_mark_percentage: 70, show_result_to_student: true };
       } else if (itemType === "ESSAY") {
         payload.assessment_type = "ESSAY";
+        payload.is_final_assessment = isFinalAssessment;
         payload.essay_settings = { question: title, description: "Write your answer here.", submission_mode: "TEXT" };
       } else if (itemType === "QUIZ_GROUP") {
         payload.assessment_type = "QUIZ_GROUP";
+        payload.is_final_assessment = isFinalAssessment;
         payload.quiz_group_settings = {
           max_attempts: null,
           pass_mark_percentage: 70,
@@ -142,6 +149,7 @@ export function AddItemModal({
             id: result.id,
             assessment_type: itemType,
             due_date: null,
+            is_final_assessment: isFinalAssessment,
           };
           if (itemType === "QUIZ") {
             result.assessment.quiz = {
@@ -155,6 +163,8 @@ export function AddItemModal({
               question: title,
               description: "Write your answer here.",
               submission_mode: "TEXT",
+              pass_mark_percentage: 70,
+              max_attempts: null,
             };
           } else if (itemType === "QUIZ_GROUP") {
             result.assessment.quiz_group = {
@@ -354,6 +364,23 @@ export function AddItemModal({
               Allow non-enrolled users to preview this item
             </span>
           </label>
+
+          {isAssessmentType && (
+            <label className="flex items-start gap-2.5 cursor-pointer select-none mt-3">
+              <input
+                type="checkbox"
+                checked={isFinalAssessment}
+                onChange={(e) => setIsFinalAssessment(e.target.checked)}
+                className="accent-[#2D6A4F] mt-0.5"
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Final assessment for this section
+                <span className="block text-xs text-gray-400 dark:text-gray-600 mt-0.5">
+                  Students must pass this before the next section unlocks. Can be changed later in settings.
+                </span>
+              </span>
+            </label>
+          )}
         </fieldset>
 
         {isUploading && (

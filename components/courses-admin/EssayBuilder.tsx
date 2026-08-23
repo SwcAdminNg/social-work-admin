@@ -8,6 +8,7 @@ import type { CourseItem, EssaySubmission } from "@/lib/api/courses.types";
 import { IconChevronDown, IconSpinner } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { TextAreaField } from "./FormControls";
+import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 
 export function EssayBuilder({
   item,
@@ -22,6 +23,9 @@ export function EssayBuilder({
   const [description, setDescription] = useState(essay?.description ?? "");
   const [submissionMode, setSubmissionMode] = useState<"TEXT" | "DOCUMENT">(essay?.submission_mode ?? "TEXT");
   const [dueDate, setDueDate] = useState<string>(item.assessment?.due_date ? item.assessment.due_date.slice(0, 16) : "");
+  const [passMark, setPassMark] = useState(String(essay?.pass_mark_percentage ?? 70));
+  const [maxAttempts, setMaxAttempts] = useState(essay?.max_attempts ? String(essay.max_attempts) : "");
+  const [isFinalAssessment, setIsFinalAssessment] = useState(item.assessment?.is_final_assessment ?? false);
 
   const [saving, setSaving] = useState(false);
 
@@ -33,17 +37,25 @@ export function EssayBuilder({
     try {
       const payload = {
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        is_final_assessment: isFinalAssessment,
         essay_settings: {
           question: question.trim(),
           description: description.trim(),
           submission_mode: submissionMode,
+          pass_mark_percentage: parseInt(passMark) || 70,
+          max_attempts: maxAttempts ? parseInt(maxAttempts) : null,
         },
       };
       await updateAssessmentSettings(item.id, payload);
       dispatch({
         type: "UPDATE_ASSESSMENT",
         itemId: item.id,
-        assessment: { ...item.assessment!, due_date: payload.due_date, essay: { ...essay, ...payload.essay_settings } },
+        assessment: {
+          ...item.assessment!,
+          due_date: payload.due_date,
+          is_final_assessment: payload.is_final_assessment,
+          essay: { ...essay, ...payload.essay_settings },
+        },
       });
       toast.success("Essay settings saved.");
     } catch (error) {
@@ -56,6 +68,12 @@ export function EssayBuilder({
   return (
     <div className="flex flex-col gap-4">
       <form onSubmit={handleSave} className="flex flex-col gap-4">
+        {item.assessment?.is_final_assessment && (
+          <div>
+            <FinalAssessmentBadge />
+          </div>
+        )}
+
         <TextAreaField
           label="Essay Prompt / Question"
           id={`essay-prompt-${item.id}`}
@@ -96,6 +114,39 @@ export function EssayBuilder({
               className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
             />
           </div>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+            Pass mark and attempts only matter once this essay is a final assessment (below) — a
+            regular essay has nothing that &ldquo;fails&rdquo; it.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Pass Mark (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={passMark}
+                onChange={(e) => setPassMark(e.target.value)}
+                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Max Attempts (Optional)</label>
+              <input
+                type="number"
+                min="1"
+                value={maxAttempts}
+                onChange={(e) => setMaxAttempts(e.target.value)}
+                placeholder="Unlimited"
+                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </div>
+          </div>
+          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
         </div>
 
         <button

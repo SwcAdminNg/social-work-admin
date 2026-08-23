@@ -8,6 +8,7 @@ import type { CourseItem, CreateQuizOptionPayload } from "@/lib/api/courses.type
 import { IconPlus, IconSpinner, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
+import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -32,6 +33,7 @@ export function QuizBuilder({
   const [passMark, setPassMark] = useState(String(item.assessment?.quiz?.pass_mark_percentage ?? 70));
   const [maxAttempts, setMaxAttempts] = useState(item.assessment?.quiz?.max_attempts ? String(item.assessment.quiz.max_attempts) : "");
   const [showResult, setShowResult] = useState(item.assessment?.quiz?.show_result_to_student ?? true);
+  const [isFinalAssessment, setIsFinalAssessment] = useState(item.assessment?.is_final_assessment ?? false);
   const [savingSettings, setSavingSettings] = useState(false);
 
   const quiz = item.assessment?.quiz;
@@ -97,6 +99,7 @@ export function QuizBuilder({
     try {
       const payload = {
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        is_final_assessment: isFinalAssessment,
         quiz_settings: {
           pass_mark_percentage: parseInt(passMark) || 70,
           max_attempts: maxAttempts ? parseInt(maxAttempts) : null,
@@ -107,7 +110,12 @@ export function QuizBuilder({
       dispatch({
         type: "UPDATE_ASSESSMENT",
         itemId: item.id,
-        assessment: { ...item.assessment!, due_date: payload.due_date, quiz: { ...quiz, ...payload.quiz_settings } },
+        assessment: {
+          ...item.assessment!,
+          due_date: payload.due_date,
+          is_final_assessment: payload.is_final_assessment,
+          quiz: { ...quiz, ...payload.quiz_settings },
+        },
       });
       setEditingSettings(false);
       toast.success("Quiz settings updated.");
@@ -140,6 +148,8 @@ export function QuizBuilder({
               <input type="checkbox" checked={showResult} onChange={(e) => setShowResult(e.target.checked)} className="accent-[#2D6A4F]" />
               <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Show result to student</label>
             </div>
+            <div className="h-px bg-gray-100 dark:bg-gray-800 sm:col-span-2" />
+            <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
           </div>
           <div className="flex items-center justify-end gap-2 mt-2">
             <button type="button" onClick={() => setEditingSettings(false)} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
@@ -150,10 +160,11 @@ export function QuizBuilder({
         </form>
       ) : (
         <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <span>Pass mark: {quiz.pass_mark_percentage}%</span>
             <span>Attempts: {quiz.max_attempts ? quiz.max_attempts : "Unlimited"}</span>
             {item.assessment?.due_date && <span>Due: {new Date(item.assessment.due_date).toLocaleDateString()}</span>}
+            {item.assessment?.is_final_assessment && <FinalAssessmentBadge />}
           </div>
           <button type="button" onClick={() => setEditingSettings(true)} className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer">Edit settings</button>
         </div>

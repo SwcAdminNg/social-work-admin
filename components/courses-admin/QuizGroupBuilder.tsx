@@ -20,6 +20,7 @@ import { IconAlertTriangle, IconChevronDown, IconPlus, IconSpinner, IconTrash } 
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -42,6 +43,7 @@ export function QuizGroupBuilder({
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(
     quizGroup?.time_limit_seconds ? String(Math.round(quizGroup.time_limit_seconds / 60)) : ""
   );
+  const [isFinalAssessment, setIsFinalAssessment] = useState(item.assessment?.is_final_assessment ?? false);
   const [savingSettings, setSavingSettings] = useState(false);
 
   const [addingSection, setAddingSection] = useState(false);
@@ -58,6 +60,7 @@ export function QuizGroupBuilder({
       const parsedMinutes = timeLimitMinutes ? parseInt(timeLimitMinutes, 10) : null;
       const payload = {
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        is_final_assessment: isFinalAssessment,
         quiz_group_settings: {
           pass_mark_percentage: parseInt(passMark) || 70,
           max_attempts: maxAttempts ? parseInt(maxAttempts) : null,
@@ -70,7 +73,12 @@ export function QuizGroupBuilder({
       dispatch({
         type: "UPDATE_ASSESSMENT",
         itemId: item.id,
-        assessment: { ...item.assessment!, due_date: payload.due_date, quiz_group: { ...quizGroup, ...payload.quiz_group_settings } },
+        assessment: {
+          ...item.assessment!,
+          due_date: payload.due_date,
+          is_final_assessment: payload.is_final_assessment,
+          quiz_group: { ...quizGroup, ...payload.quiz_group_settings },
+        },
       });
       setEditingSettings(false);
       toast.success("Quiz group settings updated.");
@@ -129,6 +137,8 @@ export function QuizGroupBuilder({
               <input type="checkbox" checked={showResult} onChange={(e) => setShowResult(e.target.checked)} className="accent-[#2D6A4F]" />
               <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Show result to student</label>
             </div>
+            <div className="h-px bg-gray-100 dark:bg-gray-800 sm:col-span-2" />
+            <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
           </div>
           <div className="flex items-center justify-end gap-2 mt-2">
             <button type="button" onClick={() => setEditingSettings(false)} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
@@ -144,6 +154,7 @@ export function QuizGroupBuilder({
             <span>Attempts: {quizGroup.max_attempts ? quizGroup.max_attempts : "Unlimited"}</span>
             <span>Time limit: {quizGroup.time_limit_seconds ? `${Math.round(quizGroup.time_limit_seconds / 60)} min` : "Untimed"}</span>
             {item.assessment?.due_date && <span>Due: {new Date(item.assessment.due_date).toLocaleDateString()}</span>}
+            {item.assessment?.is_final_assessment && <FinalAssessmentBadge />}
           </div>
           <button type="button" onClick={() => setEditingSettings(true)} className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer">Edit settings</button>
         </div>
