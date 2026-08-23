@@ -7,6 +7,7 @@ import { ApiError } from "@/lib/api/client";
 import { createCertificateTemplate } from "@/lib/api/certificates-client";
 import { IconSpinner } from "@/components/dashboard/icons";
 import { TemplateFormFields, type TemplateFormState } from "./TemplateFormFields";
+import { CertificatePreview } from "./CertificatePreview";
 
 const DEFAULT_STATE: TemplateFormState = {
   name: "",
@@ -69,17 +70,25 @@ export function CreateTemplateForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <TemplateFormFields state={state} onChange={handleChange} />
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5 items-start">
+      <div className="flex flex-col gap-5 min-w-0">
+        <TemplateFormFields state={state} onChange={handleChange} />
+      </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-      >
-        {submitting && <IconSpinner className="text-white/80" />}
-        {submitting ? "Creating…" : "Create template"}
-      </button>
+      <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 flex flex-col gap-4">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Preview</h3>
+          <CertificatePreview state={state} />
+          <button
+            type="submit"
+            disabled={submitting}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {submitting && <IconSpinner className="text-white/80" />}
+            {submitting ? "Creating…" : "Create template"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

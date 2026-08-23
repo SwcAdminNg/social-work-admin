@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { getLogoUploadUrl, getSignatureUploadUrl } from "@/lib/api/certificates-client";
@@ -63,13 +62,8 @@ export function CertificateImageUploader({
       <div className="flex items-center gap-4">
         <div className="w-24 h-24 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden flex items-center justify-center">
           {currentImageUrl && (
-            <Image
-              src={currentImageUrl}
-              alt={label}
-              width={96}
-              height={96}
-              className="object-contain w-full h-full"
-            />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={currentImageUrl} alt={label} className="object-contain w-full h-full" />
           )}
         </div>
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelected} />
