@@ -225,7 +225,11 @@ function QuizGroupSectionPanel({
 }) {
   const [expanded, setExpanded] = useState(true);
   const [title, setTitle] = useState(section.title);
+  // "Ask every question" is a deliberate mode (questions_to_ask: null), not just an empty
+  // input — modeled as its own toggle so it can't be confused with "haven't set this yet".
+  const [askAll, setAskAll] = useState(section.questions_to_ask == null);
   const [questionsToAsk, setQuestionsToAsk] = useState(section.questions_to_ask ? String(section.questions_to_ask) : "");
+  const [askError, setAskError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
@@ -252,22 +256,41 @@ function QuizGroupSectionPanel({
     }
   }
 
-  async function saveQuestionsToAsk() {
-    const trimmed = questionsToAsk.trim();
-    const parsed = parseInt(trimmed, 10);
-    const newVal = !isNaN(parsed) && parsed > 0 ? parsed : null;
-    if (newVal === section.questions_to_ask) {
-      setQuestionsToAsk(section.questions_to_ask ? String(section.questions_to_ask) : "");
-      return;
-    }
+  async function persistQuestionsToAsk(newVal: number | null) {
+    if (newVal === section.questions_to_ask) return;
     try {
       await updateQuizGroupSection(section.id, { questions_to_ask: newVal });
       dispatch({ type: "UPDATE_QUIZ_GROUP_SECTION", sectionId: section.id, fields: { questions_to_ask: newVal } });
-      setQuestionsToAsk(newVal ? String(newVal) : "");
     } catch (error) {
+      // Revert the toggle/input to whatever the server still has.
+      setAskAll(section.questions_to_ask == null);
       setQuestionsToAsk(section.questions_to_ask ? String(section.questions_to_ask) : "");
       toast.error(error instanceof ApiError ? error.message : "Failed to update section.");
     }
+  }
+
+  async function handleToggleAskAll(next: boolean) {
+    setAskAll(next);
+    setAskError(null);
+    if (next) {
+      await persistQuestionsToAsk(null);
+    }
+    // Switching off leaves the number field for the instructor to fill in and blur —
+    // nothing to save yet with no value entered.
+  }
+
+  async function saveQuestionsToAsk() {
+    if (askAll) return;
+    const trimmed = questionsToAsk.trim();
+    const parsed = Number(trimmed);
+    // Match the API's own validation (§8: 422 on questions_to_ask below 1) instead of
+    // silently reinterpreting a bad value as "ask every question".
+    if (trimmed === "" || !Number.isInteger(parsed) || parsed < 1) {
+      setAskError("Enter a whole number of 1 or more, or turn on “ask every question.”");
+      return;
+    }
+    setAskError(null);
+    await persistQuestionsToAsk(parsed);
   }
 
   async function handleDeleteSection() {
@@ -324,16 +347,50 @@ function QuizGroupSectionPanel({
     );
   };
 
-  // How many attempts this pool can serve before a student is guaranteed to see a
-  // repeated question. "Ask 3 of 3" means the pool IS the ask count — there's nothing
-  // left over to rotate in, so every attempt is identical.
+  // Recomputed live from the in-progress edit (not just the saved value) so the
+  // instructor sees the coverage math update as they type, before they even blur.
   const poolSize = section.questions.length;
-  const askCount = section.questions_to_ask ?? poolSize;
-  const noVariety = poolSize > 0 && askCount >= poolSize;
-  const attemptsBeforeRepeat = askCount > 0 ? Math.floor(poolSize / askCount) : 0;
-  const shortfall = maxAttempts != null && !noVariety && attemptsBeforeRepeat < maxAttempts
-    ? maxAttempts * askCount - poolSize
-    : 0;
+  const draftAsk = askAll
+    ? poolSize
+    : Number.isInteger(Number(questionsToAsk)) && Number(questionsToAsk) > 0
+      ? Number(questionsToAsk)
+      : null;
+
+  let coverage: { text: string; tone: "neutral" | "warning" | "muted" } | null = null;
+  if (poolSize === 0) {
+    coverage = { text: "No questions in this pool yet — add some below.", tone: "muted" };
+  } else if (askAll) {
+    coverage = {
+      text: `${poolSize} question${poolSize === 1 ? "" : "s"} in this pool · asked every time · no variance (deliberate).`,
+      tone: "muted",
+    };
+  } else if (draftAsk === null) {
+    coverage = { text: "Enter how many questions to ask per attempt.", tone: "muted" };
+  } else {
+    const attemptsBeforeRepeat = Math.floor(poolSize / draftAsk);
+    const noVariety = draftAsk >= poolSize;
+    const shortfall =
+      maxAttempts != null && !noVariety && attemptsBeforeRepeat < maxAttempts
+        ? maxAttempts * draftAsk - poolSize
+        : 0;
+    const base = `${poolSize} question${poolSize === 1 ? "" : "s"} in this pool · ${draftAsk} asked per attempt · `;
+
+    if (noVariety) {
+      coverage = { text: `${base}no variance — every attempt will be identical.`, tone: "warning" };
+    } else if (shortfall > 0) {
+      coverage = {
+        text: `${base}covers ${attemptsBeforeRepeat} of ${maxAttempts} attempts without repeats — add ${shortfall} more to cover them all.`,
+        tone: "warning",
+      };
+    } else if (maxAttempts != null) {
+      coverage = { text: `${base}covers all ${maxAttempts} attempts with no repeats.`, tone: "neutral" };
+    } else {
+      coverage = {
+        text: `${base}covers ${attemptsBeforeRepeat} attempt${attemptsBeforeRepeat === 1 ? "" : "s"} before questions start repeating.`,
+        tone: "neutral",
+      };
+    }
+  }
 
   const handleAddQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -379,23 +436,10 @@ function QuizGroupSectionPanel({
           onBlur={saveTitle}
           className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1.5 py-0.5"
         />
-        <div className="flex items-center gap-1.5 flex-shrink-0 text-xs text-gray-500 dark:text-gray-400">
-          <span>Ask</span>
-          <input
-            type="number"
-            min="1"
-            value={questionsToAsk}
-            onChange={(e) => setQuestionsToAsk(e.target.value)}
-            onBlur={saveQuestionsToAsk}
-            placeholder="All"
-            className="w-14 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          />
-          <span>of {section.questions.length}</span>
-        </div>
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
+          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer flex-shrink-0"
           aria-label="Delete section"
         >
           <IconTrash />
@@ -403,7 +447,7 @@ function QuizGroupSectionPanel({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-transform duration-150 cursor-pointer"
+          className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-transform duration-150 cursor-pointer flex-shrink-0"
           style={{ transform: expanded ? "rotate(180deg)" : undefined }}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
@@ -411,29 +455,58 @@ function QuizGroupSectionPanel({
         </button>
       </div>
 
-      {noVariety ? (
-        <div className="flex items-start gap-2 px-3 pb-3 text-xs text-amber-700 dark:text-amber-400">
-          <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-          <span>
-            Asking all {poolSize} question{poolSize === 1 ? "" : "s"} in the pool — every attempt will be
-            identical. Add more questions (use the duplicate button on a question to spin off a variant) so
-            retakes can draw something different.
-          </span>
+      <div className="px-3 pb-3 flex flex-col gap-2 border-t border-gray-100 dark:border-gray-800/60 pt-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-600 dark:text-gray-400">
+            <input
+              type="checkbox"
+              checked={askAll}
+              onChange={(e) => handleToggleAskAll(e.target.checked)}
+              className="accent-[#2D6A4F]"
+            />
+            Ask every question every time
+          </label>
+
+          {!askAll && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 dark:text-gray-400">Questions per attempt</span>
+              <input
+                type="number"
+                min="1"
+                value={questionsToAsk}
+                onChange={(e) => {
+                  setQuestionsToAsk(e.target.value);
+                  if (askError) setAskError(null);
+                }}
+                onBlur={saveQuestionsToAsk}
+                placeholder="e.g. 5"
+                className={`w-16 rounded-lg border bg-white dark:bg-gray-900 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 ${
+                  askError
+                    ? "border-red-400 dark:border-red-500 focus:ring-red-400"
+                    : "border-gray-200 dark:border-gray-700 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                }`}
+              />
+            </div>
+          )}
         </div>
-      ) : shortfall > 0 ? (
-        <div className="flex items-start gap-2 px-3 pb-3 text-xs text-amber-700 dark:text-amber-400">
-          <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-          <span>
-            This pool covers {attemptsBeforeRepeat} attempt{attemptsBeforeRepeat === 1 ? "" : "s"} without repeats,
-            but Max Attempts is set to {maxAttempts}. Add {shortfall} more question{shortfall === 1 ? "" : "s"} to
-            avoid repeats across every attempt.
-          </span>
-        </div>
-      ) : maxAttempts != null && poolSize > 0 ? (
-        <div className="px-3 pb-3 text-xs text-gray-400 dark:text-gray-600">
-          Pool covers all {maxAttempts} attempt{maxAttempts === 1 ? "" : "s"} without repeats.
-        </div>
-      ) : null}
+
+        {askError && <p className="text-xs text-red-600 dark:text-red-400">{askError}</p>}
+
+        {coverage && (
+          <div
+            className={`flex items-start gap-2 text-xs ${
+              coverage.tone === "warning"
+                ? "text-amber-700 dark:text-amber-400"
+                : coverage.tone === "muted"
+                  ? "text-gray-400 dark:text-gray-600"
+                  : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            {coverage.tone === "warning" && <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />}
+            <span>{coverage.text}</span>
+          </div>
+        )}
+      </div>
 
       {expanded && (
         <div className="border-t border-gray-200 dark:border-gray-800 p-3 flex flex-col gap-3">
