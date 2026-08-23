@@ -61,11 +61,12 @@ export function SectionList({
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={course.sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-4">
-          {course.sections.map((section) => (
+          {course.sections.map((section, index) => (
             <SectionCard
               key={section.id}
               course={course}
               section={section}
+              index={index}
               dispatch={dispatch}
               onRefresh={onRefresh}
               onItemCreated={onItemCreated}

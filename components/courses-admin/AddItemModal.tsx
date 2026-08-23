@@ -15,7 +15,7 @@ import {
   IconX,
 } from "@/components/dashboard/icons";
 
-type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY";
+type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP";
 
 const ITEM_TYPES: {
   value: UIItemType;
@@ -26,6 +26,7 @@ const ITEM_TYPES: {
   { value: "DOCUMENT", label: "Document", icon: IconDocument },
   { value: "QUIZ", label: "Quiz", icon: IconQuiz },
   { value: "ESSAY", label: "Essay", icon: IconDocumentText },
+  { value: "QUIZ_GROUP", label: "Quiz Group", icon: IconQuiz },
 ];
 
 export function AddItemModal({
@@ -101,7 +102,7 @@ export function AddItemModal({
     try {
       let actualItemType: CourseItemType = "VIDEO";
       if (itemType === "DOCUMENT") actualItemType = "DOCUMENT";
-      else if (itemType === "QUIZ" || itemType === "ESSAY") actualItemType = "ASSESSMENT";
+      else if (itemType === "QUIZ" || itemType === "ESSAY" || itemType === "QUIZ_GROUP") actualItemType = "ASSESSMENT";
 
       const parsedMinutes = parseInt(estimatedMinutes, 10);
       const minutes = !isNaN(parsedMinutes) && parsedMinutes > 0 ? parsedMinutes : null;
@@ -121,13 +122,21 @@ export function AddItemModal({
       } else if (itemType === "ESSAY") {
         payload.assessment_type = "ESSAY";
         payload.essay_settings = { question: title, description: "Write your answer here.", submission_mode: "TEXT" };
+      } else if (itemType === "QUIZ_GROUP") {
+        payload.assessment_type = "QUIZ_GROUP";
+        payload.quiz_group_settings = {
+          max_attempts: null,
+          pass_mark_percentage: 70,
+          show_result_to_student: true,
+          time_limit_seconds: null,
+        };
       }
 
       const result = await createItem(_courseId, sectionId, payload);
 
       // Backend may not echo the full assessment payload on creation,
       // inject default state so the UI builder can immediately render.
-      if (itemType === "QUIZ" || itemType === "ESSAY") {
+      if (itemType === "QUIZ" || itemType === "ESSAY" || itemType === "QUIZ_GROUP") {
         if (!result.assessment) {
           result.assessment = {
             id: result.id,
@@ -146,6 +155,14 @@ export function AddItemModal({
               question: title,
               description: "Write your answer here.",
               submission_mode: "TEXT",
+            };
+          } else if (itemType === "QUIZ_GROUP") {
+            result.assessment.quiz_group = {
+              max_attempts: null,
+              pass_mark_percentage: 70,
+              show_result_to_student: true,
+              time_limit_seconds: null,
+              sections: [],
             };
           }
         }
@@ -226,7 +243,7 @@ export function AddItemModal({
         </h2>
 
         <fieldset disabled={isUploading}>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {ITEM_TYPES.map(({ value, label, icon: Icon }) => (
               <button
                 key={value}
@@ -265,7 +282,9 @@ export function AddItemModal({
                       ? "e.g. Cheat sheet"
                       : itemType === "QUIZ"
                         ? "e.g. Module 1 quiz"
-                        : "e.g. Midterm essay"
+                        : itemType === "QUIZ_GROUP"
+                          ? "e.g. Module 1 final"
+                          : "e.g. Midterm essay"
                 }
                 className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
               />

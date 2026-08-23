@@ -24,6 +24,34 @@ import { VideoUploader } from "./VideoUploader";
 import { DocumentUploader } from "./DocumentUploader";
 import { QuizBuilder } from "./QuizBuilder";
 import { EssayBuilder } from "./EssayBuilder";
+import { QuizGroupBuilder } from "./QuizGroupBuilder";
+
+const TYPE_SWATCH_STYLES: Record<string, string> = {
+  VIDEO: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
+  DOCUMENT: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
+  QUIZ: "bg-violet-500/10 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400",
+  ESSAY: "bg-teal-500/10 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400",
+  QUIZ_GROUP: "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
+};
+
+function assessmentSummary(item: CourseItem): string | null {
+  const assessment = item.assessment;
+  if (!assessment) return null;
+  const due = assessment.due_date ? `Due ${new Date(assessment.due_date).toLocaleDateString()}` : null;
+
+  if (assessment.assessment_type === "ESSAY" && assessment.essay) {
+    return [assessment.essay.submission_mode === "TEXT" ? "Text submission" : "File upload", due]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  const settings = assessment.assessment_type === "QUIZ" ? assessment.quiz : assessment.quiz_group;
+  if (!settings) return null;
+  const attempts = settings.max_attempts
+    ? `${settings.max_attempts} attempt${settings.max_attempts === 1 ? "" : "s"}`
+    : "Unlimited attempts";
+  return [`${settings.pass_mark_percentage}% pass`, attempts, due].filter(Boolean).join(" · ");
+}
 
 export function ItemRow({
   item,
@@ -48,11 +76,15 @@ export function ItemRow({
   const [deleting, setDeleting] = useState(false);
   
   let TypeIcon = IconVideo;
-  if (item.item_type === "DOCUMENT") TypeIcon = IconDocument;
-  else if (item.item_type === "ASSESSMENT") {
-    if (item.assessment?.assessment_type === "ESSAY") TypeIcon = IconDocumentText;
-    else TypeIcon = IconQuiz;
+  let typeKey = "VIDEO";
+  if (item.item_type === "DOCUMENT") {
+    TypeIcon = IconDocument;
+    typeKey = "DOCUMENT";
+  } else if (item.item_type === "ASSESSMENT") {
+    typeKey = item.assessment?.assessment_type ?? "QUIZ";
+    TypeIcon = typeKey === "ESSAY" ? IconDocumentText : IconQuiz;
   }
+  const summary = !expanded ? assessmentSummary(item) : null;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -134,7 +166,9 @@ export function ItemRow({
           <IconDragHandle />
         </button>
 
-        <span className="text-gray-400 dark:text-gray-500 flex-shrink-0">
+        <span
+          className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center [&_svg]:w-3.5 [&_svg]:h-3.5 ${TYPE_SWATCH_STYLES[typeKey]}`}
+        >
           <TypeIcon />
         </span>
 
@@ -144,6 +178,12 @@ export function ItemRow({
           onBlur={saveTitle}
           className="flex-1 min-w-0 bg-transparent text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1.5 py-0.5"
         />
+
+        {summary && (
+          <span className="hidden md:inline text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 truncate max-w-[220px]">
+            {summary}
+          </span>
+        )}
 
         {item.video && <VideoStatusBadge status={item.video.status} />}
         {item.document && (
@@ -221,6 +261,9 @@ export function ItemRow({
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "ESSAY" && (
             <EssayBuilder item={item} dispatch={dispatch} />
+          )}
+          {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ_GROUP" && (
+            <QuizGroupBuilder item={item} dispatch={dispatch} />
           )}
         </div>
       )}

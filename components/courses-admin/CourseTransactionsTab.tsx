@@ -8,6 +8,7 @@ import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { IconReceipt } from "@/components/dashboard/icons";
+import { StatTile } from "./StatTile";
 import Link from "next/link";
 
 const PAGE_SIZE = 10;
@@ -62,48 +63,54 @@ export function CourseTransactionsTab({ courseId }: { courseId: string }) {
   });
 
   return (
-    <div className="flex flex-col gap-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
-      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Sales & Transactions</h2>
-      
-      <DataTable
-        columns={[
-          { key: "date", header: "Date", render: (t) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(t.created_at)}</span> },
-          { 
-            key: "user", 
-            header: "User", 
-            render: (t) => (
-              <Link 
-                href={`/dashboard/user-management/${t.user.id}`}
-                className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
-              >
-                <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
-                  {t.user.full_name || `${t.user.first_name || ""} ${t.user.last_name || ""}`.trim() || "User"}
-                </span>
-                <span className="text-xs text-gray-500">{t.user.email}</span>
-              </Link>
-            ) 
-          },
-          { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-bold text-gray-900 dark:text-white">₦{t.amount.toLocaleString()}</span> },
-          { key: "status", header: "Status", render: (t) => <StatusBadge status={t.status} /> },
-          { 
-            key: "method", 
-            header: "Payment Method", 
-            render: (t) => (
-              <div className="flex items-center gap-2">
-                <PaymentIcon cardType={t.card_type} />
-              </div>
-            )
-          },
-        ]}
-        data={data?.items ?? []}
-        keyExtractor={(t) => t.id}
-        loading={isLoading}
-        emptyState={<EmptyState icon={IconReceipt} title="No sales yet" description="This course hasn't had any direct transactions." />}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="w-full sm:w-64">
+        <StatTile icon={IconReceipt} label="Total transactions" value={data?.total_items ?? (isLoading ? "…" : 0)} />
+      </div>
 
-      {data && data.total_pages > 1 && (
-        <Pagination currentPage={page} totalPages={data.total_pages} onPageChange={setPage} />
-      )}
+      <div className="flex flex-col gap-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Sales & Transactions</h2>
+
+        <DataTable
+          columns={[
+            { key: "date", header: "Date", render: (t) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(t.created_at)}</span> },
+            {
+              key: "user",
+              header: "User",
+              render: (t) => (
+                <Link
+                  href={`/dashboard/user-management/${t.user.id}`}
+                  className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
+                >
+                  <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
+                    {t.user.full_name || `${t.user.first_name || ""} ${t.user.last_name || ""}`.trim() || "User"}
+                  </span>
+                  <span className="text-xs text-gray-500">{t.user.email}</span>
+                </Link>
+              )
+            },
+            { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-bold text-gray-900 dark:text-white">₦{t.amount.toLocaleString()}</span> },
+            { key: "status", header: "Status", render: (t) => <StatusBadge status={t.status} /> },
+            {
+              key: "method",
+              header: "Payment Method",
+              render: (t) => (
+                <div className="flex items-center gap-2">
+                  <PaymentIcon cardType={t.card_type} />
+                </div>
+              )
+            },
+          ]}
+          data={data?.items ?? []}
+          keyExtractor={(t) => t.id}
+          loading={isLoading}
+          emptyState={<EmptyState icon={IconReceipt} title="No sales yet" description="This course hasn't had any direct transactions." />}
+        />
+
+        {data && data.total_pages > 1 && (
+          <Pagination currentPage={page} totalPages={data.total_pages} onPageChange={setPage} />
+        )}
+      </div>
     </div>
   );
 }

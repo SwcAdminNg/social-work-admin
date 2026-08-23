@@ -1,6 +1,24 @@
 import type { VideoStatus } from "@/lib/api/courses.types";
 
-export function PublishedBadge({ isPublished }: { isPublished: boolean }) {
+export function PublishedBadge({
+  isPublished,
+  tone = "surface",
+}: {
+  isPublished: boolean;
+  /** "surface" (default) is for white/gray card backgrounds. "banner" is for the
+   *  fixed-color green gradient hero — it stays legible without relying on the
+   *  app's light/dark theme, since the banner's own color doesn't change with it. */
+  tone?: "surface" | "banner";
+}) {
+  if (tone === "banner") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-white/15 text-white border border-white/25 backdrop-blur-sm">
+        <span className={`w-1.5 h-1.5 rounded-full ${isPublished ? "bg-emerald-300" : "bg-amber-300"}`} />
+        {isPublished ? "Published" : "Draft"}
+      </span>
+    );
+  }
+
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide ${

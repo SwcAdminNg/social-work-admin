@@ -18,7 +18,7 @@ export type CourseCategory =
 
 export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT";
 
-export type AssessmentType = "QUIZ" | "ESSAY";
+export type AssessmentType = "QUIZ" | "ESSAY" | "QUIZ_GROUP";
 export type EssaySubmissionMode = "TEXT" | "DOCUMENT";
 
 export type VideoStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
@@ -113,12 +113,29 @@ export interface CourseEssaySettings {
   submission_mode: EssaySubmissionMode;
 }
 
+export interface CourseQuizGroupSection {
+  id: string;
+  title: string;
+  order_index: number;
+  questions_to_ask: number | null;
+  questions: CourseQuizQuestion[];
+}
+
+export interface CourseQuizGroupSettings {
+  max_attempts: number | null;
+  pass_mark_percentage: number;
+  show_result_to_student: boolean;
+  time_limit_seconds: number | null;
+  sections: CourseQuizGroupSection[];
+}
+
 export interface CourseAssessment {
   id: string;
   assessment_type: AssessmentType;
   due_date: string | null;
   quiz?: CourseQuizSettings;
   essay?: CourseEssaySettings;
+  quiz_group?: CourseQuizGroupSettings;
 }
 
 export interface CourseItem {
@@ -192,6 +209,7 @@ export interface CreateItemPayload {
   due_date?: string | null;
   quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">>;
   essay_settings?: CourseEssaySettings;
+  quiz_group_settings?: Partial<Omit<CourseQuizGroupSettings, "sections">>;
 }
 
 export interface UpdateItemPayload {
@@ -205,6 +223,7 @@ export interface UpdateAssessmentPayload {
   due_date?: string | null;
   quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">> | null;
   essay_settings?: Partial<CourseEssaySettings> | null;
+  quiz_group_settings?: Partial<Omit<CourseQuizGroupSettings, "sections">> | null;
 }
 
 export interface ReorderItemsPayload {
@@ -259,6 +278,37 @@ export interface UpdateQuizOptionPayload {
   text?: string;
   is_correct?: boolean;
   order_index?: number;
+}
+
+export interface CreateQuizGroupSectionPayload {
+  title: string;
+  order_index?: number;
+  questions_to_ask?: number | null;
+}
+
+export interface UpdateQuizGroupSectionPayload {
+  title?: string;
+  order_index?: number;
+  questions_to_ask?: number | null;
+}
+
+export interface EssaySubmission {
+  user_id: string;
+  user_full_name: string;
+  user_email: string;
+  content_text: string | null;
+  document_file_name: string | null;
+  document_download_url: string | null;
+  submitted_at: string;
+  score: number | null;
+  is_published: boolean;
+  feedback: string | null;
+}
+
+export interface GradeEssayPayload {
+  score: number;
+  feedback?: string | null;
+  is_published?: boolean;
 }
 
 export interface ManagedCourseListParams {

@@ -4,6 +4,7 @@ import type {
   CourseDetail,
   CourseQuizOption,
   CourseQuizQuestion,
+  CourseQuizGroupSection,
   CourseSection,
   CourseCatalog,
   CourseReview,
@@ -15,10 +16,13 @@ import type {
   CreateItemResult,
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
+  CreateQuizGroupSectionPayload,
   CreateSectionPayload,
+  EssaySubmission,
   FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
+  GradeEssayPayload,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
@@ -27,6 +31,7 @@ import type {
   UpdateCoursePayload,
   UpdateItemPayload,
   UpdateAssessmentPayload,
+  UpdateQuizGroupSectionPayload,
   UpdateQuizOptionPayload,
   UpdateQuizQuestionPayload,
   UpdateSectionPayload,
@@ -283,6 +288,61 @@ export async function deleteQuizQuestion(questionId: string): Promise<void> {
 
 export async function deleteQuizOption(optionId: string): Promise<void> {
   await request(`/quiz/options/${optionId}`, { method: "DELETE" });
+}
+
+export async function createQuizGroupSection(
+  itemId: string,
+  payload: CreateQuizGroupSectionPayload,
+): Promise<CourseQuizGroupSection> {
+  const res = await request<CourseQuizGroupSection>(
+    `/items/${itemId}/quiz-group/sections`,
+    { method: "POST", body: payload },
+  );
+  return res.data;
+}
+
+export async function updateQuizGroupSection(
+  sectionId: string,
+  payload: UpdateQuizGroupSectionPayload,
+): Promise<void> {
+  await request(`/quiz-group/sections/${sectionId}`, { method: "PATCH", body: payload });
+}
+
+export async function deleteQuizGroupSection(sectionId: string): Promise<void> {
+  await request(`/quiz-group/sections/${sectionId}`, { method: "DELETE" });
+}
+
+export async function createQuizGroupSectionQuestion(
+  sectionId: string,
+  payload: CreateQuizQuestionPayload,
+): Promise<CourseQuizQuestion> {
+  const res = await request<CourseQuizQuestion>(
+    `/quiz-group/sections/${sectionId}/questions`,
+    { method: "POST", body: payload },
+  );
+  return res.data;
+}
+
+export async function listEssaySubmissions(
+  itemId: string,
+  params: { page?: number; page_size?: number } = {},
+): Promise<PaginatedResult<EssaySubmission>> {
+  const res = await request<EssaySubmission[]>(
+    `/items/${itemId}/essay/submissions${buildQuery(params)}`,
+    { method: "GET" },
+  );
+  return { items: res.data, meta: res.meta! };
+}
+
+export async function gradeEssaySubmission(
+  itemId: string,
+  userId: string,
+  payload: GradeEssayPayload,
+): Promise<void> {
+  await request(`/items/${itemId}/essay/submissions/${userId}/grade`, {
+    method: "POST",
+    body: payload,
+  });
 }
 
 export async function getThumbnailUploadUrl(

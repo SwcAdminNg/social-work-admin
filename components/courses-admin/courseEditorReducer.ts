@@ -4,6 +4,8 @@ import type {
   CourseItem,
   CourseAssessment,
   CourseQuizSettings,
+  CourseQuizGroupSettings,
+  CourseQuizGroupSection,
   CourseEssaySettings,
   CourseQuizOption,
   CourseQuizQuestion,
@@ -27,7 +29,16 @@ export type CourseEditorAction =
   | { type: "REMOVE_QUIZ_QUESTION"; questionId: string }
   | { type: "ADD_QUIZ_OPTION"; questionId: string; option: CourseQuizOption }
   | { type: "UPDATE_QUIZ_OPTION"; optionId: string; fields: Partial<CourseQuizOption> }
-  | { type: "REMOVE_QUIZ_OPTION"; optionId: string };
+  | { type: "REMOVE_QUIZ_OPTION"; optionId: string }
+  | {
+      type: "UPDATE_QUIZ_GROUP_SETTINGS";
+      itemId: string;
+      fields: Partial<Omit<CourseQuizGroupSettings, "sections">>;
+    }
+  | { type: "ADD_QUIZ_GROUP_SECTION"; itemId: string; section: CourseQuizGroupSection }
+  | { type: "UPDATE_QUIZ_GROUP_SECTION"; sectionId: string; fields: Partial<CourseQuizGroupSection> }
+  | { type: "REMOVE_QUIZ_GROUP_SECTION"; sectionId: string }
+  | { type: "ADD_QUIZ_GROUP_SECTION_QUESTION"; sectionId: string; question: CourseQuizQuestion };
 
 function mapSections(state: CourseDetail, fn: (section: CourseSection) => CourseSection): CourseDetail {
   return { ...state, sections: state.sections.map(fn) };
@@ -40,18 +51,91 @@ function mapItems(
   return mapSections(state, (section) => ({ ...section, items: section.items.map(fn) }));
 }
 
+// Question ids are unique across both a standalone quiz and a quiz group's section pools,
+// so mutation actions dispatched by QuizQuestionCard search both containers to find where
+// the question actually lives (it doesn't know which one it was rendered from).
 function mapQuestion(item: CourseItem, questionId: string, fn: (q: CourseQuizQuestion) => CourseQuizQuestion): CourseItem {
-  if (!item.assessment?.quiz) return item;
-  return {
-    ...item,
-    assessment: {
-      ...item.assessment,
-      quiz: {
-        ...item.assessment.quiz,
-        questions: item.assessment.quiz.questions.map((q) => (q.id === questionId ? fn(q) : q)),
+  const assessment = item.assessment;
+  if (!assessment) return item;
+
+  if (assessment.quiz?.questions.some((q) => q.id === questionId)) {
+    return {
+      ...item,
+      assessment: {
+        ...assessment,
+        quiz: {
+          ...assessment.quiz,
+          questions: assessment.quiz.questions.map((q) => (q.id === questionId ? fn(q) : q)),
+        },
       },
-    },
-  };
+    };
+  }
+
+  if (assessment.quiz_group?.sections.some((s) => s.questions.some((q) => q.id === questionId))) {
+    return {
+      ...item,
+      assessment: {
+        ...assessment,
+        quiz_group: {
+          ...assessment.quiz_group,
+          sections: assessment.quiz_group.sections.map((s) =>
+            s.questions.some((q) => q.id === questionId)
+              ? { ...s, questions: s.questions.map((q) => (q.id === questionId ? fn(q) : q)) }
+              : s
+          ),
+        },
+      },
+    };
+  }
+
+  return item;
+}
+
+function removeQuestion(item: CourseItem, questionId: string): CourseItem {
+  const assessment = item.assessment;
+  if (!assessment) return item;
+  let next = assessment;
+
+  if (assessment.quiz?.questions.some((q) => q.id === questionId)) {
+    next = { ...next, quiz: { ...assessment.quiz, questions: assessment.quiz.questions.filter((q) => q.id !== questionId) } };
+  }
+
+  if (assessment.quiz_group?.sections.some((s) => s.questions.some((q) => q.id === questionId))) {
+    next = {
+      ...next,
+      quiz_group: {
+        ...assessment.quiz_group,
+        sections: assessment.quiz_group.sections.map((s) => ({
+          ...s,
+          questions: s.questions.filter((q) => q.id !== questionId),
+        })),
+      },
+    };
+  }
+
+  return next === assessment ? item : { ...item, assessment: next };
+}
+
+function mapAllQuestions(item: CourseItem, fn: (q: CourseQuizQuestion) => CourseQuizQuestion): CourseItem {
+  const assessment = item.assessment;
+  if (!assessment) return item;
+  let next = assessment;
+
+  if (assessment.quiz) {
+    next = { ...next, quiz: { ...assessment.quiz, questions: assessment.quiz.questions.map(fn) } };
+  }
+
+  if (assessment.quiz_group) {
+    next = {
+      ...next,
+      quiz_group: {
+        ...assessment.quiz_group,
+        sections: assessment.quiz_group.sections.map((s) => ({ ...s, questions: s.questions.map(fn) })),
+      },
+    };
+  }
+
+  return next === assessment ? item : { ...item, assessment: next };
 }
 
 export function courseEditorReducer(state: CourseDetail, action: CourseEditorAction): CourseDetail {
@@ -112,70 +196,112 @@ export function courseEditorReducer(state: CourseDetail, action: CourseEditorAct
       );
 
     case "UPDATE_QUIZ_QUESTION":
-      return mapItems(state, (item) =>
-        item.assessment?.quiz?.questions.some((q) => q.id === action.questionId)
-          ? mapQuestion(item, action.questionId, (q) => ({ ...q, ...action.fields }))
-          : item
-      );
+      return mapItems(state, (item) => mapQuestion(item, action.questionId, (q) => ({ ...q, ...action.fields })));
 
     case "REMOVE_QUIZ_QUESTION":
+      return mapItems(state, (item) => removeQuestion(item, action.questionId));
+
+    case "ADD_QUIZ_OPTION":
       return mapItems(state, (item) =>
-        item.assessment?.quiz
+        mapQuestion(item, action.questionId, (q) => ({ ...q, options: [...q.options, action.option] }))
+      );
+
+    case "UPDATE_QUIZ_OPTION":
+      return mapItems(state, (item) =>
+        mapAllQuestions(item, (q) => ({
+          ...q,
+          options: q.options.map((o) => (o.id === action.optionId ? { ...o, ...action.fields } : o)),
+        }))
+      );
+
+    case "REMOVE_QUIZ_OPTION":
+      return mapItems(state, (item) =>
+        mapAllQuestions(item, (q) => ({
+          ...q,
+          options: q.options.filter((o) => o.id !== action.optionId),
+        }))
+      );
+
+    case "UPDATE_QUIZ_GROUP_SETTINGS":
+      return mapItems(state, (item) =>
+        item.id === action.itemId && item.assessment?.quiz_group
           ? {
               ...item,
               assessment: {
                 ...item.assessment,
-                quiz: {
-                  ...item.assessment.quiz,
-                  questions: item.assessment.quiz.questions.filter((q) => q.id !== action.questionId),
+                quiz_group: { ...item.assessment.quiz_group, ...action.fields },
+              },
+            }
+          : item
+      );
+
+    case "ADD_QUIZ_GROUP_SECTION":
+      return mapItems(state, (item) =>
+        item.id === action.itemId && item.assessment?.quiz_group
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz_group: {
+                  ...item.assessment.quiz_group,
+                  sections: [...item.assessment.quiz_group.sections, action.section],
                 },
               },
             }
           : item
       );
 
-    case "ADD_QUIZ_OPTION":
+    case "UPDATE_QUIZ_GROUP_SECTION":
       return mapItems(state, (item) =>
-        item.assessment?.quiz?.questions.some((q) => q.id === action.questionId)
-          ? mapQuestion(item, action.questionId, (q) => ({ ...q, options: [...q.options, action.option] }))
+        item.assessment?.quiz_group?.sections.some((s) => s.id === action.sectionId)
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz_group: {
+                  ...item.assessment.quiz_group,
+                  sections: item.assessment.quiz_group.sections.map((s) =>
+                    s.id === action.sectionId ? { ...s, ...action.fields } : s
+                  ),
+                },
+              },
+            }
           : item
       );
 
-    case "UPDATE_QUIZ_OPTION":
-      return mapItems(state, (item) => {
-        if (!item.assessment?.quiz) return item;
-        return {
-          ...item,
-          assessment: {
-            ...item.assessment,
-            quiz: {
-              ...item.assessment.quiz,
-              questions: item.assessment.quiz.questions.map((q) => ({
-                ...q,
-                options: q.options.map((o) => (o.id === action.optionId ? { ...o, ...action.fields } : o)),
-              })),
-            },
-          },
-        };
-      });
+    case "REMOVE_QUIZ_GROUP_SECTION":
+      return mapItems(state, (item) =>
+        item.assessment?.quiz_group?.sections.some((s) => s.id === action.sectionId)
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz_group: {
+                  ...item.assessment.quiz_group,
+                  sections: item.assessment.quiz_group.sections.filter((s) => s.id !== action.sectionId),
+                },
+              },
+            }
+          : item
+      );
 
-    case "REMOVE_QUIZ_OPTION":
-      return mapItems(state, (item) => {
-        if (!item.assessment?.quiz) return item;
-        return {
-          ...item,
-          assessment: {
-            ...item.assessment,
-            quiz: {
-              ...item.assessment.quiz,
-              questions: item.assessment.quiz.questions.map((q) => ({
-                ...q,
-                options: q.options.filter((o) => o.id !== action.optionId),
-              })),
-            },
-          },
-        };
-      });
+    case "ADD_QUIZ_GROUP_SECTION_QUESTION":
+      return mapItems(state, (item) =>
+        item.assessment?.quiz_group?.sections.some((s) => s.id === action.sectionId)
+          ? {
+              ...item,
+              assessment: {
+                ...item.assessment,
+                quiz_group: {
+                  ...item.assessment.quiz_group,
+                  sections: item.assessment.quiz_group.sections.map((s) =>
+                    s.id === action.sectionId ? { ...s, questions: [...s.questions, action.question] } : s
+                  ),
+                },
+              },
+            }
+          : item
+      );
 
     default:
       return state;

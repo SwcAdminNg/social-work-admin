@@ -11,16 +11,22 @@ import {
   updateQuizQuestion,
 } from "@/lib/api/courses-client";
 import type { CourseQuizQuestion } from "@/lib/api/courses.types";
-import { IconPlus, IconTrash } from "@/components/dashboard/icons";
+import { IconCopy, IconPlus, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 export function QuizQuestionCard({
   question,
   dispatch,
+  onDuplicate,
+  duplicating,
 }: {
   question: CourseQuizQuestion;
   dispatch: React.Dispatch<CourseEditorAction>;
+  /** When provided, shows a "Duplicate" button — used in quiz-group section pools so instructors can
+   *  quickly spin off variant questions, growing the pool so retakes don't repeat the same question. */
+  onDuplicate?: () => void;
+  duplicating?: boolean;
 }) {
   const [text, setText] = useState(question.text);
   const [newOptionText, setNewOptionText] = useState("");
@@ -141,6 +147,18 @@ export function QuizQuestionCard({
           onBlur={saveText}
           className="flex-1 bg-transparent text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800 rounded px-1.5 py-1"
         />
+        {onDuplicate && (
+          <button
+            type="button"
+            onClick={onDuplicate}
+            disabled={duplicating}
+            className="p-1.5 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Duplicate question as a variant"
+            title="Duplicate as a variant (so retakes can draw a different version instead of repeating this one)"
+          >
+            <IconCopy />
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}

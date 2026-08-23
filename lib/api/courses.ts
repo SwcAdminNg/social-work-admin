@@ -4,6 +4,7 @@ import type {
   CourseDetail,
   CourseQuizOption,
   CourseQuizQuestion,
+  CourseQuizGroupSection,
   CourseSection,
   CourseCatalog,
   CreateCatalogPayload,
@@ -12,17 +13,22 @@ import type {
   CreateItemResult,
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
+  CreateQuizGroupSectionPayload,
   CreateSectionPayload,
+  EssaySubmission,
   FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
+  GradeEssayPayload,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
   ReorderSectionsPayload,
   SetFeaturedCoursesPayload,
+  UpdateAssessmentPayload,
   UpdateCoursePayload,
   UpdateItemPayload,
+  UpdateQuizGroupSectionPayload,
   UpdateQuizOptionPayload,
   UpdateQuizQuestionPayload,
   UpdateSectionPayload,
@@ -151,6 +157,14 @@ export async function updateItem(
   await apiClient.patch(`/courses/items/${itemId}`, payload, { token });
 }
 
+export async function updateAssessmentSettings(
+  itemId: string,
+  payload: UpdateAssessmentPayload,
+  token: string
+): Promise<void> {
+  await apiClient.patch(`/courses/items/${itemId}/assessment`, payload, { token });
+}
+
 export async function deleteItem(itemId: string, token: string): Promise<void> {
   await apiClient.delete(`/courses/items/${itemId}`, { token });
 }
@@ -236,6 +250,65 @@ export async function deleteQuizQuestion(questionId: string, token: string): Pro
 
 export async function deleteQuizOption(optionId: string, token: string): Promise<void> {
   await apiClient.delete(`/courses/quiz/options/${optionId}`, { token });
+}
+
+export async function createQuizGroupSection(
+  itemId: string,
+  payload: CreateQuizGroupSectionPayload,
+  token: string
+): Promise<CourseQuizGroupSection> {
+  const res = await apiClient.post<ApiEnvelope<CourseQuizGroupSection>>(
+    `/courses/items/${itemId}/quiz-group/sections`,
+    payload,
+    { token }
+  );
+  return res.data;
+}
+
+export async function updateQuizGroupSection(
+  sectionId: string,
+  payload: UpdateQuizGroupSectionPayload,
+  token: string
+): Promise<void> {
+  await apiClient.patch(`/courses/quiz-group/sections/${sectionId}`, payload, { token });
+}
+
+export async function deleteQuizGroupSection(sectionId: string, token: string): Promise<void> {
+  await apiClient.delete(`/courses/quiz-group/sections/${sectionId}`, { token });
+}
+
+export async function createQuizGroupSectionQuestion(
+  sectionId: string,
+  payload: CreateQuizQuestionPayload,
+  token: string
+): Promise<CourseQuizQuestion> {
+  const res = await apiClient.post<ApiEnvelope<CourseQuizQuestion>>(
+    `/courses/quiz-group/sections/${sectionId}/questions`,
+    payload,
+    { token }
+  );
+  return res.data;
+}
+
+export async function listEssaySubmissions(
+  itemId: string,
+  params: { page?: number; page_size?: number },
+  token: string
+): Promise<PaginatedResult<EssaySubmission>> {
+  const res = await apiClient.get<ApiEnvelope<EssaySubmission[]>>(
+    `/courses/items/${itemId}/essay/submissions${buildQuery(params)}`,
+    { token }
+  );
+  return { items: res.data, meta: res.meta! };
+}
+
+export async function gradeEssaySubmission(
+  itemId: string,
+  userId: string,
+  payload: GradeEssayPayload,
+  token: string
+): Promise<void> {
+  await apiClient.post(`/courses/items/${itemId}/essay/submissions/${userId}/grade`, payload, { token });
 }
 
 export async function getFeaturedCourses(

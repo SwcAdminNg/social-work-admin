@@ -16,6 +16,7 @@ import { AddItemModal } from "./AddItemModal";
 export function SectionCard({
   course,
   section,
+  index,
   dispatch,
   onRefresh,
   onItemCreated,
@@ -24,6 +25,7 @@ export function SectionCard({
 }: {
   course: CourseDetail;
   section: CourseSection;
+  index: number;
   dispatch: React.Dispatch<CourseEditorAction>;
   onRefresh: () => void;
   onItemCreated: (sectionId: string, result: CreateItemResult) => void;
@@ -84,6 +86,10 @@ export function SectionCard({
         >
           <IconDragHandle />
         </button>
+
+        <span className="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] text-xs font-extrabold">
+          {index + 1}
+        </span>
 
         <input
           value={title}
