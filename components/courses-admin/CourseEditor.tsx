@@ -10,6 +10,7 @@ import { deleteCourse, getManagedCourse } from "@/lib/api/courses-client";
 import type { CourseDetail } from "@/lib/api/courses.types";
 import {
   IconBookOpen,
+  IconCertificate,
   IconClipboardCheck,
   IconClock,
   IconFolder,
@@ -26,6 +27,7 @@ import { categoryLabel, levelLabel } from "./constants";
 import { CourseDetailsTab } from "./CourseDetailsTab";
 import { CourseCurriculumTab } from "./CourseCurriculumTab";
 import { CourseTransactionsTab } from "./CourseTransactionsTab";
+import { CourseCertificateTab } from "./CourseCertificateTab";
 
 const VIDEO_POLL_INTERVAL_MS = 5000;
 
@@ -38,7 +40,7 @@ function formatDuration(totalMinutes: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-type Tab = "details" | "curriculum" | "sales";
+type Tab = "details" | "curriculum" | "sales" | "certificate";
 
 export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail }) {
   const router = useRouter();
@@ -161,6 +163,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
             [
               { key: "details", label: "Details", icon: IconBookOpen, count: undefined },
               { key: "curriculum", label: "Curriculum", icon: IconGrid, count: stats.itemCount },
+              { key: "certificate", label: "Certificate", icon: IconCertificate, count: undefined },
               { key: "sales", label: "Sales & Transactions", icon: IconReceipt, count: undefined },
             ] as const satisfies readonly { key: Tab; label: string; icon: React.ComponentType; count: number | undefined }[]
           ).map(({ key, label, icon: Icon, count }) => (
@@ -217,6 +220,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       {tab === "curriculum" && (
         <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
       )}
+      {tab === "certificate" && <CourseCertificateTab courseId={course.id} />}
       {tab === "sales" && (
         <CourseTransactionsTab courseId={course.id} />
       )}

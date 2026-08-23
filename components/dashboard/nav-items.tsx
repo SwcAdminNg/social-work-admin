@@ -1,5 +1,6 @@
 import {
   IconBookOpen,
+  IconCertificate,
   IconGrid,
   IconReceipt,
   IconSettings,
@@ -35,6 +36,12 @@ export const dashboardNavItems: NavItem[] = [
     label: "Course Catalogs",
     href: "/dashboard/course-catalogs",
     icon: IconFolder,
+    adminOnly: true,
+  },
+  {
+    label: "Certificates",
+    href: "/dashboard/certificates",
+    icon: IconCertificate,
     adminOnly: true,
   },
   {
