@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { login } from "@/lib/api/auth";
-import { ApiError } from "@/lib/api/client";
+import type { AuthSessionData } from "@/lib/api/auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -16,42 +15,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers: [
     Credentials({
+      // Password verification and two-factor authentication both happen
+      // out-of-band, against the auth API's challenge-token endpoints, before
+      // this provider is ever invoked (see components/auth/Login.tsx and
+      // components/auth/twoFactor). By the time authorize() runs, the caller
+      // already holds a completed AuthSessionDTO — this just turns it into a
+      // NextAuth session.
       credentials: {
-        identifier: {},
-        password: {},
+        verifiedSession: {},
         keepLoggedIn: {},
       },
       authorize: async (credentials) => {
-        const identifier = credentials?.identifier as string | undefined;
-        const password = credentials?.password as string | undefined;
+        const verifiedSession = credentials?.verifiedSession as string | undefined;
+        if (!verifiedSession) return null;
 
-        if (!identifier || !password) return null;
-
+        let data: AuthSessionData;
         try {
-          const { data } = await login({
-            identifier,
-            password,
-            keep_logged_in: credentials?.keepLoggedIn === "true",
-          });
-
-          return {
-            id: data.user.id,
-            firstName: data.user.first_name,
-            lastName: data.user.last_name,
-            email: data.user.email,
-            username: data.user.username,
-            userType: data.user.user_type,
-            accessToken: data.tokens.access_token,
-            refreshToken: data.tokens.refresh_token,
-            accessTokenExpires: Date.now() + data.tokens.expires_in * 1000,
-            keepLoggedIn: credentials?.keepLoggedIn === "true",
-          };
-        } catch (error) {
-          if (error instanceof ApiError) {
-            throw new Error(error.message);
-          }
-          throw new Error("Unable to sign in. Please try again.");
+          data = JSON.parse(verifiedSession);
+        } catch {
+          return null;
         }
+
+        return {
+          id: data.user.id,
+          firstName: data.user.first_name,
+          lastName: data.user.last_name,
+          email: data.user.email,
+          username: data.user.username,
+          userType: data.user.user_type,
+          accessToken: data.tokens.access_token,
+          refreshToken: data.tokens.refresh_token,
+          accessTokenExpires: Date.now() + data.tokens.expires_in * 1000,
+          keepLoggedIn: credentials?.keepLoggedIn === "true",
+        };
       },
     }),
   ],

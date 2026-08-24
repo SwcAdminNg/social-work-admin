@@ -6,8 +6,9 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { listCertificateTemplates, updateCourseCertificateSettings } from "@/lib/api/certificates-client";
 import type { CertificateTemplate } from "@/lib/api/certificates.types";
-import { IconSpinner } from "@/components/dashboard/icons";
+import { IconClock, IconSpinner } from "@/components/dashboard/icons";
 import { ToggleField } from "./FormControls";
+import type { AccessMode } from "@/lib/api/courses.types";
 
 interface StoredCertificateSettings {
   certificateEnabled: boolean;
@@ -59,7 +60,15 @@ function FormSection({
   );
 }
 
-export function CourseCertificateTab({ courseId }: { courseId: string }) {
+export function CourseCertificateTab({
+  courseId,
+  accessMode,
+  accessEndDate,
+}: {
+  courseId: string;
+  accessMode?: AccessMode;
+  accessEndDate?: string | null;
+}) {
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [certificateEnabled, setCertificateEnabled] = useState(true);
@@ -131,15 +140,35 @@ export function CourseCertificateTab({ courseId }: { courseId: string }) {
     }
   }
 
+  const holdsForSchedule = accessMode === "SCHEDULED" && !!accessEndDate;
+
   return (
     <div className="flex flex-col gap-5 max-w-2xl">
+      {holdsForSchedule && (
+        <div className="flex items-start gap-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4">
+          <IconClock className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600 dark:text-amber-500" />
+          <p className="text-sm text-amber-800 dark:text-amber-400">
+            This course is scheduled with an end date of{" "}
+            <strong>
+              {new Date(accessEndDate as string).toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </strong>
+            . Certificates are held back and issued together once that date passes, even for
+            students who finish earlier.
+          </p>
+        </div>
+      )}
+
       <FormSection
         title="Issuance"
         description="A certificate is issued automatically the moment a student completes this course."
       >
         <ToggleField
           label="Certificates enabled"
-          hint="Turn off to stop issuing certificates for this course going forward. Already-issued certificates are unaffected."
+          hint="Turn off to stop issuing certificates for this course going forward — this always wins, even once a scheduled course's end date passes. Already-issued certificates are unaffected."
           checked={certificateEnabled}
           onChange={handleSaveEnabled}
           disabled={saving}

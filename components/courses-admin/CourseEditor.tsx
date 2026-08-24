@@ -220,7 +220,13 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       {tab === "curriculum" && (
         <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
       )}
-      {tab === "certificate" && <CourseCertificateTab courseId={course.id} />}
+      {tab === "certificate" && (
+        <CourseCertificateTab
+          courseId={course.id}
+          accessMode={course.access_mode}
+          accessEndDate={course.access_end_date}
+        />
+      )}
       {tab === "sales" && (
         <CourseTransactionsTab courseId={course.id} />
       )}
