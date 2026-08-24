@@ -18,7 +18,11 @@ async function forward(
     );
   }
 
-  if (session.user.userType !== "ADMIN") {
+  // FAQ management stays ADMIN-only, but the ticket queue is open to any staff member —
+  // an ADMIN, or an INSTRUCTOR granted access via the "Support Desk" group. The backend is
+  // the source of truth for the latter (it checks actual group membership); this is just a
+  // coarse account-type gate so a plain USER account can never reach this proxy at all.
+  if (session.user.userType !== "ADMIN" && session.user.userType !== "INSTRUCTOR") {
     return NextResponse.json(
       {
         success: false,

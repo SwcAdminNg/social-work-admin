@@ -4,8 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
-import { getTickets } from "@/lib/api/support-client";
-import { getUsers } from "@/lib/api/users";
+import { getAssignableStaff, getTickets } from "@/lib/api/support-client";
 import type { Ticket, TicketStatus } from "@/lib/api/support.types";
 import type { User } from "@/lib/api/users.types";
 import type { PaginatedResult } from "@/lib/api/courses.types";
@@ -72,16 +71,17 @@ function formatRelativeTime(dateStr?: string | null): string {
 
 interface TicketQueueListProps {
   initialData: PaginatedResult<Ticket>;
-  currentAdminId: string;
+  currentUserId: string;
+  isAdmin: boolean;
 }
 
-export function TicketQueueList({ initialData, currentAdminId }: TicketQueueListProps) {
+export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQueueListProps) {
   const router = useRouter();
   const [data, setData] = useState<PaginatedResult<Ticket>>(initialData);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<TicketStatus | "">("");
   const [assignedFilter, setAssignedFilter] = useState<string>("");
-  const [admins, setAdmins] = useState<User[]>([]);
+  const [staff, setStaff] = useState<User[]>([]);
   const dataRef = useRef(data);
 
   useEffect(() => {
@@ -89,10 +89,13 @@ export function TicketQueueList({ initialData, currentAdminId }: TicketQueueList
   }, [data]);
 
   useEffect(() => {
-    getUsers({ userType: "ADMIN", pageSize: 100 })
-      .then((res) => setAdmins(res.data ?? []))
+    // Only an admin can enumerate the full staff roster (Users + Groups are admin-only
+    // endpoints) — a non-admin staff member just gets "assigned to me" as a filter option.
+    if (!isAdmin) return;
+    getAssignableStaff()
+      .then(setStaff)
       .catch(() => {});
-  }, []);
+  }, [isAdmin]);
 
   const fetchPage = useCallback(
     async (page: number, opts?: { status?: TicketStatus | ""; assignedAdminId?: string; silent?: boolean }) => {
@@ -102,7 +105,7 @@ export function TicketQueueList({ initialData, currentAdminId }: TicketQueueList
       try {
         const res = await getTickets({
           status: effectiveStatus || undefined,
-          assigned_admin_id: effectiveAssigned === "me" ? currentAdminId : effectiveAssigned || undefined,
+          assigned_admin_id: effectiveAssigned === "me" ? currentUserId : effectiveAssigned || undefined,
           page,
           page_size: dataRef.current.meta.page_size,
         });
@@ -115,7 +118,7 @@ export function TicketQueueList({ initialData, currentAdminId }: TicketQueueList
         if (!opts?.silent) setLoading(false);
       }
     },
-    [status, assignedFilter, currentAdminId]
+    [status, assignedFilter, currentUserId]
   );
 
   // Silent background auto-refresh so the queue stays live for whoever is watching it.
@@ -231,9 +234,9 @@ export function TicketQueueList({ initialData, currentAdminId }: TicketQueueList
             >
               <option value="">Everyone</option>
               <option value="me">Assigned to me</option>
-              {admins.map((admin) => (
-                <option key={admin.id} value={admin.id}>
-                  {[admin.first_name, admin.last_name].filter(Boolean).join(" ") || admin.username}
+              {staff.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {[member.first_name, member.last_name].filter(Boolean).join(" ") || member.username}
                 </option>
               ))}
             </select>

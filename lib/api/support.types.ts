@@ -79,6 +79,8 @@ export interface Ticket {
 
 export type TicketSenderType = "USER" | "ADMIN";
 
+export type SupportAttachmentKind = "IMAGE" | "DOCUMENT";
+
 export interface TicketMessage {
   id: string;
   ticket_id: string;
@@ -87,6 +89,11 @@ export interface TicketMessage {
   sender?: TicketUserSummary | null;
   body: string;
   created_at: string;
+  attachment_url?: string | null;
+  attachment_file_name?: string | null;
+  attachment_mime_type?: string | null;
+  attachment_file_size_bytes?: number | null;
+  attachment_kind?: SupportAttachmentKind | null;
 }
 
 export interface GetTicketsParams {
@@ -106,4 +113,18 @@ export interface SetTicketStatusPayload {
 
 export interface SendTicketMessagePayload {
   body: string;
+  attachment_storage_key?: string;
+  attachment_file_name?: string;
+  attachment_mime_type?: string;
+  attachment_file_size_bytes?: number;
+}
+
+export interface UploadAttachmentRequestPayload {
+  file_name: string;
+  content_type?: string;
+}
+
+export interface UploadAttachmentResponse {
+  upload_url: string;
+  storage_key: string;
 }

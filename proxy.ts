@@ -5,9 +5,13 @@ const protectedPrefixes = ["/dashboard"];
 const authPrefixes = ["/login", "/register", "/forgot-password", "/reset-password"];
 const adminOnlyPrefixes = [
   "/dashboard/course-management",
-  "/dashboard/help-support",
+  "/dashboard/help-support/faq",
   "/dashboard/groups",
 ];
+// Staff (ADMIN or INSTRUCTOR) — real enforcement of "is this instructor actually on the
+// Support Desk" happens API-side; this is just coarse account-type gating so plain USER
+// accounts never see the ticket queue at all.
+const staffOnlyPrefixes = ["/dashboard/help-support/tickets"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -16,6 +20,8 @@ export default auth((req) => {
   const isProtectedRoute = protectedPrefixes.some((p) => pathname.startsWith(p));
   const isAuthRoute = authPrefixes.some((p) => pathname.startsWith(p));
   const isAdminOnlyRoute = adminOnlyPrefixes.some((p) => pathname.startsWith(p));
+  const isStaffOnlyRoute = staffOnlyPrefixes.some((p) => pathname.startsWith(p));
+  const userType = req.auth?.user?.userType;
 
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL("/login", req.nextUrl);
@@ -23,7 +29,11 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAdminOnlyRoute && isAuthenticated && req.auth?.user?.userType !== "ADMIN") {
+  if (isAdminOnlyRoute && isAuthenticated && userType !== "ADMIN") {
+    return NextResponse.redirect(new URL("/dashboard/not-authorized", req.nextUrl));
+  }
+
+  if (isStaffOnlyRoute && isAuthenticated && userType !== "ADMIN" && userType !== "INSTRUCTOR") {
     return NextResponse.redirect(new URL("/dashboard/not-authorized", req.nextUrl));
   }
 

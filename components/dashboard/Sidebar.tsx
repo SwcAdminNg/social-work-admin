@@ -22,8 +22,9 @@ export function Sidebar() {
     useSidebar();
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const isAdmin = session?.user?.userType === "ADMIN";
+  const isStaff = isAdmin || session?.user?.userType === "INSTRUCTOR";
   const visibleNavItems = dashboardNavItems.filter(
-    (item) => !item.adminOnly || isAdmin,
+    (item) => (!item.adminOnly || isAdmin) && (!item.staffOnly || isStaff),
   );
 
   return (
