@@ -15,9 +15,11 @@ import {
   setTicketStatus,
   uploadTicketAttachment,
 } from "@/lib/api/support-client";
-import type { TicketMessage, TicketStatus } from "@/lib/api/support.types";
+import type { PaginatedResult } from "@/lib/api/courses.types";
+import type { Ticket, TicketMessage, TicketStatus } from "@/lib/api/support.types";
 import { StatusBadge } from "./TicketQueueList";
 import { NotStaffNotice } from "./NotStaffNotice";
+import { useTicketSocket } from "@/lib/hooks/useTicketSocket";
 import {
   IconSend,
   IconSpinner,
@@ -26,13 +28,16 @@ import {
   IconUpload,
   IconX,
   IconDocument,
+  IconWifi,
 } from "@/components/dashboard/icons";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconLifeBuoy } from "@/components/dashboard/icons";
 
 const STATUS_OPTIONS: TicketStatus[] = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
-const MESSAGES_POLL_MS = 5_000;
-const TICKET_POLL_MS = 15_000;
+// The WebSocket keeps this live — these are just a safety net for whenever it's down
+// (reconnecting, or an event type it doesn't cover, e.g. a user-submitted rating).
+const FALLBACK_MESSAGES_POLL_MS = 8_000;
+const FALLBACK_TICKET_POLL_MS = 20_000;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 function personName(person?: { first_name?: string; last_name?: string; username?: string; email?: string } | null) {
@@ -50,6 +55,15 @@ function formatTimestamp(dateStr: string) {
   });
 }
 
+function appendMessage(
+  old: PaginatedResult<TicketMessage> | undefined,
+  message: TicketMessage
+): PaginatedResult<TicketMessage> | undefined {
+  if (!old) return old;
+  if (old.items.some((m) => m.id === message.id)) return old; // already have it (e.g. our own just-sent message)
+  return { ...old, items: [...old.items, message] };
+}
+
 export function TicketDetail({ ticketId }: { ticketId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -65,14 +79,12 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
   const ticketQuery = useQuery({
     queryKey: ["support_ticket", ticketId],
     queryFn: () => getTicket(ticketId),
-    refetchInterval: TICKET_POLL_MS,
     retry: (failureCount, error) => error instanceof ApiError && error.status !== 403 && error.status !== 404 && failureCount < 2,
   });
 
   const messagesQuery = useQuery({
     queryKey: ["support_ticket_messages", ticketId],
     queryFn: () => getTicketMessages(ticketId, 1, 100),
-    refetchInterval: MESSAGES_POLL_MS,
     enabled: !ticketQuery.isError,
   });
 
@@ -84,6 +96,47 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
     staleTime: 60_000,
     enabled: isAdmin && !ticketQuery.isError,
   });
+
+  const { connected } = useTicketSocket({
+    ticketId,
+    token: session?.accessToken,
+    enabled: !ticketQuery.isError,
+    onMessage: (message) => {
+      queryClient.setQueryData<PaginatedResult<TicketMessage>>(["support_ticket_messages", ticketId], (old) =>
+        appendMessage(old, message)
+      );
+      // A new message can also flip status (OPEN -> IN_PROGRESS) and clear escalation.
+      queryClient.invalidateQueries({ queryKey: ["support_ticket", ticketId] });
+    },
+    onAssigned: () => {
+      // The event only carries the id, not the full embedded user — refetch for that.
+      queryClient.invalidateQueries({ queryKey: ["support_ticket", ticketId] });
+    },
+    onStatusChanged: (status) => {
+      queryClient.setQueryData<Ticket>(["support_ticket", ticketId], (old) => (old ? { ...old, status } : old));
+    },
+    onError: (detail) => toast.error(detail),
+  });
+
+  // Fallback polling only while the socket is down, so nothing goes stale silently.
+  useEffect(() => {
+    if (connected || ticketQuery.isError) return;
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["support_ticket_messages", ticketId] });
+      queryClient.invalidateQueries({ queryKey: ["support_ticket", ticketId] });
+    }, FALLBACK_MESSAGES_POLL_MS);
+    return () => clearInterval(interval);
+  }, [connected, ticketQuery.isError, ticketId, queryClient]);
+
+  // Even while connected, refresh the ticket occasionally to pick up things the socket
+  // doesn't push an event for, e.g. a user submitting a rating after resolution.
+  useEffect(() => {
+    if (!connected) return;
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["support_ticket", ticketId] });
+    }, FALLBACK_TICKET_POLL_MS);
+    return () => clearInterval(interval);
+  }, [connected, ticketId, queryClient]);
 
   const messages = messagesQuery.data?.items ?? [];
   const prevCount = useRef(0);
@@ -107,10 +160,12 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
       }
       return sendTicketMessage(ticketId, { body, ...attachmentFields });
     },
-    onSuccess: () => {
+    onSuccess: (message) => {
       setReply("");
       setAttachment(null);
-      queryClient.invalidateQueries({ queryKey: ["support_ticket_messages", ticketId] });
+      queryClient.setQueryData<PaginatedResult<TicketMessage>>(["support_ticket_messages", ticketId], (old) =>
+        appendMessage(old, message)
+      );
       queryClient.invalidateQueries({ queryKey: ["support_ticket", ticketId] });
     },
     onError: (err: unknown) => {
@@ -274,6 +329,17 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
       </div>
 
       <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 pt-4">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-400">Conversation</h2>
+          <span
+            className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-wider ${
+              connected ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"
+            }`}
+          >
+            <IconWifi />
+            {connected ? "Live" : "Reconnecting…"}
+          </span>
+        </div>
         <div className="flex flex-col gap-3 p-6 max-h-[55vh] overflow-y-auto">
           {messagesQuery.isLoading ? (
             <div className="flex justify-center py-10">
