@@ -2,6 +2,7 @@ import { apiClient, ApiEnvelope } from "./client";
 import type { PaginatedResult } from "./courses.types";
 import type {
   FaqCategory,
+  FaqCategoryWithItems,
   FaqItem,
   GetTicketsParams,
   Ticket,
@@ -19,9 +20,14 @@ function buildQuery(params: object): string {
   return qs ? `?${qs}` : "";
 }
 
+/**
+ * There is no admin list-categories endpoint — categories are only enumerable via the
+ * public GET /support/faq, which nests each category with its *published* items. We only
+ * use it here for the {id, name, order} shell; item data comes from getFaqItems instead.
+ */
 export async function getFaqCategories(token: string): Promise<FaqCategory[]> {
-  const res = await apiClient.get<ApiEnvelope<FaqCategory[]>>("/support/faq/categories", { token });
-  return res.data ?? [];
+  const res = await apiClient.get<ApiEnvelope<FaqCategoryWithItems[]>>("/support/faq", { token });
+  return (res.data ?? []).map(({ id, name, order }) => ({ id, name, order }));
 }
 
 export async function getFaqItems(

@@ -77,11 +77,6 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
         </span>
       ),
     },
-    {
-      key: "members",
-      header: "Members",
-      render: (g) => <span className="text-sm text-gray-600 dark:text-gray-400">{g.member_count ?? "—"}</span>,
-    },
   ];
 
   return (

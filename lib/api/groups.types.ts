@@ -7,7 +7,6 @@ export interface Group {
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
-  member_count?: number;
 }
 
 export interface GroupMember {

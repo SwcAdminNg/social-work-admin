@@ -185,7 +185,7 @@ export function TicketQueueList({ initialData, currentAdminId }: TicketQueueList
       header: "Last Activity",
       render: (t) => (
         <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap" suppressHydrationWarning>
-          {formatRelativeTime(t.last_user_message_at ?? t.updated_at ?? t.created_at)}
+          {formatRelativeTime(t.last_admin_reply_at ?? t.last_user_message_at ?? t.created_at)}
         </span>
       ),
     },

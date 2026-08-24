@@ -233,7 +233,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                         : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
                     }`}
                   >
-                    {msg.message}
+                    {msg.body}
                   </div>
                   <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 mt-1 px-1">
                     {isAdmin ? personName(msg.sender) || "Admin" : personName(msg.sender) || personName(ticket.user) || "User"} ·{" "}

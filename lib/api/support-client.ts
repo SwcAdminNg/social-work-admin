@@ -5,6 +5,7 @@ import type {
   CreateFaqCategoryPayload,
   CreateFaqItemPayload,
   FaqCategory,
+  FaqCategoryWithItems,
   FaqItem,
   GetTicketsParams,
   SetTicketStatusPayload,
@@ -58,10 +59,14 @@ function buildQuery(params: Record<string, string | number | undefined>): string
 }
 
 // FAQ categories
+//
+// There is no admin list-categories endpoint — categories are only enumerable via the
+// public GET /support/faq, which nests each category with its *published* items. We only
+// use it here for the {id, name, order} shell; item data comes from getFaqItems instead.
 
 export async function getFaqCategories(): Promise<FaqCategory[]> {
-  const res = await request<ApiEnvelope<FaqCategory[]>>("/api/support/faq/categories");
-  return res.data ?? [];
+  const res = await request<ApiEnvelope<FaqCategoryWithItems[]>>("/api/support/faq");
+  return (res.data ?? []).map(({ id, name, order }) => ({ id, name, order }));
 }
 
 export async function createFaqCategory(payload: CreateFaqCategoryPayload): Promise<FaqCategory> {
@@ -139,10 +144,10 @@ export async function getTicketMessages(id: string, page = 1, pageSize = 50): Pr
   return toPaginated(res, page, pageSize);
 }
 
-export async function sendTicketMessage(id: string, message: string): Promise<TicketMessage> {
+export async function sendTicketMessage(id: string, body: string): Promise<TicketMessage> {
   const res = await request<ApiEnvelope<TicketMessage>>(`/api/support/tickets/${id}/messages`, {
     method: "POST",
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ body }),
   });
   return res.data;
 }

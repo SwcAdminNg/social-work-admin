@@ -6,6 +6,14 @@ export interface FaqCategory {
   updated_at?: string;
 }
 
+/** What GET /support/faq (public) returns — categories with only their published items nested. */
+export interface FaqCategoryWithItems {
+  id: string;
+  name: string;
+  order: number;
+  items: FaqItem[];
+}
+
 export interface FaqItem {
   id: string;
   category_id: string;
@@ -55,14 +63,13 @@ export interface TicketUserSummary {
 
 export interface Ticket {
   id: string;
-  subject?: string | null;
+  subject: string;
   status: TicketStatus;
   user_id: string;
   user?: TicketUserSummary | null;
   assigned_admin_id?: string | null;
   assigned_admin?: TicketUserSummary | null;
   created_at: string;
-  updated_at?: string;
   last_user_message_at?: string | null;
   last_admin_reply_at?: string | null;
   escalated_at?: string | null;
@@ -78,7 +85,7 @@ export interface TicketMessage {
   sender_type: TicketSenderType;
   sender_id: string;
   sender?: TicketUserSummary | null;
-  message: string;
+  body: string;
   created_at: string;
 }
 
@@ -98,5 +105,5 @@ export interface SetTicketStatusPayload {
 }
 
 export interface SendTicketMessagePayload {
-  message: string;
+  body: string;
 }
