@@ -3,7 +3,11 @@ import { auth } from "@/auth";
 
 const protectedPrefixes = ["/dashboard"];
 const authPrefixes = ["/login", "/register", "/forgot-password", "/reset-password"];
-const adminOnlyPrefixes = ["/dashboard/course-management"];
+const adminOnlyPrefixes = [
+  "/dashboard/course-management",
+  "/dashboard/help-support",
+  "/dashboard/groups",
+];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;

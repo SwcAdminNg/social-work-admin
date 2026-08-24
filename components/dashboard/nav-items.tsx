@@ -9,6 +9,8 @@ import {
   IconUsers,
   IconFolder,
   IconMail,
+  IconLifeBuoy,
+  IconClipboardCheck,
 } from "./icons";
 
 export type NavItem = {
@@ -51,9 +53,21 @@ export const dashboardNavItems: NavItem[] = [
     adminOnly: true,
   },
   {
+    label: "Help & Support",
+    href: "/dashboard/help-support",
+    icon: IconLifeBuoy,
+    adminOnly: true,
+  },
+  {
     label: "User Management",
     href: "/dashboard/user-management",
     icon: IconUsers,
+    adminOnly: true,
+  },
+  {
+    label: "Groups",
+    href: "/dashboard/groups",
+    icon: IconClipboardCheck,
     adminOnly: true,
   },
   {
