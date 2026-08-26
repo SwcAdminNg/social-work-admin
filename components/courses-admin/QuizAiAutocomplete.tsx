@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
-import { createQuizQuestion, generateQuizFromDocument } from "@/lib/api/courses-client";
+import { createQuizQuestion, generateQuizFromDocument, generateQuizFromPrompt } from "@/lib/api/courses-client";
 import type {
   CourseQuizQuestion,
   CreateQuizQuestionPayload,
   GenerateQuizFromDocumentResult,
+  GenerateQuizFromPromptResult,
   GeneratedQuizQuestion,
 } from "@/lib/api/courses.types";
 import { IconPlus, IconSparkles, IconSpinner, IconUpload } from "@/components/dashboard/icons";
@@ -51,12 +52,14 @@ export function QuizAiAutocomplete({
   const [sourceMode, setSourceMode] = useState<AiSourceMode>("FILE");
   const [file, setFile] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
+  const [provider, setProvider] = useState<"GEMINI" | "OPENAI" | "DEEPSEEK">("GEMINI");
+  const [model, setModel] = useState<string>("");
   const [questionCount, setQuestionCount] = useState("10");
   const [optionsPerQuestion, setOptionsPerQuestion] = useState("4");
   const [persist, setPersist] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [addingPreview, setAddingPreview] = useState(false);
-  const [result, setResult] = useState<GenerateQuizFromDocumentResult | null>(null);
+  const [result, setResult] = useState<GenerateQuizFromDocumentResult | GenerateQuizFromPromptResult | null>(null);
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -92,13 +95,26 @@ export function QuizAiAutocomplete({
 
     setGenerating(true);
     try {
-      const nextResult = await generateQuizFromDocument(itemId, {
-        file: sourceMode === "FILE" ? file ?? undefined : undefined,
-        prompt: sourceMode === "PROMPT" ? trimmedPrompt : undefined,
-        question_count: parsedQuestionCount,
-        options_per_question: parsedOptionsPerQuestion,
-        persist,
-      });
+      let nextResult;
+      if (sourceMode === "PROMPT") {
+        nextResult = await generateQuizFromPrompt(itemId, {
+          prompt: trimmedPrompt,
+          question_count: parsedQuestionCount,
+          options_per_question: parsedOptionsPerQuestion,
+          persist,
+          provider,
+          model: model.trim() || undefined,
+        });
+      } else {
+        nextResult = await generateQuizFromDocument(itemId, {
+          file: file ?? undefined,
+          question_count: parsedQuestionCount,
+          options_per_question: parsedOptionsPerQuestion,
+          persist,
+          provider,
+          model: model.trim() || undefined,
+        });
+      }
 
       setResult(nextResult);
 
@@ -144,7 +160,12 @@ export function QuizAiAutocomplete({
 
   const generatedQuestions = result?.generated_questions ?? [];
   const canAddPreview = result && !result.persisted && generatedQuestions.length > 0;
-  const sourceLabel = result?.source_file_name ?? result?.source_prompt ?? (sourceMode === "PROMPT" ? "Prompt" : "Document");
+  const sourceLabel = 
+    (result && "source_file_name" in result && result.source_file_name) 
+      ? result.source_file_name 
+      : (result && "source_prompt" in result && result.source_prompt) 
+        ? result.source_prompt 
+        : (sourceMode === "PROMPT" ? "Prompt" : "Document");
 
   return (
     <section className="rounded-xl border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10 p-4">
@@ -200,6 +221,31 @@ export function QuizAiAutocomplete({
         )}
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+          <div className="grid grid-cols-2 gap-2 sm:w-64">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+              Provider
+              <select
+                value={provider}
+                onChange={(event) => setProvider(event.target.value as "GEMINI" | "OPENAI" | "DEEPSEEK")}
+                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              >
+                <option value="GEMINI">Gemini</option>
+                <option value="OPENAI">OpenAI</option>
+                <option value="DEEPSEEK">DeepSeek</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+              Model (Optional)
+              <input
+                type="text"
+                placeholder="Default"
+                value={model}
+                onChange={(event) => setModel(event.target.value)}
+                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              />
+            </label>
+          </div>
+
           <div className="grid grid-cols-2 gap-2 sm:w-64">
             <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
               Questions

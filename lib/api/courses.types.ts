@@ -292,6 +292,8 @@ export interface GenerateQuizFromDocumentPayload {
   question_count: number;
   options_per_question: number;
   persist: boolean;
+  provider?: "GEMINI" | "OPENAI" | "DEEPSEEK";
+  model?: string;
 }
 
 export interface GenerateQuizFromDocumentResult {
@@ -299,6 +301,25 @@ export interface GenerateQuizFromDocumentResult {
   source_mime_type?: string;
   source_prompt?: string;
   extracted_text_preview?: string;
+  provider: string;
+  model: string;
+  persisted: boolean;
+  generated_questions: GeneratedQuizQuestion[];
+  created_questions?: CourseQuizQuestion[];
+}
+
+export interface GenerateQuizFromPromptPayload {
+  prompt: string;
+  question_count: number;
+  options_per_question: number;
+  persist: boolean;
+  provider?: "GEMINI" | "OPENAI" | "DEEPSEEK";
+  model?: string;
+}
+
+export interface GenerateQuizFromPromptResult {
+  prompt: string;
+  provider: string;
   model: string;
   persisted: boolean;
   generated_questions: GeneratedQuizQuestion[];

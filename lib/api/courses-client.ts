@@ -18,6 +18,8 @@ import type {
   CreateQuizQuestionPayload,
   GenerateQuizFromDocumentPayload,
   GenerateQuizFromDocumentResult,
+  GenerateQuizFromPromptPayload,
+  GenerateQuizFromPromptResult,
   CreateQuizGroupSectionPayload,
   CreateSectionPayload,
   EssaySubmission,
@@ -265,6 +267,20 @@ export async function createQuizQuestion(
   return res.data;
 }
 
+export async function generateQuizFromPrompt(
+  itemId: string,
+  payload: GenerateQuizFromPromptPayload,
+): Promise<GenerateQuizFromPromptResult> {
+  const res = await request<GenerateQuizFromPromptResult>(
+    `/items/${itemId}/quiz/ai-generate`,
+    {
+      method: "POST",
+      body: payload,
+    },
+  );
+  return res.data;
+}
+
 export async function generateQuizFromDocument(
   itemId: string,
   payload: GenerateQuizFromDocumentPayload,
@@ -279,6 +295,12 @@ export async function generateQuizFromDocument(
   formData.set("question_count", String(payload.question_count));
   formData.set("options_per_question", String(payload.options_per_question));
   formData.set("persist", String(payload.persist));
+  if (payload.provider) {
+    formData.set("provider", payload.provider);
+  }
+  if (payload.model) {
+    formData.set("model", payload.model);
+  }
 
   const res = await request<GenerateQuizFromDocumentResult>(
     `/items/${itemId}/quiz/ai-autocomplete`,
