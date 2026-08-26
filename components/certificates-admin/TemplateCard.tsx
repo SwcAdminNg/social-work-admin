@@ -5,9 +5,11 @@ import { borderStyleLabel } from "./constants";
 
 export function TemplateCard({
   template,
+  canManage,
   onDelete,
 }: {
   template: CertificateTemplate;
+  canManage: boolean;
   onDelete: () => void;
 }) {
   return (
@@ -53,16 +55,18 @@ export function TemplateCard({
             href={`/dashboard/certificates/${template.id}`}
             className="flex-1 text-center px-3 py-2 rounded-xl text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 no-underline transition-colors duration-150"
           >
-            Manage
+            {canManage ? "Manage" : "View"}
           </Link>
-          <button
-            type="button"
-            onClick={onDelete}
-            aria-label={`Delete ${template.name}`}
-            className="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
-          >
-            <IconTrash />
-          </button>
+          {canManage && (
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label={`Delete ${template.name}`}
+              className="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
+            >
+              <IconTrash />
+            </button>
+          )}
         </div>
       </div>
     </div>

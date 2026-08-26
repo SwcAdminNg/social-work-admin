@@ -12,12 +12,13 @@ export default async function CertificateTemplateEditorPage({
   const { id } = await params;
   const session = await auth();
 
-  if (!session?.accessToken || session.user.userType !== "ADMIN") {
+  if (!session?.accessToken || (session.user.userType !== "ADMIN" && session.user.userType !== "INSTRUCTOR")) {
     redirect("/dashboard/not-authorized");
   }
 
   const template = await fetchTemplate(id, session.accessToken);
-  return <TemplateEditor initialTemplate={template} />;
+  const canManage = session.user.userType === "ADMIN" || template.owner_id === session.user.id;
+  return <TemplateEditor initialTemplate={template} canManage={canManage} />;
 }
 
 async function fetchTemplate(id: string, token: string) {

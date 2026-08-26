@@ -133,6 +133,9 @@ export async function getTickets(params: GetTicketsParams = {}): Promise<Paginat
     `/api/support/tickets${buildQuery({
       status: params.status,
       assigned_admin_id: params.assigned_admin_id,
+      search: params.search,
+      start_date: params.start_date,
+      end_date: params.end_date,
       page: params.page ?? 1,
       page_size: params.page_size ?? 20,
     })}`
@@ -175,12 +178,13 @@ export async function getAttachmentUploadUrl(
 export async function uploadTicketAttachment(ticketId: string, file: File) {
   const { upload_url, storage_key } = await getAttachmentUploadUrl(ticketId, {
     file_name: file.name,
-    content_type: file.type,
+    content_type: file.type || undefined,
   });
+  const headers = file.type ? { "Content-Type": file.type } : undefined;
   const putRes = await fetch(upload_url, {
     method: "PUT",
     body: file,
-    headers: { "Content-Type": file.type },
+    headers,
   });
   if (!putRes.ok) {
     throw new Error("File upload to storage failed. Please try again.");

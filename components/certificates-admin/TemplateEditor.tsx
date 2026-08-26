@@ -33,7 +33,13 @@ function toFormState(template: CertificateTemplate): TemplateFormState {
   };
 }
 
-export function TemplateEditor({ initialTemplate }: { initialTemplate: CertificateTemplate }) {
+export function TemplateEditor({
+  initialTemplate,
+  canManage,
+}: {
+  initialTemplate: CertificateTemplate;
+  canManage: boolean;
+}) {
   const router = useRouter();
   const [template, setTemplate] = useState(initialTemplate);
   const [state, setState] = useState<TemplateFormState>(toFormState(initialTemplate));
@@ -125,57 +131,70 @@ export function TemplateEditor({ initialTemplate }: { initialTemplate: Certifica
             </p>
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate">{template.name}</h1>
           </div>
-          <button
-            type="button"
-            onClick={() => setDeleteOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-colors duration-150 cursor-pointer flex-shrink-0"
-          >
-            <IconTrash />
-            Delete
-          </button>
+          {canManage && (
+            <button
+              type="button"
+              onClick={() => setDeleteOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-colors duration-150 cursor-pointer flex-shrink-0"
+            >
+              <IconTrash />
+              Delete
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
-        <ToggleField
-          label="Template active"
-          hint="Inactive templates can't be assigned to new courses and drop out of the global fallback pool."
-          checked={template.is_active}
-          onChange={handleToggleActive}
-          disabled={togglingActive}
-        />
-      </div>
-
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 flex flex-col gap-4">
-        <div>
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Logo &amp; signature</h3>
+      {canManage ? (
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+          <ToggleField
+            label="Template active"
+            hint="Inactive templates can't be assigned to new courses and drop out of the global fallback pool."
+            checked={template.is_active}
+            onChange={handleToggleActive}
+            disabled={togglingActive}
+          />
+        </div>
+      ) : (
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">Read-only template</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Uploads apply immediately — no separate save step needed.
+            Global templates can be assigned to your courses, but only their owner or an admin can edit them.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <CertificateImageUploader
-            templateId={template.id}
-            kind="logo"
-            label="Logo"
-            hint="Rendered centered near the top, above the organization name."
-            currentImageUrl={template.logo_url ?? null}
-            onImageUploaded={(url) => setTemplate((prev) => ({ ...prev, logo_url: url }))}
-          />
-          <CertificateImageUploader
-            templateId={template.id}
-            kind="signature"
-            label="Signature image"
-            hint="Rendered above the signature line, alongside the signature name/title."
-            currentImageUrl={template.signature_image_url ?? null}
-            onImageUploaded={(url) => setTemplate((prev) => ({ ...prev, signature_image_url: url }))}
-          />
+      )}
+
+      {canManage && (
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 flex flex-col gap-4">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Logo &amp; signature</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Uploads apply immediately — no separate save step needed.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <CertificateImageUploader
+              templateId={template.id}
+              kind="logo"
+              label="Logo"
+              hint="Rendered centered near the top, above the organization name."
+              currentImageUrl={template.logo_url ?? null}
+              onImageUploaded={(url) => setTemplate((prev) => ({ ...prev, logo_url: url }))}
+            />
+            <CertificateImageUploader
+              templateId={template.id}
+              kind="signature"
+              label="Signature image"
+              hint="Rendered above the signature line, alongside the signature name/title."
+              currentImageUrl={template.signature_image_url ?? null}
+              onImageUploaded={(url) => setTemplate((prev) => ({ ...prev, signature_image_url: url }))}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5 items-start">
         <div className="flex flex-col gap-5 min-w-0">
-          <TemplateFormFields state={state} onChange={handleChange} />
+          <TemplateFormFields state={state} onChange={handleChange} disabled={!canManage} />
         </div>
 
         <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
@@ -186,14 +205,16 @@ export function TemplateEditor({ initialTemplate }: { initialTemplate: Certifica
               logoUrl={template.logo_url}
               signatureImageUrl={template.signature_image_url}
             />
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {saving && <IconSpinner className="text-white/80" />}
-              {saving ? "Saving…" : "Save changes"}
-            </button>
+            {canManage && (
+              <button
+                type="submit"
+                disabled={saving}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {saving && <IconSpinner className="text-white/80" />}
+                {saving ? "Saving…" : "Save changes"}
+              </button>
+            )}
           </div>
         </div>
       </form>

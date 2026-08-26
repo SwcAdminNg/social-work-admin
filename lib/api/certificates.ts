@@ -39,7 +39,17 @@ export async function listCertificateTemplates(
     `/certificates/templates${buildQuery(params)}`,
     { token }
   );
-  return { items: res.data, meta: res.meta! };
+  return {
+    items: res.data ?? [],
+    meta: res.meta ?? {
+      page: params.page ?? 1,
+      page_size: params.page_size ?? 20,
+      total_items: 0,
+      total_pages: 1,
+      has_next: false,
+      has_previous: false,
+    },
+  };
 }
 
 export async function getCertificateTemplate(id: string, token: string): Promise<CertificateTemplate> {

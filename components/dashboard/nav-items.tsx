@@ -18,8 +18,7 @@ export type NavItem = {
   href: string;
   icon: React.ComponentType;
   adminOnly?: boolean;
-  /** Visible to ADMIN users and to INSTRUCTOR users, since instructors can be granted staff
-   *  access (e.g. to Help & Support) via group membership without changing their account type. */
+  /** Visible to ADMIN and INSTRUCTOR accounts. Backend ownership/group checks still decide exact access. */
   staffOnly?: boolean;
 };
 
@@ -47,7 +46,7 @@ export const dashboardNavItems: NavItem[] = [
     label: "Certificates",
     href: "/dashboard/certificates",
     icon: IconCertificate,
-    adminOnly: true,
+    staffOnly: true,
   },
   {
     label: "Contact Messages",

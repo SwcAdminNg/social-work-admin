@@ -81,6 +81,9 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<TicketStatus | "">("");
   const [assignedFilter, setAssignedFilter] = useState<string>("");
+  const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [staff, setStaff] = useState<User[]>([]);
   const dataRef = useRef(data);
 
@@ -98,14 +101,30 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
   }, [isAdmin]);
 
   const fetchPage = useCallback(
-    async (page: number, opts?: { status?: TicketStatus | ""; assignedAdminId?: string; silent?: boolean }) => {
+    async (
+      page: number,
+      opts?: {
+        status?: TicketStatus | "";
+        assignedAdminId?: string;
+        search?: string;
+        startDate?: string;
+        endDate?: string;
+        silent?: boolean;
+      },
+    ) => {
       const effectiveStatus = opts?.status ?? status;
       const effectiveAssigned = opts?.assignedAdminId ?? assignedFilter;
+      const effectiveSearch = opts?.search ?? search;
+      const effectiveStartDate = opts?.startDate ?? startDate;
+      const effectiveEndDate = opts?.endDate ?? endDate;
       if (!opts?.silent) setLoading(true);
       try {
         const res = await getTickets({
           status: effectiveStatus || undefined,
           assigned_admin_id: effectiveAssigned === "me" ? currentUserId : effectiveAssigned || undefined,
+          search: effectiveSearch.trim() || undefined,
+          start_date: effectiveStartDate || undefined,
+          end_date: effectiveEndDate || undefined,
           page,
           page_size: dataRef.current.meta.page_size,
         });
@@ -118,7 +137,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
         if (!opts?.silent) setLoading(false);
       }
     },
-    [status, assignedFilter, currentUserId]
+    [status, assignedFilter, search, startDate, endDate, currentUserId]
   );
 
   // Silent background auto-refresh so the queue stays live for whoever is watching it.
@@ -137,6 +156,20 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
   const handleAssignedChange = (value: string) => {
     setAssignedFilter(value);
     fetchPage(1, { assignedAdminId: value });
+  };
+
+  const handleFilterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setStatus("");
+    setAssignedFilter("");
+    setSearch("");
+    setStartDate("");
+    setEndDate("");
+    fetchPage(1, { status: "", assignedAdminId: "", search: "", startDate: "", endDate: "" });
   };
 
   const columns: DataTableColumn<Ticket>[] = [
@@ -209,8 +242,21 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <form
+        onSubmit={handleFilterSubmit}
+        className="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col gap-4"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_auto] gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Search</label>
+            <input
+              type="search"
+              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Subject, name, email, phone"
+            />
+          </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</label>
             <select
@@ -224,6 +270,26 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
                 </option>
               ))}
             </select>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Start Date</label>
+            <input
+              type="date"
+              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              max={endDate || undefined}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">End Date</label>
+            <input
+              type="date"
+              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate || undefined}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Assigned To</label>
@@ -241,7 +307,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
               ))}
             </select>
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
             <button
               type="button"
               onClick={() => fetchPage(data.meta.page)}
@@ -251,9 +317,24 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
               <IconRefresh className={loading ? "animate-spin" : ""} />
               Refresh
             </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+            >
+              Reset
+            </button>
           </div>
         </div>
-      </div>
+      </form>
 
       <div className={`transition-opacity duration-200 ${loading && data.items.length > 0 ? "opacity-60" : ""}`}>
         <DataTable

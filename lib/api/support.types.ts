@@ -59,6 +59,7 @@ export interface TicketUserSummary {
   last_name?: string;
   email?: string;
   username?: string;
+  phone_number?: string | null;
 }
 
 export interface Ticket {
@@ -99,6 +100,9 @@ export interface TicketMessage {
 export interface GetTicketsParams {
   status?: TicketStatus;
   assigned_admin_id?: string;
+  search?: string;
+  start_date?: string;
+  end_date?: string;
   page?: number;
   page_size?: number;
 }

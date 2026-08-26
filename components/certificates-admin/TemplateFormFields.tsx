@@ -45,9 +45,11 @@ export interface TemplateFormState {
 export function TemplateFormFields({
   state,
   onChange,
+  disabled,
 }: {
   state: TemplateFormState;
   onChange: (next: Partial<TemplateFormState>) => void;
+  disabled?: boolean;
 }) {
   return (
     <>
@@ -60,6 +62,7 @@ export function TemplateFormFields({
           placeholder="e.g. Gold Seal — Advanced Courses"
           required
           hint="Used to pick this template later — not shown on the certificate itself."
+          disabled={disabled}
         />
         <TextField
           label="Title text"
@@ -67,6 +70,7 @@ export function TemplateFormFields({
           value={state.titleText}
           onChange={(v) => onChange({ titleText: v })}
           placeholder="Certificate of Completion"
+          disabled={disabled}
         />
         <TextField
           label="Subtitle text"
@@ -74,6 +78,7 @@ export function TemplateFormFields({
           value={state.subtitleText}
           onChange={(v) => onChange({ subtitleText: v })}
           placeholder="This certificate is proudly presented to"
+          disabled={disabled}
         />
         <TextAreaField
           label="Body text"
@@ -82,6 +87,7 @@ export function TemplateFormFields({
           onChange={(v) => onChange({ bodyText: v })}
           rows={4}
           hint={`Placeholders: {student_name} {course_title} {completion_date} {instructor_name} {organization_name}`}
+          disabled={disabled}
         />
       </FormSection>
 
@@ -92,6 +98,7 @@ export function TemplateFormFields({
           value={state.organizationName}
           onChange={(v) => onChange({ organizationName: v })}
           placeholder="Social Workers Academy"
+          disabled={disabled}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <TextField
@@ -100,6 +107,7 @@ export function TemplateFormFields({
             value={state.signatureName}
             onChange={(v) => onChange({ signatureName: v })}
             placeholder="Optional"
+            disabled={disabled}
           />
           <TextField
             label="Signature title"
@@ -107,6 +115,7 @@ export function TemplateFormFields({
             value={state.signatureTitle}
             onChange={(v) => onChange({ signatureTitle: v })}
             placeholder="e.g. Program Director"
+            disabled={disabled}
           />
         </div>
         <TextField
@@ -115,6 +124,7 @@ export function TemplateFormFields({
           value={state.footerText}
           onChange={(v) => onChange({ footerText: v })}
           placeholder="Optional small print"
+          disabled={disabled}
         />
       </FormSection>
 
@@ -125,24 +135,28 @@ export function TemplateFormFields({
             id="primaryColor"
             value={state.primaryColor}
             onChange={(v) => onChange({ primaryColor: v })}
+            disabled={disabled}
           />
           <ColorField
             label="Accent color"
             id="accentColor"
             value={state.accentColor}
             onChange={(v) => onChange({ accentColor: v })}
+            disabled={disabled}
           />
           <ColorField
             label="Background color"
             id="backgroundColor"
             value={state.backgroundColor}
             onChange={(v) => onChange({ backgroundColor: v })}
+            disabled={disabled}
           />
           <ColorField
             label="Text color"
             id="textColor"
             value={state.textColor}
             onChange={(v) => onChange({ textColor: v })}
+            disabled={disabled}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -152,6 +166,7 @@ export function TemplateFormFields({
             value={state.fontFamily}
             onChange={(v) => onChange({ fontFamily: v })}
             options={FONT_FAMILY_OPTIONS}
+            disabled={disabled}
           />
           <SelectField
             label="Border style"
@@ -159,6 +174,7 @@ export function TemplateFormFields({
             value={state.borderStyle}
             onChange={(v) => onChange({ borderStyle: v as CertificateBorderStyle })}
             options={BORDER_STYLE_OPTIONS}
+            disabled={disabled}
           />
         </div>
       </FormSection>

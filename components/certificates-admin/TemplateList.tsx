@@ -15,9 +15,15 @@ import { ConfirmDialog } from "@/components/courses-admin/ConfirmDialog";
 
 interface TemplateListProps {
   initialData: PaginatedResult<CertificateTemplate>;
+  currentUserId: string;
+  isAdmin: boolean;
 }
 
-export function TemplateList({ initialData }: TemplateListProps) {
+function canManageTemplate(template: CertificateTemplate, currentUserId: string, isAdmin: boolean) {
+  return isAdmin || template.owner_id === currentUserId;
+}
+
+export function TemplateList({ initialData, currentUserId, isAdmin }: TemplateListProps) {
   const [result, setResult] = useState(initialData);
   const [page, setPage] = useState(1);
   const [pending, startTransition] = useTransition();
@@ -79,7 +85,12 @@ export function TemplateList({ initialData }: TemplateListProps) {
       ) : (
         <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ${pending ? "opacity-60" : ""}`}>
           {result.items.map((template) => (
-            <TemplateCard key={template.id} template={template} onDelete={() => setDeleteTarget(template)} />
+            <TemplateCard
+              key={template.id}
+              template={template}
+              canManage={canManageTemplate(template, currentUserId, isAdmin)}
+              onDelete={() => setDeleteTarget(template)}
+            />
           ))}
         </div>
       )}

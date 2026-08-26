@@ -18,7 +18,7 @@ async function forward(
     );
   }
 
-  if (session.user.userType !== "ADMIN") {
+  if (session.user.userType !== "ADMIN" && session.user.userType !== "INSTRUCTOR") {
     return NextResponse.json(
       {
         success: false,

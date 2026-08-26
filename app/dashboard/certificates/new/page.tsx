@@ -1,9 +1,15 @@
-"use client";
-
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { CreateTemplateForm } from "@/components/certificates-admin/CreateTemplateForm";
 
-export default function NewCertificateTemplatePage() {
+export default async function NewCertificateTemplatePage() {
+  const session = await auth();
+
+  if (!session?.accessToken || (session.user.userType !== "ADMIN" && session.user.userType !== "INSTRUCTOR")) {
+    redirect("/dashboard/not-authorized");
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div>

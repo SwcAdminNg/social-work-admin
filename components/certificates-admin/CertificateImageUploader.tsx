@@ -34,13 +34,14 @@ export function CertificateImageUploader({
       const getUploadUrl = kind === "logo" ? getLogoUploadUrl : getSignatureUploadUrl;
       const { upload_url, image_url } = await getUploadUrl(templateId, {
         file_name: file.name,
-        content_type: file.type,
+        content_type: file.type || null,
       });
 
+      const headers = file.type ? { "Content-Type": file.type } : undefined;
       const putRes = await fetch(upload_url, {
         method: "PUT",
         body: file,
-        headers: { "Content-Type": file.type },
+        headers,
       });
 
       if (!putRes.ok) {
