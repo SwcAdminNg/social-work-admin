@@ -18,6 +18,8 @@ const ACCEPTED_FILE_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
+type AiSourceMode = "FILE" | "PROMPT";
+
 function isAcceptedAssessmentFile(file: File): boolean {
   const name = file.name.toLowerCase();
   return ACCEPTED_FILE_TYPES.includes(file.type) || name.endsWith(".pdf") || name.endsWith(".docx");
@@ -46,7 +48,9 @@ export function QuizAiAutocomplete({
   currentQuestionCount: number;
   dispatch: React.Dispatch<CourseEditorAction>;
 }) {
+  const [sourceMode, setSourceMode] = useState<AiSourceMode>("FILE");
   const [file, setFile] = useState<File | null>(null);
+  const [prompt, setPrompt] = useState("");
   const [questionCount, setQuestionCount] = useState("10");
   const [optionsPerQuestion, setOptionsPerQuestion] = useState("4");
   const [persist, setPersist] = useState(true);
@@ -57,13 +61,19 @@ export function QuizAiAutocomplete({
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!file) {
+    if (sourceMode === "FILE" && !file) {
       toast.error("Choose a PDF or DOCX file.");
       return;
     }
 
-    if (!isAcceptedAssessmentFile(file)) {
+    if (sourceMode === "FILE" && file && !isAcceptedAssessmentFile(file)) {
       toast.error("Use a PDF or DOCX file.");
+      return;
+    }
+
+    const trimmedPrompt = prompt.trim();
+    if (sourceMode === "PROMPT" && trimmedPrompt.length < 10) {
+      toast.error("Add a little more detail to the prompt.");
       return;
     }
 
@@ -83,7 +93,8 @@ export function QuizAiAutocomplete({
     setGenerating(true);
     try {
       const nextResult = await generateQuizFromDocument(itemId, {
-        file,
+        file: sourceMode === "FILE" ? file ?? undefined : undefined,
+        prompt: sourceMode === "PROMPT" ? trimmedPrompt : undefined,
         question_count: parsedQuestionCount,
         options_per_question: parsedOptionsPerQuestion,
         persist,
@@ -133,30 +144,62 @@ export function QuizAiAutocomplete({
 
   const generatedQuestions = result?.generated_questions ?? [];
   const canAddPreview = result && !result.persisted && generatedQuestions.length > 0;
+  const sourceLabel = result?.source_file_name ?? result?.source_prompt ?? (sourceMode === "PROMPT" ? "Prompt" : "Document");
 
   return (
     <section className="rounded-xl border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10 p-4">
       <form onSubmit={handleGenerate} className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-          <div className="flex-1">
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-              AI Autocomplete
-            </label>
-            <label className="flex min-h-11 items-center gap-2 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-              <IconUpload />
-              <span className="truncate">{file ? file.name : "PDF or DOCX"}</span>
-              <input
-                type="file"
-                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                className="sr-only"
-                onChange={(event) => {
-                  setFile(event.target.files?.[0] ?? null);
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">AI Autocomplete</span>
+          <div className="inline-grid grid-cols-2 rounded-lg border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-gray-900 p-0.5 text-xs font-semibold">
+            {(["FILE", "PROMPT"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => {
+                  setSourceMode(mode);
                   setResult(null);
                 }}
-              />
-            </label>
+                className={`rounded-md px-3 py-1.5 transition-colors ${
+                  sourceMode === mode
+                    ? "bg-[#2D6A4F] text-white"
+                    : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                }`}
+              >
+                {mode === "FILE" ? "File" : "Prompt"}
+              </button>
+            ))}
           </div>
+        </div>
 
+        {sourceMode === "FILE" ? (
+          <label className="flex min-h-11 items-center gap-2 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+            <IconUpload />
+            <span className="truncate">{file ? file.name : "PDF or DOCX"}</span>
+            <input
+              type="file"
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className="sr-only"
+              onChange={(event) => {
+                setFile(event.target.files?.[0] ?? null);
+                setResult(null);
+              }}
+            />
+          </label>
+        ) : (
+          <textarea
+            value={prompt}
+            onChange={(event) => {
+              setPrompt(event.target.value);
+              setResult(null);
+            }}
+            rows={4}
+            placeholder="Generate case-study questions about trauma-informed care for beginner social workers."
+            className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+          />
+        )}
+
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="grid grid-cols-2 gap-2 sm:w-64">
             <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
               Questions
@@ -209,7 +252,7 @@ export function QuizAiAutocomplete({
       {result && (
         <div className="mt-4 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span>{result.source_file_name}</span>
+            <span>{sourceLabel}</span>
             <span>{result.model}</span>
             <span>{generatedQuestions.length} generated</span>
           </div>

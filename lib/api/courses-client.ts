@@ -269,7 +269,12 @@ export async function generateQuizFromDocument(
   payload: GenerateQuizFromDocumentPayload,
 ): Promise<GenerateQuizFromDocumentResult> {
   const formData = new FormData();
-  formData.set("file", payload.file);
+  if (payload.file) {
+    formData.set("file", payload.file);
+  }
+  if (payload.prompt?.trim()) {
+    formData.set("prompt", payload.prompt.trim());
+  }
   formData.set("question_count", String(payload.question_count));
   formData.set("options_per_question", String(payload.options_per_question));
   formData.set("persist", String(payload.persist));

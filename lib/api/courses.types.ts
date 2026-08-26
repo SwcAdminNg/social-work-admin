@@ -287,16 +287,18 @@ export interface GeneratedQuizQuestion {
 }
 
 export interface GenerateQuizFromDocumentPayload {
-  file: File;
+  file?: File;
+  prompt?: string;
   question_count: number;
   options_per_question: number;
   persist: boolean;
 }
 
 export interface GenerateQuizFromDocumentResult {
-  source_file_name: string;
-  source_mime_type: string;
-  extracted_text_preview: string;
+  source_file_name?: string;
+  source_mime_type?: string;
+  source_prompt?: string;
+  extracted_text_preview?: string;
   model: string;
   persisted: boolean;
   generated_questions: GeneratedQuizQuestion[];
