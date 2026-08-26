@@ -52,7 +52,8 @@ function buildQuery(params: object): string {
 }
 
 function isFormDataBody(body: unknown): body is FormData {
-  return typeof FormData !== "undefined" && body instanceof FormData;
+  if (typeof FormData !== "undefined" && body instanceof FormData) return true;
+  return body !== null && typeof body === "object" && typeof (body as any).append === "function";
 }
 
 function serializeBody(body: unknown): BodyInit {
