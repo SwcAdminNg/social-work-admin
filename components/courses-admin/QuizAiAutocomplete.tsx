@@ -47,6 +47,21 @@ function toQuestionPayload(question: GeneratedQuizQuestion, orderIndex: number):
   };
 }
 
+const PROVIDER_MODELS: Record<"GEMINI" | "OPENAI" | "DEEPSEEK", { id: string; label: string }[]> = {
+  DEEPSEEK: [
+    { id: "deepseek-v4-flash", label: "DeepSeek V4 Flash" },
+    { id: "deepseek-reasoner", label: "DeepSeek Reasoner" },
+  ],
+  OPENAI: [
+    { id: "gpt-4o-mini", label: "GPT-4o Mini" },
+    { id: "gpt-4o", label: "GPT-4o" },
+  ],
+  GEMINI: [
+    { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
+    { id: "gemini-3.7-pro", label: "Gemini 3.7 Pro" },
+  ],
+};
+
 export function QuizAiAutocomplete({
   itemId,
   sectionId,
@@ -61,8 +76,8 @@ export function QuizAiAutocomplete({
   const [sourceMode, setSourceMode] = useState<AiSourceMode>("FILE");
   const [file, setFile] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
-  const [provider, setProvider] = useState<"GEMINI" | "OPENAI" | "DEEPSEEK">("GEMINI");
-  const [model, setModel] = useState<string>("");
+  const [provider, setProvider] = useState<"GEMINI" | "OPENAI" | "DEEPSEEK">("DEEPSEEK");
+  const [model, setModel] = useState<string>("deepseek-v4-flash");
   const [questionCount, setQuestionCount] = useState("10");
   const [optionsPerQuestion, setOptionsPerQuestion] = useState("4");
   const [persist, setPersist] = useState(true);
@@ -250,23 +265,31 @@ export function QuizAiAutocomplete({
               Provider
               <select
                 value={provider}
-                onChange={(event) => setProvider(event.target.value as "GEMINI" | "OPENAI" | "DEEPSEEK")}
+                onChange={(event) => {
+                  const newProvider = event.target.value as "GEMINI" | "OPENAI" | "DEEPSEEK";
+                  setProvider(newProvider);
+                  setModel(PROVIDER_MODELS[newProvider][0].id);
+                }}
                 className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
               >
-                <option value="GEMINI">Gemini</option>
-                <option value="OPENAI">OpenAI</option>
                 <option value="DEEPSEEK">DeepSeek</option>
+                <option value="OPENAI">OpenAI</option>
+                <option value="GEMINI">Gemini</option>
               </select>
             </label>
             <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
-              Model (Optional)
-              <input
-                type="text"
-                placeholder="Default"
+              Model
+              <select
                 value={model}
                 onChange={(event) => setModel(event.target.value)}
                 className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-              />
+              >
+                {PROVIDER_MODELS[provider].map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 
