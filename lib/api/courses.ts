@@ -19,6 +19,10 @@ import type {
   FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
+  GenerateQuizFromDocumentPayload,
+  GenerateQuizFromDocumentResult,
+  GenerateQuizFromPromptPayload,
+  GenerateQuizFromPromptResult,
   GradeEssayPayload,
   ManagedCourseListParams,
   PaginatedResult,
@@ -285,6 +289,49 @@ export async function createQuizGroupSectionQuestion(
   const res = await apiClient.post<ApiEnvelope<CourseQuizQuestion>>(
     `/courses/quiz-group/sections/${sectionId}/questions`,
     payload,
+    { token }
+  );
+  return res.data;
+}
+
+export async function generateQuizGroupSectionFromPrompt(
+  sectionId: string,
+  payload: GenerateQuizFromPromptPayload,
+  token: string
+): Promise<GenerateQuizFromPromptResult> {
+  const res = await apiClient.post<ApiEnvelope<GenerateQuizFromPromptResult>>(
+    `/courses/quiz-group/sections/${sectionId}/ai-generate`,
+    payload,
+    { token }
+  );
+  return res.data;
+}
+
+export async function generateQuizGroupSectionFromDocument(
+  sectionId: string,
+  payload: GenerateQuizFromDocumentPayload,
+  token: string
+): Promise<GenerateQuizFromDocumentResult> {
+  const formData = new FormData();
+  if (payload.file) {
+    formData.set("file", payload.file);
+  }
+  if (payload.prompt?.trim()) {
+    formData.set("prompt", payload.prompt.trim());
+  }
+  formData.set("question_count", String(payload.question_count));
+  formData.set("options_per_question", String(payload.options_per_question));
+  formData.set("persist", String(payload.persist));
+  if (payload.provider) {
+    formData.set("provider", payload.provider);
+  }
+  if (payload.model) {
+    formData.set("model", payload.model);
+  }
+
+  const res = await apiClient.post<ApiEnvelope<GenerateQuizFromDocumentResult>>(
+    `/courses/quiz-group/sections/${sectionId}/ai-autocomplete`,
+    formData,
     { token }
   );
   return res.data;

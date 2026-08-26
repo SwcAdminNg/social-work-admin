@@ -21,6 +21,7 @@ import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
+import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -163,6 +164,7 @@ export function QuizGroupBuilder({
       {quizGroup.sections.map((section) => (
         <QuizGroupSectionPanel
           key={section.id}
+          itemId={item.id}
           section={section}
           maxAttempts={quizGroup.max_attempts}
           dispatch={dispatch}
@@ -226,10 +228,12 @@ export function QuizGroupBuilder({
 }
 
 function QuizGroupSectionPanel({
+  itemId,
   section,
   maxAttempts,
   dispatch,
 }: {
+  itemId: string;
   section: CourseQuizGroupSection;
   maxAttempts: number | null;
   dispatch: React.Dispatch<CourseEditorAction>;
@@ -521,6 +525,8 @@ function QuizGroupSectionPanel({
 
       {expanded && (
         <div className="border-t border-gray-200 dark:border-gray-800 p-3 flex flex-col gap-3">
+          <QuizAiAutocomplete itemId={itemId} sectionId={section.id} currentQuestionCount={section.questions.length} dispatch={dispatch} />
+
           {section.questions.map((question) => (
             <QuizQuestionCard
               key={question.id}

@@ -387,6 +387,51 @@ export async function createQuizGroupSectionQuestion(
   return res.data;
 }
 
+export async function generateQuizGroupSectionFromPrompt(
+  sectionId: string,
+  payload: GenerateQuizFromPromptPayload,
+): Promise<GenerateQuizFromPromptResult> {
+  const res = await request<GenerateQuizFromPromptResult>(
+    `/quiz-group/sections/${sectionId}/ai-generate`,
+    {
+      method: "POST",
+      body: payload,
+    },
+  );
+  return res.data;
+}
+
+export async function generateQuizGroupSectionFromDocument(
+  sectionId: string,
+  payload: GenerateQuizFromDocumentPayload,
+): Promise<GenerateQuizFromDocumentResult> {
+  const formData = new FormData();
+  if (payload.file) {
+    formData.set("file", payload.file);
+  }
+  if (payload.prompt?.trim()) {
+    formData.set("prompt", payload.prompt.trim());
+  }
+  formData.set("question_count", String(payload.question_count));
+  formData.set("options_per_question", String(payload.options_per_question));
+  formData.set("persist", String(payload.persist));
+  if (payload.provider) {
+    formData.set("provider", payload.provider);
+  }
+  if (payload.model) {
+    formData.set("model", payload.model);
+  }
+
+  const res = await request<GenerateQuizFromDocumentResult>(
+    `/quiz-group/sections/${sectionId}/ai-autocomplete`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+  return res.data;
+}
+
 export async function listEssaySubmissions(
   itemId: string,
   params: { page?: number; page_size?: number } = {},

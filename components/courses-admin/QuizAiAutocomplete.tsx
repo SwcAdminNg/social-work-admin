@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
-import { createQuizQuestion, generateQuizFromDocument, generateQuizFromPrompt } from "@/lib/api/courses-client";
+import {
+  createQuizQuestion,
+  createQuizGroupSectionQuestion,
+  generateQuizFromDocument,
+  generateQuizFromPrompt,
+  generateQuizGroupSectionFromDocument,
+  generateQuizGroupSectionFromPrompt,
+} from "@/lib/api/courses-client";
 import type {
   CourseQuizQuestion,
   CreateQuizQuestionPayload,
@@ -42,10 +49,12 @@ function toQuestionPayload(question: GeneratedQuizQuestion, orderIndex: number):
 
 export function QuizAiAutocomplete({
   itemId,
+  sectionId,
   currentQuestionCount,
   dispatch,
 }: {
   itemId: string;
+  sectionId?: string;
   currentQuestionCount: number;
   dispatch: React.Dispatch<CourseEditorAction>;
 }) {
@@ -97,23 +106,29 @@ export function QuizAiAutocomplete({
     try {
       let nextResult;
       if (sourceMode === "PROMPT") {
-        nextResult = await generateQuizFromPrompt(itemId, {
+        const payload = {
           prompt: trimmedPrompt,
           question_count: parsedQuestionCount,
           options_per_question: parsedOptionsPerQuestion,
           persist,
           provider,
           model: model.trim() || undefined,
-        });
+        };
+        nextResult = sectionId
+          ? await generateQuizGroupSectionFromPrompt(sectionId, payload)
+          : await generateQuizFromPrompt(itemId, payload);
       } else {
-        nextResult = await generateQuizFromDocument(itemId, {
+        const payload = {
           file: file ?? undefined,
           question_count: parsedQuestionCount,
           options_per_question: parsedOptionsPerQuestion,
           persist,
           provider,
           model: model.trim() || undefined,
-        });
+        };
+        nextResult = sectionId
+          ? await generateQuizGroupSectionFromDocument(sectionId, payload)
+          : await generateQuizFromDocument(itemId, payload);
       }
 
       setResult(nextResult);
@@ -121,7 +136,11 @@ export function QuizAiAutocomplete({
       if (nextResult.persisted) {
         const createdQuestions = nextResult.created_questions ?? [];
         createdQuestions.forEach((question) => {
-          dispatch({ type: "ADD_QUIZ_QUESTION", itemId, question });
+          if (sectionId) {
+            dispatch({ type: "ADD_QUIZ_GROUP_SECTION_QUESTION", sectionId, question });
+          } else {
+            dispatch({ type: "ADD_QUIZ_QUESTION", itemId, question });
+          }
         });
         toast.success(`Generated ${createdQuestions.length} question${createdQuestions.length === 1 ? "" : "s"}.`);
       } else {
@@ -142,11 +161,16 @@ export function QuizAiAutocomplete({
 
     try {
       for (const generatedQuestion of result.generated_questions) {
-        const question: CourseQuizQuestion = await createQuizQuestion(
-          itemId,
-          toQuestionPayload(generatedQuestion, currentQuestionCount + createdCount),
-        );
-        dispatch({ type: "ADD_QUIZ_QUESTION", itemId, question });
+        const payload = toQuestionPayload(generatedQuestion, currentQuestionCount + createdCount);
+        const question: CourseQuizQuestion = sectionId
+          ? await createQuizGroupSectionQuestion(sectionId, payload)
+          : await createQuizQuestion(itemId, payload);
+        
+        if (sectionId) {
+          dispatch({ type: "ADD_QUIZ_GROUP_SECTION_QUESTION", sectionId, question });
+        } else {
+          dispatch({ type: "ADD_QUIZ_QUESTION", itemId, question });
+        }
         createdCount += 1;
       }
       setResult((prev) => (prev ? { ...prev, persisted: true } : prev));
