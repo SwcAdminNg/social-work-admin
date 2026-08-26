@@ -37,20 +37,37 @@ type RequestOptions = Omit<RequestInit, "body"> & {
   token?: string;
 };
 
+function isFormDataBody(body: unknown): body is FormData {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+}
+
+function serializeBody(body: unknown): BodyInit {
+  if (isFormDataBody(body)) return body;
+  if (typeof URLSearchParams !== "undefined" && body instanceof URLSearchParams) return body;
+  if (typeof Blob !== "undefined" && body instanceof Blob) return body;
+  if (typeof body === "string") return body;
+  return JSON.stringify(body);
+}
+
 async function request<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
   const { body, token, headers, ...rest } = options;
+  const requestHeaders = new Headers(headers);
+
+  if (token) {
+    requestHeaders.set("Authorization", `Bearer ${token}`);
+  }
+
+  if (body !== undefined && !isFormDataBody(body) && !requestHeaders.has("Content-Type")) {
+    requestHeaders.set("Content-Type", "application/json");
+  }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    headers: requestHeaders,
+    body: body !== undefined ? serializeBody(body) : undefined,
   });
 
   const isJson = res.headers.get("content-type")?.includes("application/json");

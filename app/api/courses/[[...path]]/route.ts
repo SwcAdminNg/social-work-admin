@@ -35,8 +35,13 @@ async function forward(
 
   let body: unknown;
   if (method === "POST" || method === "PATCH" || method === "PUT") {
-    const text = await request.text();
-    body = text ? JSON.parse(text) : undefined;
+    const contentType = request.headers.get("content-type") ?? "";
+    if (contentType.includes("multipart/form-data")) {
+      body = await request.formData();
+    } else {
+      const text = await request.text();
+      body = text ? JSON.parse(text) : undefined;
+    }
   }
 
   try {

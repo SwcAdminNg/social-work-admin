@@ -16,6 +16,8 @@ import type {
   CreateItemResult,
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
+  GenerateQuizFromDocumentPayload,
+  GenerateQuizFromDocumentResult,
   CreateQuizGroupSectionPayload,
   CreateSectionPayload,
   EssaySubmission,
@@ -49,17 +51,31 @@ function buildQuery(params: object): string {
   return qs ? `?${qs}` : "";
 }
 
+function isFormDataBody(body: unknown): body is FormData {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+}
+
+function serializeBody(body: unknown): BodyInit {
+  if (isFormDataBody(body)) return body;
+  return JSON.stringify(body);
+}
+
 async function request<T>(
   path: string,
   options: { method: string; body?: unknown } = { method: "GET" },
 ): Promise<ApiEnvelope<T>> {
+  const isFormData = isFormDataBody(options.body);
+  const body =
+    options.body === undefined
+      ? undefined
+      : serializeBody(options.body);
   const res = await fetch(`/api/courses${path}`, {
     method: options.method,
     headers:
-      options.body !== undefined
+      options.body !== undefined && !isFormData
         ? { "Content-Type": "application/json" }
         : undefined,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body,
   });
 
   const isJson = res.headers.get("content-type")?.includes("application/json");
@@ -243,6 +259,26 @@ export async function createQuizQuestion(
     {
       method: "POST",
       body: payload,
+    },
+  );
+  return res.data;
+}
+
+export async function generateQuizFromDocument(
+  itemId: string,
+  payload: GenerateQuizFromDocumentPayload,
+): Promise<GenerateQuizFromDocumentResult> {
+  const formData = new FormData();
+  formData.set("file", payload.file);
+  formData.set("question_count", String(payload.question_count));
+  formData.set("options_per_question", String(payload.options_per_question));
+  formData.set("persist", String(payload.persist));
+
+  const res = await request<GenerateQuizFromDocumentResult>(
+    `/items/${itemId}/quiz/ai-autocomplete`,
+    {
+      method: "POST",
+      body: formData,
     },
   );
   return res.data;

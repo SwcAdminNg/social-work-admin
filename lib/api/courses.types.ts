@@ -278,6 +278,31 @@ export interface CreateQuizQuestionPayload {
   options: CreateQuizOptionPayload[];
 }
 
+export interface GeneratedQuizQuestion {
+  text: string;
+  order_index: number;
+  allow_multiple_answers: boolean;
+  multi_answer_mode?: "AND" | "OR" | null;
+  options: CreateQuizOptionPayload[];
+}
+
+export interface GenerateQuizFromDocumentPayload {
+  file: File;
+  question_count: number;
+  options_per_question: number;
+  persist: boolean;
+}
+
+export interface GenerateQuizFromDocumentResult {
+  source_file_name: string;
+  source_mime_type: string;
+  extracted_text_preview: string;
+  model: string;
+  persisted: boolean;
+  generated_questions: GeneratedQuizQuestion[];
+  created_questions?: CourseQuizQuestion[];
+}
+
 export interface UpdateQuizQuestionPayload {
   text?: string;
   order_index?: number;
@@ -396,7 +421,7 @@ export interface CourseReview {
     id: string;
     first_name: string;
     last_name: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   course?: {
     id: string;

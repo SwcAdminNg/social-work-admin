@@ -9,6 +9,7 @@ import { IconPlus, IconSpinner, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
+import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -169,6 +170,8 @@ export function QuizBuilder({
           <button type="button" onClick={() => setEditingSettings(true)} className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer">Edit settings</button>
         </div>
       )}
+
+      <QuizAiAutocomplete itemId={item.id} currentQuestionCount={quiz.questions.length} dispatch={dispatch} />
 
       {quiz.questions.map((question) => (
         <QuizQuestionCard key={question.id} question={question} dispatch={dispatch} />
