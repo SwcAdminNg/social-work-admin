@@ -70,7 +70,14 @@ export function InstructorsInput({ value, onChange }: InstructorsInputProps) {
         {value.map((instructor, i) => (
           <div key={i} className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-800 relative">
             <div className="flex-1 w-full">
-              <label className="block text-xs text-gray-500 mb-1">Display Name (Required)</label>
+              <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1.5">
+                Display Name (Required)
+                {"is_guest" in instructor && instructor.is_guest && (
+                  <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                    Guest
+                  </span>
+                )}
+              </label>
               <input
                 type="text"
                 value={instructor.name}
@@ -79,6 +86,12 @@ export function InstructorsInput({ value, onChange }: InstructorsInputProps) {
                 className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
                 required
               />
+              {"is_guest" in instructor && instructor.is_guest && (
+                <p className="text-[11px] text-gray-400 mt-1">
+                  Credited automatically as a guest lecturer on a section. Remove them from that
+                  section to fully unlist them.
+                </p>
+              )}
             </div>
             
             <div className="flex-1 w-full relative">

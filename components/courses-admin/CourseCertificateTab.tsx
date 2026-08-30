@@ -10,31 +10,22 @@ import { IconClock, IconSpinner } from "@/components/dashboard/icons";
 import { ToggleField } from "./FormControls";
 import type { AccessMode } from "@/lib/api/courses.types";
 
-interface StoredCertificateSettings {
-  certificateEnabled: boolean;
-  templateId: string;
+function templateStorageKey(courseId: string): string {
+  return `certificate-template:${courseId}`;
 }
 
-function storageKey(courseId: string): string {
-  return `certificate-settings:${courseId}`;
-}
-
-function readStoredSettings(courseId: string): StoredCertificateSettings | null {
+function readStoredTemplateId(courseId: string): string | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(storageKey(courseId));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (typeof parsed.certificateEnabled !== "boolean" || typeof parsed.templateId !== "string") return null;
-    return parsed;
+    return localStorage.getItem(templateStorageKey(courseId));
   } catch {
     return null;
   }
 }
 
-function writeStoredSettings(courseId: string, settings: StoredCertificateSettings): void {
+function writeStoredTemplateId(courseId: string, templateId: string): void {
   try {
-    localStorage.setItem(storageKey(courseId), JSON.stringify(settings));
+    localStorage.setItem(templateStorageKey(courseId), templateId);
   } catch {
     // Non-fatal — the setting was still saved server-side.
   }
@@ -62,28 +53,32 @@ function FormSection({
 
 export function CourseCertificateTab({
   courseId,
+  certificateEnabled: initialCertificateEnabled,
   accessMode,
   accessEndDate,
+  onUpdated,
 }: {
   courseId: string;
+  certificateEnabled?: boolean;
   accessMode?: AccessMode;
   accessEndDate?: string | null;
+  onUpdated?: (fields: { certificate_enabled: boolean }) => void;
 }) {
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
-  const [certificateEnabled, setCertificateEnabled] = useState(true);
+  const [certificateEnabled, setCertificateEnabled] = useState(initialCertificateEnabled ?? false);
   const [templateId, setTemplateId] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Server-rendered markup has no access to localStorage, so the first client render must match
-  // it exactly (the defaults above) to avoid a hydration mismatch — the stored value is applied
-  // only after mount, once hydration has already settled.
+  // it exactly (empty) to avoid a hydration mismatch — the stored value is applied only after
+  // mount, once hydration has already settled. certificate_template_id still isn't returned by
+  // the API, so this remembers the last-assigned template in this browser only.
   useEffect(() => {
-    const stored = readStoredSettings(courseId);
+    const stored = readStoredTemplateId(courseId);
     if (stored) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating from localStorage, must run post-mount to avoid SSR mismatch
-      setCertificateEnabled(stored.certificateEnabled);
-      setTemplateId(stored.templateId);
+      setTemplateId(stored);
     }
   }, [courseId]);
 
@@ -111,7 +106,7 @@ export function CourseCertificateTab({
     setSaving(true);
     try {
       await updateCourseCertificateSettings(courseId, { certificate_enabled: enabled });
-      writeStoredSettings(courseId, { certificateEnabled: enabled, templateId });
+      onUpdated?.({ certificate_enabled: enabled });
       toast.success(enabled ? "Certificates enabled for this course." : "Certificates turned off for this course.");
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update certificate settings.");
@@ -132,7 +127,7 @@ export function CourseCertificateTab({
         await updateCourseCertificateSettings(courseId, { clear_template: true });
         toast.success("Certificate template unassigned — using the global default.");
       }
-      writeStoredSettings(courseId, { certificateEnabled, templateId });
+      writeStoredTemplateId(courseId, templateId);
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update certificate settings.");
     } finally {
@@ -219,8 +214,8 @@ export function CourseCertificateTab({
           </button>
 
           <p className="text-xs text-gray-400 dark:text-gray-600">
-            The API doesn&apos;t return what&apos;s currently assigned, so this remembers your last save in this
-            browser only — it won&apos;t reflect changes made elsewhere or on another device.
+            The API doesn&apos;t return which template is currently assigned, so this remembers your last
+            save in this browser only — it won&apos;t reflect changes made elsewhere or on another device.
           </p>
         </FormSection>
       </form>

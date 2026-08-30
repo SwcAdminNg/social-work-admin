@@ -16,7 +16,7 @@ export type CourseCategory =
   | "LIFESTYLE"
   | "LANGUAGE";
 
-export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT";
+export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT" | "LINKS";
 
 export type AssessmentType = "QUIZ" | "ESSAY" | "QUIZ_GROUP";
 export type EssaySubmissionMode = "TEXT" | "DOCUMENT";
@@ -28,6 +28,8 @@ export type AccessMode = "SELF_PACED" | "SCHEDULED";
 export interface CourseInstructorReadDTO {
   user_id: string | null;
   name: string;
+  profile_picture_url?: string | null;
+  is_guest?: boolean;
 }
 
 export interface CourseInstructorInputDTO {
@@ -59,6 +61,7 @@ export interface Course {
   access_start_date: string | null;
   access_end_date: string | null;
   instructors: CourseInstructorReadDTO[];
+  certificate_enabled?: boolean;
 }
 
 export interface FeaturedCourse extends Course {
@@ -81,7 +84,14 @@ export interface CourseDocument {
   mime_type: string | null;
   file_size_bytes: number | null;
   is_uploaded: boolean;
+  downloadable?: boolean;
   storage_key?: string;
+}
+
+export interface CourseLink {
+  url: string;
+  label: string | null;
+  description: string | null;
 }
 
 export interface CourseQuizOption {
@@ -151,6 +161,7 @@ export interface CourseItem {
   video: CourseVideo | null;
   document: CourseDocument | null;
   assessment: CourseAssessment | null;
+  link: CourseLink | null;
 }
 
 export interface CourseSection {
@@ -158,6 +169,7 @@ export interface CourseSection {
   title: string;
   order_index: number;
   items: CourseItem[];
+  guest_instructors: CourseInstructorReadDTO[];
 }
 
 export interface CourseDetail extends Course {
@@ -183,6 +195,7 @@ export interface CreateCoursePayload {
   access_mode?: AccessMode;
   access_start_date?: string | null;
   access_end_date?: string | null;
+  certificate_enabled?: boolean;
 }
 
 export type UpdateCoursePayload = Partial<CreateCoursePayload> & { is_exclusive?: boolean };
@@ -190,11 +203,13 @@ export type UpdateCoursePayload = Partial<CreateCoursePayload> & { is_exclusive?
 export interface CreateSectionPayload {
   title: string;
   order_index: number;
+  guest_instructors?: string[];
 }
 
 export interface UpdateSectionPayload {
   title?: string;
   order_index?: number;
+  guest_instructors?: string[];
 }
 
 export interface ReorderSectionsPayload {
@@ -220,6 +235,10 @@ export interface CreateItemPayload {
   quiz_settings?: Partial<Omit<CourseQuizSettings, "questions">>;
   essay_settings?: CreateEssaySettingsPayload;
   quiz_group_settings?: Partial<Omit<CourseQuizGroupSettings, "sections">>;
+  downloadable?: boolean;
+  url?: string;
+  label?: string | null;
+  description?: string | null;
 }
 
 export interface UpdateItemPayload {
@@ -227,6 +246,10 @@ export interface UpdateItemPayload {
   order_index?: number;
   is_preview?: boolean;
   estimated_minutes?: number | null;
+  downloadable?: boolean;
+  url?: string;
+  label?: string | null;
+  description?: string | null;
 }
 
 export interface UpdateAssessmentPayload {

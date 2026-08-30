@@ -223,8 +223,10 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       {tab === "certificate" && (
         <CourseCertificateTab
           courseId={course.id}
+          certificateEnabled={course.certificate_enabled}
           accessMode={course.access_mode}
           accessEndDate={course.access_end_date}
+          onUpdated={(fields) => dispatch({ type: "UPDATE_COURSE_FIELDS", fields })}
         />
       )}
       {tab === "sales" && (

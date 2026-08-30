@@ -56,6 +56,7 @@ export function CourseDetailsTab({
   const [requirements, setRequirements] = useState<string[]>(course.requirements);
   const [isFree, setIsFree] = useState(course.is_free);
   const [isExclusive, setIsExclusive] = useState(course.is_exclusive);
+  const [certificateEnabled, setCertificateEnabled] = useState(course.certificate_enabled ?? false);
   const [price, setPrice] = useState(course.price != null ? String(course.price) : "");
   const [thumbnailUrl, setThumbnailUrl] = useState(course.thumbnail_url ?? "");
   const [instructors, setInstructors] = useState<CourseInstructorInputDTO[]>(
@@ -122,6 +123,7 @@ export function CourseDetailsTab({
         access_mode: accessMode,
         access_start_date: accessMode === "SCHEDULED" && accessStartDate ? new Date(accessStartDate).toISOString() : null,
         access_end_date: accessMode === "SCHEDULED" && accessEndDate ? new Date(accessEndDate).toISOString() : null,
+        certificate_enabled: certificateEnabled,
       };
       const updated = await updateCourse(course.id, payload);
       onUpdated(updated);
@@ -223,6 +225,13 @@ export function CourseDetailsTab({
             hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
             checked={isExclusive}
             onChange={setIsExclusive}
+          />
+          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <ToggleField
+            label="Certificates enabled"
+            hint="Allow students to earn a certificate on completion. Keep off for courses that get continuous content updates."
+            checked={certificateEnabled}
+            onChange={setCertificateEnabled}
           />
         </FormSection>
       </div>

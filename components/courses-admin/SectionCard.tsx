@@ -7,11 +7,12 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import { deleteSection, updateSection } from "@/lib/api/courses-client";
 import type { CourseDetail, CourseSection, CreateItemResult } from "@/lib/api/courses.types";
-import { IconChevronDown, IconDragHandle, IconPlus, IconTrash } from "@/components/dashboard/icons";
+import { IconChevronDown, IconDragHandle, IconPlus, IconTrash, IconUsers } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { ItemList } from "./ItemList";
 import { AddItemModal } from "./AddItemModal";
+import { DynamicStringListInput } from "./DynamicStringListInput";
 
 export function SectionCard({
   course,
@@ -40,6 +41,23 @@ export function SectionCard({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [addItemOpen, setAddItemOpen] = useState(false);
+  const [guestNames, setGuestNames] = useState<string[]>(section.guest_instructors.map((g) => g.name));
+  const [savingGuests, setSavingGuests] = useState(false);
+
+  async function saveGuestInstructors(names: string[]) {
+    setGuestNames(names);
+    setSavingGuests(true);
+    try {
+      await updateSection(course.id, section.id, { guest_instructors: names });
+      // POST/PATCH .../sections doesn't echo the resolved list with avatars — refetch instead.
+      onRefresh();
+    } catch (error) {
+      setGuestNames(section.guest_instructors.map((g) => g.name));
+      toast.error(error instanceof ApiError ? error.message : "Failed to update guest lecturers.");
+    } finally {
+      setSavingGuests(false);
+    }
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -102,6 +120,16 @@ export function SectionCard({
           {section.items.length} item{section.items.length === 1 ? "" : "s"}
         </span>
 
+        {section.guest_instructors.length > 0 && (
+          <span
+            className="flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2 py-1 rounded-md flex-shrink-0"
+            title={section.guest_instructors.map((g) => g.name).join(", ")}
+          >
+            <IconUsers />
+            {section.guest_instructors.length} guest{section.guest_instructors.length === 1 ? "" : "s"}
+          </span>
+        )}
+
         <button
           type="button"
           onClick={() => setAddItemOpen(true)}
@@ -132,7 +160,16 @@ export function SectionCard({
       </div>
 
       {expanded && (
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 flex flex-col gap-4">
+          <div className="rounded-xl border border-gray-100 dark:border-gray-800 p-3">
+            <DynamicStringListInput
+              label="Guest lecturers"
+              placeholder="e.g. Dr. Amara Okafor"
+              values={guestNames}
+              onChange={saveGuestInstructors}
+            />
+            {savingGuests && <p className="text-xs text-gray-400 mt-1">Saving…</p>}
+          </div>
           <ItemList
             courseId={course.id}
             section={section}

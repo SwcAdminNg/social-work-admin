@@ -41,8 +41,13 @@ export function CourseCard({
         
         {/* Instructors */}
         {course.instructors && course.instructors.length > 0 && (
-          <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+          <p className="text-xs text-gray-600 dark:text-gray-400 font-medium flex items-center gap-1.5">
             {course.instructors[0].name}
+            {course.instructors[0].is_guest && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                Guest
+              </span>
+            )}
             {course.instructors.length > 1 && (
               <span className="text-gray-400"> +{course.instructors.length - 1}</span>
             )}

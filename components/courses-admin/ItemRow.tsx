@@ -13,6 +13,7 @@ import {
   IconDocument,
   IconDocumentText,
   IconDragHandle,
+  IconLink,
   IconQuiz,
   IconTrash,
   IconVideo,
@@ -22,6 +23,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { VideoStatusBadge } from "./StatusBadge";
 import { VideoUploader } from "./VideoUploader";
 import { DocumentUploader } from "./DocumentUploader";
+import { LinkEditor } from "./LinkEditor";
 import { QuizBuilder } from "./QuizBuilder";
 import { EssayBuilder } from "./EssayBuilder";
 import { QuizGroupBuilder } from "./QuizGroupBuilder";
@@ -30,6 +32,7 @@ import { FinalAssessmentBadge } from "./FinalAssessmentControls";
 const TYPE_SWATCH_STYLES: Record<string, string> = {
   VIDEO: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
   DOCUMENT: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
+  LINKS: "bg-cyan-500/10 text-cyan-600 dark:bg-cyan-500/15 dark:text-cyan-400",
   QUIZ: "bg-violet-500/10 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400",
   ESSAY: "bg-teal-500/10 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400",
   QUIZ_GROUP: "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
@@ -87,6 +90,9 @@ export function ItemRow({
   if (item.item_type === "DOCUMENT") {
     TypeIcon = IconDocument;
     typeKey = "DOCUMENT";
+  } else if (item.item_type === "LINKS") {
+    TypeIcon = IconLink;
+    typeKey = "LINKS";
   } else if (item.item_type === "ASSESSMENT") {
     typeKey = item.assessment?.assessment_type ?? "QUIZ";
     TypeIcon = typeKey === "ESSAY" ? IconDocumentText : IconQuiz;
@@ -141,6 +147,21 @@ export function ItemRow({
       dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { is_preview: next } });
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update preview setting.");
+    }
+  }
+
+  async function toggleDownloadable() {
+    if (!item.document) return;
+    const next = !item.document.downloadable;
+    try {
+      await updateItem(item.id, { downloadable: next });
+      dispatch({
+        type: "UPDATE_ITEM",
+        itemId: item.id,
+        fields: { document: { ...item.document, downloadable: next } },
+      });
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : "Failed to update downloadable setting.");
     }
   }
 
@@ -222,6 +243,18 @@ export function ItemRow({
           <span className="text-[0.65rem] uppercase font-bold text-gray-400 tracking-wider select-none">min</span>
         </div>
 
+        {item.document && (
+          <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0 ml-2">
+            <input
+              type="checkbox"
+              checked={!!item.document.downloadable}
+              onChange={toggleDownloadable}
+              className="accent-[#2D6A4F]"
+            />
+            Downloadable
+          </label>
+        )}
+
         <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0 ml-2">
           <input type="checkbox" checked={item.is_preview} onChange={togglePreview} className="accent-[#2D6A4F]" />
           Preview
@@ -263,6 +296,12 @@ export function ItemRow({
               onDocumentUpdate={(document) =>
                 dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { document } })
               }
+            />
+          )}
+          {item.item_type === "LINKS" && (
+            <LinkEditor
+              item={item}
+              onLinkUpdate={(link) => dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { link } })}
             />
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ" && (

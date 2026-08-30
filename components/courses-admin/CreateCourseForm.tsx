@@ -28,6 +28,7 @@ export function CreateCourseForm() {
   const [requirements, setRequirements] = useState<string[]>([]);
   const [isFree, setIsFree] = useState(true);
   const [isExclusive, setIsExclusive] = useState(false);
+  const [certificateEnabled, setCertificateEnabled] = useState(false);
   const [price, setPrice] = useState("");
   const [instructors, setInstructors] = useState<CourseInstructorInputDTO[]>([{ name: "", user_id: null }]);
 
@@ -74,6 +75,7 @@ export function CreateCourseForm() {
         access_mode: accessMode,
         access_start_date: accessMode === "SCHEDULED" && accessStartDate ? new Date(accessStartDate).toISOString() : null,
         access_end_date: accessMode === "SCHEDULED" && accessEndDate ? new Date(accessEndDate).toISOString() : null,
+        certificate_enabled: certificateEnabled,
       });
       toast.success("Course created as a draft.");
       router.push(`/dashboard/course-management/${course.id}`);
@@ -186,6 +188,15 @@ export function CreateCourseForm() {
           hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
           checked={isExclusive}
           onChange={setIsExclusive}
+        />
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+        <ToggleField
+          label="Certificates enabled"
+          hint="Allow students to earn a certificate on completion. Keep off for courses that get continuous content updates."
+          checked={certificateEnabled}
+          onChange={setCertificateEnabled}
         />
       </div>
 

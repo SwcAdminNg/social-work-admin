@@ -8,6 +8,7 @@ import type { CourseItemType, CreateItemResult } from "@/lib/api/courses.types";
 import {
   IconDocument,
   IconDocumentText,
+  IconLink,
   IconQuiz,
   IconSpinner,
   IconVideo,
@@ -15,7 +16,7 @@ import {
   IconX,
 } from "@/components/dashboard/icons";
 
-type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP";
+type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP" | "LINKS";
 
 const ITEM_TYPES: {
   value: UIItemType;
@@ -24,6 +25,7 @@ const ITEM_TYPES: {
 }[] = [
   { value: "VIDEO", label: "Video", icon: IconVideo },
   { value: "DOCUMENT", label: "Document", icon: IconDocument },
+  { value: "LINKS", label: "Link", icon: IconLink },
   { value: "QUIZ", label: "Quiz", icon: IconQuiz },
   { value: "ESSAY", label: "Essay", icon: IconDocumentText },
   { value: "QUIZ_GROUP", label: "Quiz Group", icon: IconQuiz },
@@ -48,6 +50,10 @@ export function AddItemModal({
   const [title, setTitle] = useState("");
   const [estimatedMinutes, setEstimatedMinutes] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [downloadable, setDownloadable] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkLabel, setLinkLabel] = useState("");
+  const [linkDescription, setLinkDescription] = useState("");
   const [isPreview, setIsPreview] = useState(false);
   const [isFinalAssessment, setIsFinalAssessment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +69,10 @@ export function AddItemModal({
     setTitle("");
     setEstimatedMinutes("");
     setFile(null);
+    setDownloadable(false);
+    setLinkUrl("");
+    setLinkLabel("");
+    setLinkDescription("");
     setIsPreview(false);
     setIsFinalAssessment(false);
     setUploadProgress(null);
@@ -101,11 +111,16 @@ export function AddItemModal({
       toast.error("Please select a file for the document item.");
       return;
     }
+    if (itemType === "LINKS" && !linkUrl.trim()) {
+      toast.error("Please enter a URL for the link item.");
+      return;
+    }
 
     setSubmitting(true);
     try {
       let actualItemType: CourseItemType = "VIDEO";
       if (itemType === "DOCUMENT") actualItemType = "DOCUMENT";
+      else if (itemType === "LINKS") actualItemType = "LINKS";
       else if (itemType === "QUIZ" || itemType === "ESSAY" || itemType === "QUIZ_GROUP") actualItemType = "ASSESSMENT";
 
       const parsedMinutes = parseInt(estimatedMinutes, 10);
@@ -119,6 +134,14 @@ export function AddItemModal({
         estimated_minutes: minutes,
         file_name: itemType === "DOCUMENT" ? file!.name : null,
       };
+
+      if (itemType === "DOCUMENT") {
+        payload.downloadable = downloadable;
+      } else if (itemType === "LINKS") {
+        payload.url = linkUrl.trim();
+        payload.label = linkLabel.trim() || null;
+        payload.description = linkDescription.trim() || null;
+      }
 
       if (itemType === "QUIZ") {
         payload.assessment_type = "QUIZ";
@@ -350,6 +373,71 @@ export function AddItemModal({
                   </button>
                 </div>
               )}
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={downloadable}
+                  onChange={(e) => setDownloadable(e.target.checked)}
+                  className="accent-[#2D6A4F]"
+                />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Allow students to download this document
+                </span>
+              </label>
+            </div>
+          )}
+
+          {itemType === "LINKS" && (
+            <div className="space-y-3 mb-4">
+              <div>
+                <label
+                  htmlFor="item-link-url"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  URL
+                </label>
+                <input
+                  id="item-link-url"
+                  type="url"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  required
+                  placeholder="https://example.org/article"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="item-link-label"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Display label (optional)
+                </label>
+                <input
+                  id="item-link-label"
+                  type="text"
+                  value={linkLabel}
+                  onChange={(e) => setLinkLabel(e.target.value)}
+                  placeholder="e.g. Trauma-Informed Practice: A Primer"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="item-link-description"
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Description (optional)
+                </label>
+                <textarea
+                  id="item-link-description"
+                  value={linkDescription}
+                  onChange={(e) => setLinkDescription(e.target.value)}
+                  rows={2}
+                  placeholder="A short blurb about this resource."
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                />
+              </div>
             </div>
           )}
 
