@@ -8,6 +8,7 @@ import {
   IconStar,
   IconUsers,
   IconFolder,
+  IconLibrary,
   IconMail,
   IconLifeBuoy,
   IconClipboardCheck,
@@ -41,6 +42,12 @@ export const dashboardNavItems: NavItem[] = [
     href: "/dashboard/course-catalogs",
     icon: IconFolder,
     adminOnly: true,
+  },
+  {
+    label: "Resource Management",
+    href: "/dashboard/resource-management",
+    icon: IconLibrary,
+    staffOnly: true,
   },
   {
     label: "Certificates",

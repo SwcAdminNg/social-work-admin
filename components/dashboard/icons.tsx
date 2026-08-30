@@ -65,6 +65,17 @@ export function IconBookOpen() {
   );
 }
 
+export function IconLibrary() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 3v18" />
+      <path d="M8 3v18" />
+      <path d="m13 3 4 18" />
+      <path d="m17 3 4 18" />
+    </svg>
+  );
+}
+
 export function IconStar() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
