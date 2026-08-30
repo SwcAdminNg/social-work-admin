@@ -16,6 +16,7 @@ import {
   IconFolder,
   IconGrid,
   IconLink,
+  IconMessageCircle,
   IconReceipt,
   IconTrash,
 } from "@/components/dashboard/icons";
@@ -30,6 +31,7 @@ import { CourseCurriculumTab } from "./CourseCurriculumTab";
 import { CourseTransactionsTab } from "./CourseTransactionsTab";
 import { CourseCertificateTab } from "./CourseCertificateTab";
 import { CourseResourcesTab } from "./CourseResourcesTab";
+import { CourseCommunityTab } from "./CourseCommunityTab";
 
 const VIDEO_POLL_INTERVAL_MS = 5000;
 
@@ -42,7 +44,7 @@ function formatDuration(totalMinutes: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-type Tab = "details" | "curriculum" | "resources" | "sales" | "certificate";
+type Tab = "details" | "curriculum" | "resources" | "chat" | "sales" | "certificate";
 
 export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail }) {
   const router = useRouter();
@@ -166,6 +168,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
               { key: "details", label: "Details", icon: IconBookOpen, count: undefined },
               { key: "curriculum", label: "Curriculum", icon: IconGrid, count: stats.itemCount },
               { key: "resources", label: "Resources", icon: IconLink, count: undefined },
+              { key: "chat", label: "Class Chat", icon: IconMessageCircle, count: undefined },
               { key: "certificate", label: "Certificate", icon: IconCertificate, count: undefined },
               { key: "sales", label: "Sales & Transactions", icon: IconReceipt, count: undefined },
             ] as const satisfies readonly { key: Tab; label: string; icon: React.ComponentType; count: number | undefined }[]
@@ -224,6 +227,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
         <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
       )}
       {tab === "resources" && <CourseResourcesTab courseId={course.id} courseTitle={course.title} />}
+      {tab === "chat" && <CourseCommunityTab courseId={course.id} />}
       {tab === "certificate" && (
         <CourseCertificateTab
           courseId={course.id}

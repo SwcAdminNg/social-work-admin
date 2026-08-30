@@ -12,6 +12,7 @@ import {
   IconMail,
   IconLifeBuoy,
   IconClipboardCheck,
+  IconMessageCircle,
 } from "./icons";
 
 export type NavItem = {
@@ -48,6 +49,11 @@ export const dashboardNavItems: NavItem[] = [
     href: "/dashboard/resource-management",
     icon: IconLibrary,
     staffOnly: true,
+  },
+  {
+    label: "Communities",
+    href: "/dashboard/communities",
+    icon: IconMessageCircle,
   },
   {
     label: "Certificates",
