@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
 import {
   getCommunityMessages,
+  markCommunityRead,
   sendCommunityMessage,
   uploadCommunityAttachment,
 } from "@/lib/api/community-client";
@@ -83,6 +84,19 @@ export function CommunityChatPanel({
     queryFn: () => getCommunityMessages(communityId, 1, 50),
   });
 
+  // Viewing a room counts as reading it — mark it read on open and again as new messages
+  // arrive while it stays open, so the sidebar's unread badge stays accurate.
+  function markRead() {
+    markCommunityRead(communityId)
+      .then(() => queryClient.invalidateQueries({ queryKey: ["community_unread_count"] }))
+      .catch(() => {});
+  }
+
+  useEffect(() => {
+    markRead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [communityId]);
+
   const { connected } = useCommunitySocket({
     communityId,
     token: session?.accessToken,
@@ -91,6 +105,7 @@ export function CommunityChatPanel({
       queryClient.setQueryData<PaginatedResult<CommunityMessage>>(["community_messages", communityId], (old) =>
         appendMessage(old, message),
       );
+      markRead();
     },
     onError: (detail) => toast.error(detail),
   });

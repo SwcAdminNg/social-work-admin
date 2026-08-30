@@ -174,3 +174,14 @@ export async function sendCommunityPresenceHeartbeat(): Promise<void> {
 }
 
 type CommunityMemberUserId = string;
+
+// Read state
+
+export async function getUnreadCommunityCount(): Promise<number> {
+  const res = await request<{ unread_count: number }>("/unread-count");
+  return res.data?.unread_count ?? 0;
+}
+
+export async function markCommunityRead(communityId: string): Promise<void> {
+  await request(`/${communityId}/read`, { method: "POST" });
+}

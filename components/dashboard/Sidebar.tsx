@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { IconLogoMark } from "@/components/auth/shared/icons";
+import { UnreadBadge } from "@/components/community-admin/UnreadBadge";
 import { dashboardNavItems } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
 import { IconChevronsLeft, IconClose, IconLogout } from "./icons";
@@ -102,10 +103,11 @@ export function Sidebar() {
                       <Icon />
                     </span>
                     <span
-                      className={`whitespace-nowrap transition-opacity duration-200 ${collapsed ? "lg:hidden" : ""}`}
+                      className={`whitespace-nowrap transition-opacity duration-200 flex-1 ${collapsed ? "lg:hidden" : ""}`}
                     >
                       {label}
                     </span>
+                    {href === "/dashboard/communities" && !collapsed && <UnreadBadge />}
                   </Link>
                 </li>
               );
