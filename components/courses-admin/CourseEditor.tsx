@@ -15,6 +15,7 @@ import {
   IconClock,
   IconFolder,
   IconGrid,
+  IconLink,
   IconReceipt,
   IconTrash,
 } from "@/components/dashboard/icons";
@@ -28,6 +29,7 @@ import { CourseDetailsTab } from "./CourseDetailsTab";
 import { CourseCurriculumTab } from "./CourseCurriculumTab";
 import { CourseTransactionsTab } from "./CourseTransactionsTab";
 import { CourseCertificateTab } from "./CourseCertificateTab";
+import { CourseResourcesTab } from "./CourseResourcesTab";
 
 const VIDEO_POLL_INTERVAL_MS = 5000;
 
@@ -40,7 +42,7 @@ function formatDuration(totalMinutes: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-type Tab = "details" | "curriculum" | "sales" | "certificate";
+type Tab = "details" | "curriculum" | "resources" | "sales" | "certificate";
 
 export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail }) {
   const router = useRouter();
@@ -163,6 +165,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
             [
               { key: "details", label: "Details", icon: IconBookOpen, count: undefined },
               { key: "curriculum", label: "Curriculum", icon: IconGrid, count: stats.itemCount },
+              { key: "resources", label: "Resources", icon: IconLink, count: undefined },
               { key: "certificate", label: "Certificate", icon: IconCertificate, count: undefined },
               { key: "sales", label: "Sales & Transactions", icon: IconReceipt, count: undefined },
             ] as const satisfies readonly { key: Tab; label: string; icon: React.ComponentType; count: number | undefined }[]
@@ -220,6 +223,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       {tab === "curriculum" && (
         <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
       )}
+      {tab === "resources" && <CourseResourcesTab courseId={course.id} courseTitle={course.title} />}
       {tab === "certificate" && (
         <CourseCertificateTab
           courseId={course.id}
