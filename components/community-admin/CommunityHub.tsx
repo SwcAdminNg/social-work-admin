@@ -122,7 +122,7 @@ export function CommunityHub({
   }
 
   return (
-    <div className="flex h-[calc(100vh-11rem)] min-h-[32rem] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex h-[calc(100dvh-11rem)] max-h-[calc(100dvh-11rem)] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
       {/* Sidebar */}
       <div
         className={`w-full sm:w-80 shrink-0 border-r border-gray-100 dark:border-gray-800 flex flex-col ${
