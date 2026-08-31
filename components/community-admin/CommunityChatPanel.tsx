@@ -243,20 +243,22 @@ export function CommunityChatPanel({
                         }`}
                       >
                         <p className="font-semibold opacity-80">{displayName(msg.reply_to.sender)}</p>
-                        <p className="opacity-70 truncate">{msg.reply_to.body || "Attachment"}</p>
+                        <p className="opacity-70 truncate">
+                          {msg.reply_to.body || (msg.reply_to.attachment ? "Attachment" : msg.reply_to.resource_reference ? "Shared resource" : "")}
+                        </p>
                       </div>
                     )}
-                    {msg.attachment_url && msg.attachment_kind === "IMAGE" && (
+                    {msg.attachment && msg.attachment.kind === "IMAGE" && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={msg.attachment_url}
-                        alt={msg.attachment_file_name ?? "Attachment"}
+                        src={msg.attachment.url}
+                        alt={msg.attachment.file_name ?? "Attachment"}
                         className="max-w-full max-h-64 rounded-lg object-contain"
                       />
                     )}
-                    {msg.attachment_url && msg.attachment_kind === "DOCUMENT" && (
+                    {msg.attachment && msg.attachment.kind === "DOCUMENT" && (
                       <a
-                        href={msg.attachment_url}
+                        href={msg.attachment.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold underline underline-offset-2 ${
@@ -264,7 +266,7 @@ export function CommunityChatPanel({
                         }`}
                       >
                         <IconDocument />
-                        {msg.attachment_file_name ?? "Attachment"}
+                        {msg.attachment.file_name ?? "Attachment"}
                       </a>
                     )}
                     {msg.resource_reference && (

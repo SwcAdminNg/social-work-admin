@@ -37,6 +37,18 @@ export interface CommunityResourceReference {
   thumbnail_url?: string | null;
 }
 
+/**
+ * The admin doc's data model lists a single `attachment` field on CommunityMessage (not
+ * flattened attachment_url/kind/file_name) — this mirrors that. `community-client.ts`
+ * normalizes incoming messages so this is the only shape the UI ever has to handle, even if
+ * the backend happens to flatten it on the wire.
+ */
+export interface CommunityAttachment {
+  url: string;
+  kind: CommunityAttachmentKind;
+  file_name?: string | null;
+}
+
 export interface CommunityMessage {
   id: string;
   community_id: string;
@@ -44,9 +56,7 @@ export interface CommunityMessage {
   sender: CommunityMemberUser | null;
   reply_to_message_id?: string | null;
   reply_to?: CommunityMessage | null;
-  attachment_url?: string | null;
-  attachment_kind?: CommunityAttachmentKind | null;
-  attachment_file_name?: string | null;
+  attachment?: CommunityAttachment | null;
   resource_reference_id?: string | null;
   resource_reference?: CommunityResourceReference | null;
   created_at: string;
@@ -68,9 +78,7 @@ export interface SendCommunityMessagePayload {
   body?: string;
   reply_to_message_id?: string | null;
   resource_reference_id?: string | null;
-  attachment_url?: string | null;
-  attachment_kind?: CommunityAttachmentKind | null;
-  attachment_file_name?: string | null;
+  attachment?: CommunityAttachment | null;
 }
 
 export interface ListCustomCommunitiesParams {

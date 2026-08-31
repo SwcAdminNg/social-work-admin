@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { normalizeMessage } from "@/lib/api/community-client";
 import type { CommunityMessage } from "@/lib/api/community.types";
 
 function wsBaseUrl(): string {
@@ -80,7 +81,7 @@ export function useCommunitySocket({
         const handlers = handlersRef.current;
         switch (payload.type) {
           case "message":
-            if (payload.data) handlers.onMessage(payload.data);
+            if (payload.data) handlers.onMessage(normalizeMessage(payload.data));
             break;
           case "typing":
             if (payload.user_id) handlers.onTyping?.(payload.user_id);
