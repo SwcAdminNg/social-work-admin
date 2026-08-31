@@ -98,7 +98,7 @@ export function CommunityMembersPanel({
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto px-5 py-3 flex flex-col gap-3">
+          <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-3 flex flex-col gap-3">
             {membersQuery.isLoading ? (
               <div className="flex justify-center py-10">
                 <IconSpinner className="w-5 h-5 text-gray-400" />

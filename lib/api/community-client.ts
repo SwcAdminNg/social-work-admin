@@ -2,7 +2,6 @@ import { ApiError, type ApiEnvelope } from "./client";
 import type {
   AddCommunityMembersPayload,
   Community,
-  CommunityAttachment,
   CommunityMember,
   CommunityMessage,
   CreateCustomCommunityPayload,
@@ -10,34 +9,6 @@ import type {
   PaginatedResult,
   SendCommunityMessagePayload,
 } from "./community.types";
-
-/**
- * The doc's data model lists a single `attachment` field on a message, but tolerates that the
- * wire format might flatten it (attachment_url/attachment_kind/attachment_file_name) instead —
- * this normalizes either shape into the nested `CommunityAttachment` the UI expects, so a
- * mismatch here doesn't silently drop the attachment from the rendered message.
- */
-function normalizeAttachment(raw: unknown): CommunityAttachment | null {
-  if (!raw || typeof raw !== "object") return null;
-  const obj = raw as Record<string, unknown>;
-  const url = (obj.url ?? obj.attachment_url ?? obj.file_url ?? obj.public_url) as string | undefined;
-  if (!url) return null;
-  const kind = (obj.kind ?? obj.attachment_kind ?? "DOCUMENT") as CommunityAttachment["kind"];
-  const fileName = (obj.file_name ?? obj.attachment_file_name ?? obj.filename) as string | undefined;
-  return { url, kind, file_name: fileName ?? null };
-}
-
-export function normalizeMessage(raw: unknown): CommunityMessage {
-  const obj = (raw ?? {}) as Record<string, unknown>;
-  const flatAttachment = obj.attachment_url
-    ? { url: obj.attachment_url, kind: obj.attachment_kind, file_name: obj.attachment_file_name }
-    : null;
-  return {
-    ...(obj as unknown as CommunityMessage),
-    attachment: normalizeAttachment(obj.attachment ?? flatAttachment),
-    reply_to: obj.reply_to ? normalizeMessage(obj.reply_to) : null,
-  };
-}
 
 function buildQuery(params: Record<string, string | number | undefined>): string {
   const search = new URLSearchParams();
@@ -148,7 +119,7 @@ export async function getCommunityMessages(
   const res = await request<CommunityMessage[]>(
     `/${communityId}/messages${buildQuery({ page, page_size: pageSize })}`,
   );
-  return { items: (res.data ?? []).slice().reverse().map(normalizeMessage), meta: res.meta! };
+  return { items: (res.data ?? []).slice().reverse(), meta: res.meta! };
 }
 
 export async function sendCommunityMessage(
@@ -156,18 +127,12 @@ export async function sendCommunityMessage(
   payload: SendCommunityMessagePayload,
 ): Promise<CommunityMessage> {
   const res = await request<CommunityMessage>(`/${communityId}/messages`, { method: "POST", body: payload });
-  return normalizeMessage(res.data);
+  return res.data;
 }
 
 interface CommunityAttachmentUploadCredentials {
   upload_url: string;
-  attachment_url?: string;
-  // Field-name fallbacks — the doc doesn't pin this down, so tolerate whatever the backend
-  // actually calls the resulting public URL rather than silently dropping it.
-  url?: string;
-  file_url?: string;
-  public_url?: string;
-  storage_key?: string;
+  storage_key: string;
 }
 
 export async function getCommunityAttachmentUploadUrl(
@@ -181,20 +146,19 @@ export async function getCommunityAttachmentUploadUrl(
   return res.data;
 }
 
-/** Uploads straight to storage via a presigned PUT URL — same pattern as ticket attachments. */
+/**
+ * Uploads straight to storage via a presigned PUT URL — same pattern as ticket attachments
+ * (support-client.ts's uploadTicketAttachment). The upload-url response only hands back a
+ * `storage_key`, not a persistent URL (the presigned PUT URL itself expires in minutes), so the
+ * storage_key is what gets sent to the message endpoint — the backend resolves the actual
+ * (possibly signed) `attachment_url` when it returns the message.
+ */
 export async function uploadCommunityAttachment(communityId: string, file: File) {
-  const credentials = await getCommunityAttachmentUploadUrl(communityId, {
+  const { upload_url, storage_key } = await getCommunityAttachmentUploadUrl(communityId, {
     file_name: file.name,
     content_type: file.type || undefined,
   });
-  const attachmentUrl =
-    credentials.attachment_url ?? credentials.url ?? credentials.file_url ?? credentials.public_url;
-  if (!attachmentUrl) {
-    throw new Error(
-      "The server didn't return a usable attachment URL for this upload — check the attachments/upload-url response shape.",
-    );
-  }
-  const putRes = await fetch(credentials.upload_url, {
+  const putRes = await fetch(upload_url, {
     method: "PUT",
     body: file,
     headers: file.type ? { "Content-Type": file.type } : undefined,
@@ -202,12 +166,12 @@ export async function uploadCommunityAttachment(communityId: string, file: File)
   if (!putRes.ok) {
     throw new Error("File upload to storage failed. Please try again.");
   }
-  const attachment: CommunityAttachment = {
-    url: attachmentUrl,
-    file_name: file.name,
-    kind: file.type.startsWith("image/") ? "IMAGE" : "DOCUMENT",
+  return {
+    attachment_storage_key: storage_key,
+    attachment_file_name: file.name,
+    attachment_mime_type: file.type || undefined,
+    attachment_file_size_bytes: file.size,
   };
-  return { attachment };
 }
 
 // Presence

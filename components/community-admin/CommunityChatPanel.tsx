@@ -208,7 +208,7 @@ export function CommunityChatPanel({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3 min-h-0">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-4 flex flex-col gap-3 min-h-0">
         {messagesQuery.isLoading ? (
           <div className="flex justify-center py-10">
             <IconSpinner className="w-5 h-5 text-gray-400" />
@@ -244,21 +244,21 @@ export function CommunityChatPanel({
                       >
                         <p className="font-semibold opacity-80">{displayName(msg.reply_to.sender)}</p>
                         <p className="opacity-70 truncate">
-                          {msg.reply_to.body || (msg.reply_to.attachment ? "Attachment" : msg.reply_to.resource_reference ? "Shared resource" : "")}
+                          {msg.reply_to.body || (msg.reply_to.attachment_url ? "Attachment" : msg.reply_to.resource_reference ? "Shared resource" : "")}
                         </p>
                       </div>
                     )}
-                    {msg.attachment && msg.attachment.kind === "IMAGE" && (
+                    {msg.attachment_url && msg.attachment_kind === "IMAGE" && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={msg.attachment.url}
-                        alt={msg.attachment.file_name ?? "Attachment"}
+                        src={msg.attachment_url}
+                        alt={msg.attachment_file_name ?? "Attachment"}
                         className="max-w-full max-h-64 rounded-lg object-contain"
                       />
                     )}
-                    {msg.attachment && msg.attachment.kind === "DOCUMENT" && (
+                    {msg.attachment_url && msg.attachment_kind === "DOCUMENT" && (
                       <a
-                        href={msg.attachment.url}
+                        href={msg.attachment_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold underline underline-offset-2 ${
@@ -266,7 +266,7 @@ export function CommunityChatPanel({
                         }`}
                       >
                         <IconDocument />
-                        {msg.attachment.file_name ?? "Attachment"}
+                        {msg.attachment_file_name ?? "Attachment"}
                       </a>
                     )}
                     {msg.resource_reference && (

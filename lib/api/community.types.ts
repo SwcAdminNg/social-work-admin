@@ -37,18 +37,6 @@ export interface CommunityResourceReference {
   thumbnail_url?: string | null;
 }
 
-/**
- * The admin doc's data model lists a single `attachment` field on CommunityMessage (not
- * flattened attachment_url/kind/file_name) — this mirrors that. `community-client.ts`
- * normalizes incoming messages so this is the only shape the UI ever has to handle, even if
- * the backend happens to flatten it on the wire.
- */
-export interface CommunityAttachment {
-  url: string;
-  kind: CommunityAttachmentKind;
-  file_name?: string | null;
-}
-
 export interface CommunityMessage {
   id: string;
   community_id: string;
@@ -56,7 +44,14 @@ export interface CommunityMessage {
   sender: CommunityMemberUser | null;
   reply_to_message_id?: string | null;
   reply_to?: CommunityMessage | null;
-  attachment?: CommunityAttachment | null;
+  // Same resolved-on-read shape as TicketMessage (support.types.ts) — the backend serves an
+  // R2-backed attachment as a flat attachment_url once uploaded, since the upload-url endpoint
+  // itself returns a `storage_key` (not a persistent URL) exactly like the ticket attachments.
+  attachment_url?: string | null;
+  attachment_file_name?: string | null;
+  attachment_mime_type?: string | null;
+  attachment_file_size_bytes?: number | null;
+  attachment_kind?: CommunityAttachmentKind | null;
   resource_reference_id?: string | null;
   resource_reference?: CommunityResourceReference | null;
   created_at: string;
@@ -78,7 +73,12 @@ export interface SendCommunityMessagePayload {
   body?: string;
   reply_to_message_id?: string | null;
   resource_reference_id?: string | null;
-  attachment?: CommunityAttachment | null;
+  // Matches SendTicketMessagePayload (support.types.ts) — the storage_key from the
+  // upload-url response, not a URL.
+  attachment_storage_key?: string;
+  attachment_file_name?: string;
+  attachment_mime_type?: string;
+  attachment_file_size_bytes?: number;
 }
 
 export interface ListCustomCommunitiesParams {
