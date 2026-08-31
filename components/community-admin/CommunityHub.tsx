@@ -122,7 +122,14 @@ export function CommunityHub({
   }
 
   return (
-    <div className="flex h-[calc(100dvh-11rem)] max-h-[calc(100dvh-11rem)] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+    <div
+      className="flex -mx-4 -my-4 sm:mx-0 sm:my-0
+        h-[calc(100dvh-4.5rem)] max-h-[calc(100dvh-4.5rem)]
+        sm:h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7.5rem)]
+        lg:h-[calc(100dvh-8.5rem)] lg:max-h-[calc(100dvh-8.5rem)]
+        rounded-none sm:rounded-2xl border-0 sm:border border-gray-200 dark:border-gray-800
+        bg-white dark:bg-gray-900 overflow-hidden"
+    >
       {/* Sidebar */}
       <div
         className={`w-full sm:w-80 shrink-0 border-r border-gray-100 dark:border-gray-800 flex flex-col ${
@@ -266,23 +273,15 @@ export function CommunityHub({
       {/* Chat panel */}
       <div className={`flex-1 min-w-0 flex-col ${mobileShowChat ? "flex" : "hidden sm:flex"}`}>
         {selected ? (
-          <>
-            <div className="sm:hidden px-4 pt-3">
-              <button
-                onClick={() => setMobileShowChat(false)}
-                className="text-sm font-semibold text-gray-500 dark:text-gray-400 cursor-pointer"
-              >
-                &larr; All communities
-              </button>
-            </div>
-            <CommunityChatPanel
-              communityId={selected.id}
-              communityName={selected.name}
-              courseId={selected.course_id}
-              memberCount={selected.member_count}
-              onOpenMembers={() => setMembersOpen(true)}
-            />
-          </>
+          <CommunityChatPanel
+            key={selected.id}
+            communityId={selected.id}
+            communityName={selected.name}
+            courseId={selected.course_id}
+            memberCount={selected.member_count}
+            onOpenMembers={() => setMembersOpen(true)}
+            onBack={() => setMobileShowChat(false)}
+          />
         ) : (
           <div className="flex-1 flex items-center justify-center p-10">
             <EmptyState

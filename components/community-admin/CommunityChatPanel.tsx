@@ -16,6 +16,8 @@ import type { Resource } from "@/lib/api/resources.types";
 import { useCommunitySocket } from "@/lib/hooks/useCommunitySocket";
 import {
   IconAlertTriangle,
+  IconChevronDown,
+  IconChevronLeft,
   IconDocument,
   IconLibrary,
   IconReply,
@@ -58,6 +60,7 @@ export function CommunityChatPanel({
   memberCount,
   onlineCount,
   onOpenMembers,
+  onBack,
 }: {
   communityId: string;
   communityName: string;
@@ -65,6 +68,8 @@ export function CommunityChatPanel({
   memberCount?: number;
   onlineCount?: number;
   onOpenMembers?: () => void;
+  /** Renders a mobile-only back button in the header (e.g. returning to the community list). */
+  onBack?: () => void;
 }) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
@@ -76,8 +81,13 @@ export function CommunityChatPanel({
   const [replyTo, setReplyTo] = useState<CommunityMessage | null>(null);
   const [sharedResource, setSharedResource] = useState<Resource | null>(null);
   const [resourcePickerOpen, setResourcePickerOpen] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
 
   const messagesQuery = useQuery({
     queryKey: ["community_messages", communityId],
@@ -119,12 +129,47 @@ export function CommunityChatPanel({
   }, [connected, communityId, queryClient]);
 
   const messages = messagesQuery.data?.items ?? [];
+
+  function scrollToBottom(behavior: ScrollBehavior = "smooth") {
+    bottomRef.current?.scrollIntoView({ behavior });
+    setNewMessageCount(0);
+    setIsNearBottom(true);
+    isNearBottomRef.current = true;
+  }
+
+  function handleScroll() {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const nearBottom = distanceFromBottom < 120;
+    isNearBottomRef.current = nearBottom;
+    setIsNearBottom(nearBottom);
+    if (nearBottom) setNewMessageCount(0);
+  }
+
+  function jumpToMessage(id: string) {
+    const el = document.getElementById(`community-message-${id}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedId(id);
+    setTimeout(() => setHighlightedId((current) => (current === id ? null : current)), 1500);
+  }
+
   const prevCount = useRef(0);
   useEffect(() => {
-    if (messages.length !== prevCount.current) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      prevCount.current = messages.length;
+    if (messages.length === prevCount.current) return;
+    const added = messages.length - prevCount.current;
+    const isFirstLoad = prevCount.current === 0;
+    const lastMessage = messages[messages.length - 1];
+    const isOwnLast = lastMessage?.sender?.id === currentUserId;
+    prevCount.current = messages.length;
+
+    if (isFirstLoad || isOwnLast || isNearBottomRef.current) {
+      scrollToBottom(isFirstLoad ? "auto" : "smooth");
+    } else {
+      setNewMessageCount((c) => c + added);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
 
   const sendMutation = useMutation({
@@ -180,8 +225,19 @@ export function CommunityChatPanel({
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
-        <div className="min-w-0">
+      <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label="Back to all communities"
+              className="sm:hidden -ml-1 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer shrink-0"
+            >
+              <IconChevronLeft />
+            </button>
+          )}
+          <div className="min-w-0">
           <h2 className="text-sm font-bold text-gray-900 dark:text-white truncate">{communityName}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             {memberCount !== undefined && (
@@ -197,6 +253,7 @@ export function CommunityChatPanel({
               </button>
             )}
           </div>
+          </div>
         </div>
         <span
           className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-wider shrink-0 ${
@@ -208,7 +265,12 @@ export function CommunityChatPanel({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-4 flex flex-col gap-3 min-h-0">
+      <div className="relative flex-1 min-h-0">
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="absolute inset-0 overflow-y-auto no-scrollbar px-5 py-4 flex flex-col gap-3"
+        >
         {messagesQuery.isLoading ? (
           <div className="flex justify-center py-10">
             <IconSpinner className="w-5 h-5 text-gray-400" />
@@ -220,25 +282,32 @@ export function CommunityChatPanel({
         ) : (
           messages.map((msg) => {
             const isOwn = msg.sender?.id === currentUserId;
+            const isHighlighted = highlightedId === msg.id;
             return (
-              <div key={msg.id} className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : ""}`}>
+              <div
+                key={msg.id}
+                id={`community-message-${msg.id}`}
+                className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : ""}`}
+              >
                 {!isOwn && <Avatar user={msg.sender} size="sm" />}
-                <div className={`flex flex-col max-w-[70%] ${isOwn ? "items-end" : "items-start"}`}>
+                <div className={`flex flex-col max-w-[85%] sm:max-w-[70%] ${isOwn ? "items-end" : "items-start"}`}>
                   {!isOwn && (
                     <span className="text-[0.65rem] font-semibold text-gray-400 dark:text-gray-500 px-1 mb-0.5">
                       {displayName(msg.sender)}
                     </span>
                   )}
                   <div
-                    className={`group relative rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words flex flex-col gap-2 ${
+                    className={`group relative rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words flex flex-col gap-2 transition-colors duration-500 ${
                       isOwn
                         ? "bg-[#2D6A4F] text-white rounded-br-sm"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
-                    }`}
+                    } ${isHighlighted ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900" : ""}`}
                   >
                     {msg.reply_to && (
-                      <div
-                        className={`text-xs rounded-lg px-2.5 py-1.5 border-l-2 ${
+                      <button
+                        type="button"
+                        onClick={() => msg.reply_to && jumpToMessage(msg.reply_to.id)}
+                        className={`text-left text-xs rounded-lg px-2.5 py-1.5 border-l-2 cursor-pointer hover:brightness-95 dark:hover:brightness-110 ${
                           isOwn ? "bg-white/10 border-white/40" : "bg-black/5 dark:bg-white/5 border-gray-300 dark:border-gray-600"
                         }`}
                       >
@@ -246,7 +315,7 @@ export function CommunityChatPanel({
                         <p className="opacity-70 truncate">
                           {msg.reply_to.body || (msg.reply_to.attachment_url ? "Attachment" : msg.reply_to.resource_reference ? "Shared resource" : "")}
                         </p>
-                      </div>
+                      </button>
                     )}
                     {msg.attachment_url && msg.attachment_kind === "IMAGE" && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -286,7 +355,8 @@ export function CommunityChatPanel({
                       type="button"
                       onClick={() => setReplyTo(msg)}
                       title="Reply"
-                      className={`absolute -top-2.5 ${isOwn ? "-left-2.5" : "-right-2.5"} w-6 h-6 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hidden sm:flex`}
+                      aria-label="Reply"
+                      className={`absolute -top-2.5 ${isOwn ? "-left-2.5" : "-right-2.5"} w-6 h-6 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] flex items-center justify-center opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer`}
                     >
                       <IconReply />
                     </button>
@@ -300,6 +370,18 @@ export function CommunityChatPanel({
           })
         )}
         <div ref={bottomRef} />
+        </div>
+
+        {(newMessageCount > 0 || !isNearBottom) && messages.length > 0 && (
+          <button
+            type="button"
+            onClick={() => scrollToBottom()}
+            className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <IconChevronDown />
+            {newMessageCount > 0 ? `${newMessageCount} new` : ""}
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSend} className="border-t border-gray-100 dark:border-gray-800 p-4 flex flex-col gap-2 shrink-0">
