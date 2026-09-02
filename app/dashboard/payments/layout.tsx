@@ -36,6 +36,16 @@ export default function PaymentsLayout({ children }: { children: React.ReactNode
         >
           Subscription Plans
         </Link>
+        <Link
+          href="/dashboard/payments/coupons"
+          className={`px-1 py-3 text-sm font-semibold border-b-2 transition-colors ${
+            pathname.startsWith("/dashboard/payments/coupons")
+              ? "border-[#2D6A4F] dark:border-[#52b788] text-[#2D6A4F] dark:text-[#52b788]"
+              : "border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-900 dark:hover:text-gray-200"
+          }`}
+        >
+          Coupons
+        </Link>
       </div>
       <div>{children}</div>
     </div>
