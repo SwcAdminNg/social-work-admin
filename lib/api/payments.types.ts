@@ -83,3 +83,32 @@ export interface PaginatedResponse<T> {
   page_size: number;
   total_pages: number;
 }
+
+export interface TaxReportTransaction {
+  reference: string;
+  user_id: string;
+  transaction_type: TransactionType;
+  subtotal_amount: number;
+  discount_amount: number;
+  tax_rate: number;
+  tax_amount: number;
+  amount: number;
+  created_at: string;
+}
+
+export interface TaxReportSummary {
+  tax_rate: number;
+  total_tax_amount: number;
+  total_taxable_transactions: number;
+  start_date: string | null;
+  end_date: string | null;
+}
+
+export interface TaxReportResponse {
+  summary: TaxReportSummary;
+  items: TaxReportTransaction[];
+  total_items: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}

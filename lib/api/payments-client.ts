@@ -5,7 +5,14 @@ import type {
   SubscriptionPlanResponse,
   CreateSubscriptionPlanPayload,
   UpdateSubscriptionPlanPayload,
+  TaxReportResponse,
+  TaxReportTransaction,
+  TaxReportSummary,
 } from "./payments.types";
+
+type TaxReportEnvelope = ApiEnvelope<TaxReportTransaction[]> & {
+  summary: TaxReportSummary;
+};
 
 async function request<T>(
   path: string,
@@ -83,4 +90,31 @@ export async function updateSubscriptionPlan(
 
 export async function deleteSubscriptionPlan(planId: string): Promise<void> {
   await request(`/plans/${planId}`, { method: "DELETE" });
+}
+
+export async function getTaxReport(options: {
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<TaxReportResponse> {
+  const { startDate, endDate, page = 1, pageSize = 20 } = options;
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: pageSize.toString(),
+  });
+  if (startDate) params.set("start_date", startDate);
+  if (endDate) params.set("end_date", endDate);
+
+  const res = (await request<TaxReportTransaction[]>(
+    `/taxes?${params.toString()}`,
+  )) as TaxReportEnvelope;
+  return {
+    summary: res.summary,
+    items: res.data,
+    total_items: res.meta?.total_items || 0,
+    page: res.meta?.page || page,
+    page_size: res.meta?.page_size || pageSize,
+    total_pages: res.meta?.total_pages || 1,
+  };
 }
