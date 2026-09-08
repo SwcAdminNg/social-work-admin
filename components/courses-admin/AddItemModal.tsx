@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/api/client";
 import { createItem, finalizeDocument } from "@/lib/api/courses-client";
 import type { CourseItemType, CreateItemResult } from "@/lib/api/courses.types";
 import {
+  IconCalendar,
   IconDocument,
   IconDocumentText,
   IconLink,
@@ -16,7 +17,7 @@ import {
   IconX,
 } from "@/components/dashboard/icons";
 
-type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP" | "LINKS";
+type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP" | "LINKS" | "LIVE_SESSION";
 
 const ITEM_TYPES: {
   value: UIItemType;
@@ -26,6 +27,7 @@ const ITEM_TYPES: {
   { value: "VIDEO", label: "Video", icon: IconVideo },
   { value: "DOCUMENT", label: "Document", icon: IconDocument },
   { value: "LINKS", label: "Link", icon: IconLink },
+  { value: "LIVE_SESSION", label: "Live Session", icon: IconCalendar },
   { value: "QUIZ", label: "Quiz", icon: IconQuiz },
   { value: "ESSAY", label: "Essay", icon: IconDocumentText },
   { value: "QUIZ_GROUP", label: "Quiz Group", icon: IconQuiz },
@@ -54,6 +56,10 @@ export function AddItemModal({
   const [linkUrl, setLinkUrl] = useState("");
   const [linkLabel, setLinkLabel] = useState("");
   const [linkDescription, setLinkDescription] = useState("");
+  const [scheduledStartAt, setScheduledStartAt] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState("60");
+  const [guestName, setGuestName] = useState("");
+  const [guestTitle, setGuestTitle] = useState("");
   const [isPreview, setIsPreview] = useState(false);
   const [isFinalAssessment, setIsFinalAssessment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -73,6 +79,10 @@ export function AddItemModal({
     setLinkUrl("");
     setLinkLabel("");
     setLinkDescription("");
+    setScheduledStartAt("");
+    setDurationMinutes("60");
+    setGuestName("");
+    setGuestTitle("");
     setIsPreview(false);
     setIsFinalAssessment(false);
     setUploadProgress(null);
@@ -115,12 +125,23 @@ export function AddItemModal({
       toast.error("Please enter a URL for the link item.");
       return;
     }
+    if (itemType === "LIVE_SESSION") {
+      if (!scheduledStartAt) {
+        toast.error("Please choose a date and time for the live session.");
+        return;
+      }
+      if (new Date(scheduledStartAt).getTime() <= Date.now()) {
+        toast.error("The session's date and time must be in the future.");
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
       let actualItemType: CourseItemType = "VIDEO";
       if (itemType === "DOCUMENT") actualItemType = "DOCUMENT";
       else if (itemType === "LINKS") actualItemType = "LINKS";
+      else if (itemType === "LIVE_SESSION") actualItemType = "LIVE_SESSION";
       else if (itemType === "QUIZ" || itemType === "ESSAY" || itemType === "QUIZ_GROUP") actualItemType = "ASSESSMENT";
 
       const parsedMinutes = parseInt(estimatedMinutes, 10);
@@ -141,6 +162,12 @@ export function AddItemModal({
         payload.url = linkUrl.trim();
         payload.label = linkLabel.trim() || null;
         payload.description = linkDescription.trim() || null;
+      } else if (itemType === "LIVE_SESSION") {
+        payload.scheduled_start_at = new Date(scheduledStartAt).toISOString();
+        const parsedDuration = parseInt(durationMinutes, 10);
+        payload.duration_minutes = !isNaN(parsedDuration) ? parsedDuration : 60;
+        payload.guest_name = guestName.trim() || null;
+        payload.guest_title = guestTitle.trim() || null;
       }
 
       if (itemType === "QUIZ") {
@@ -276,7 +303,7 @@ export function AddItemModal({
         </h2>
 
         <fieldset disabled={isUploading}>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {ITEM_TYPES.map(({ value, label, icon: Icon }) => (
               <button
                 key={value}
@@ -441,6 +468,86 @@ export function AddItemModal({
             </div>
           )}
 
+          {itemType === "LIVE_SESSION" && (
+            <div className="space-y-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="item-live-session-start"
+                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Date &amp; time
+                  </label>
+                  <input
+                    id="item-live-session-start"
+                    type="datetime-local"
+                    value={scheduledStartAt}
+                    onChange={(e) => setScheduledStartAt(e.target.value)}
+                    required
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="item-live-session-duration"
+                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Duration (minutes)
+                  </label>
+                  <input
+                    id="item-live-session-duration"
+                    type="number"
+                    min={5}
+                    max={600}
+                    value={durationMinutes}
+                    onChange={(e) => setDurationMinutes(e.target.value)}
+                    placeholder="60"
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="item-live-session-guest-name"
+                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Guest name (optional)
+                  </label>
+                  <input
+                    id="item-live-session-guest-name"
+                    type="text"
+                    maxLength={255}
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="e.g. Dr. Amara Okafor"
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="item-live-session-guest-title"
+                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Guest title (optional)
+                  </label>
+                  <input
+                    id="item-live-session-guest-title"
+                    type="text"
+                    maxLength={255}
+                    value={guestTitle}
+                    onChange={(e) => setGuestTitle(e.target.value)}
+                    placeholder="e.g. Clinical Director, Crisis Response Network"
+                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  />
+                </div>
+              </div>
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-medium px-3 py-2">
+                Creating this item immediately emails every enrolled student a join link and calendar invite — there's no draft mode. Make sure the schedule is final before adding it.
+              </div>
+            </div>
+          )}
+
           <label className="flex items-center gap-2.5 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -502,7 +609,11 @@ export function AddItemModal({
             {submitting && !isUploading && (
               <IconSpinner className="text-white/80" />
             )}
-            {isUploading ? "Uploading..." : "Add item"}
+            {isUploading
+              ? "Uploading..."
+              : itemType === "LIVE_SESSION"
+                ? "Schedule and notify students"
+                : "Add item"}
           </button>
         </div>
       </form>

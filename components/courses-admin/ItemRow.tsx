@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/api/client";
 import { deleteItem, updateItem } from "@/lib/api/courses-client";
 import type { CourseItem } from "@/lib/api/courses.types";
 import {
+  IconCalendar,
   IconChevronDown,
   IconClock,
   IconDocument,
@@ -24,6 +25,7 @@ import { VideoStatusBadge } from "./StatusBadge";
 import { VideoUploader } from "./VideoUploader";
 import { DocumentUploader } from "./DocumentUploader";
 import { LinkEditor } from "./LinkEditor";
+import { LiveSessionEditor } from "./LiveSessionEditor";
 import { QuizBuilder } from "./QuizBuilder";
 import { EssayBuilder } from "./EssayBuilder";
 import { QuizGroupBuilder } from "./QuizGroupBuilder";
@@ -36,6 +38,7 @@ const TYPE_SWATCH_STYLES: Record<string, string> = {
   QUIZ: "bg-violet-500/10 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400",
   ESSAY: "bg-teal-500/10 text-teal-600 dark:bg-teal-500/15 dark:text-teal-400",
   QUIZ_GROUP: "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400",
+  LIVE_SESSION: "bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
 };
 
 function assessmentSummary(item: CourseItem): string | null {
@@ -61,6 +64,18 @@ function assessmentSummary(item: CourseItem): string | null {
     ? `${settings.max_attempts} attempt${settings.max_attempts === 1 ? "" : "s"}`
     : "Unlimited attempts";
   return [`${settings.pass_mark_percentage}% pass`, attempts, due].filter(Boolean).join(" · ");
+}
+
+function liveSessionSummary(item: CourseItem): string | null {
+  const liveSession = item.live_session;
+  if (!liveSession) return null;
+  const when = new Date(liveSession.scheduled_start_at).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  const parts = [when, `${liveSession.duration_minutes} min`];
+  if (liveSession.guest_name) parts.push(liveSession.guest_name);
+  return parts.join(" · ");
 }
 
 export function ItemRow({
@@ -96,8 +111,13 @@ export function ItemRow({
   } else if (item.item_type === "ASSESSMENT") {
     typeKey = item.assessment?.assessment_type ?? "QUIZ";
     TypeIcon = typeKey === "ESSAY" ? IconDocumentText : IconQuiz;
+  } else if (item.item_type === "LIVE_SESSION") {
+    TypeIcon = IconCalendar;
+    typeKey = "LIVE_SESSION";
   }
-  const summary = !expanded ? assessmentSummary(item) : null;
+  const summary = !expanded
+    ? (assessmentSummary(item) ?? liveSessionSummary(item))
+    : null;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -216,6 +236,11 @@ export function ItemRow({
         {item.assessment?.is_final_assessment && <FinalAssessmentBadge />}
 
         {item.video && <VideoStatusBadge status={item.video.status} />}
+        {item.live_session && (
+          <span className="text-[0.7rem] font-bold uppercase tracking-wide px-2 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
+            {item.live_session.status}
+          </span>
+        )}
         {item.document && (
           <span
             className={`text-[0.7rem] font-bold uppercase tracking-wide px-2 py-1 rounded-full ${
@@ -302,6 +327,14 @@ export function ItemRow({
             <LinkEditor
               item={item}
               onLinkUpdate={(link) => dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { link } })}
+            />
+          )}
+          {item.item_type === "LIVE_SESSION" && (
+            <LiveSessionEditor
+              item={item}
+              onLiveSessionUpdate={(live_session) =>
+                dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { live_session } })
+              }
             />
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ" && (

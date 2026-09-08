@@ -16,7 +16,7 @@ export type CourseCategory =
   | "LIFESTYLE"
   | "LANGUAGE";
 
-export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT" | "LINKS";
+export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT" | "LINKS" | "LIVE_SESSION";
 
 export type AssessmentType = "QUIZ" | "ESSAY" | "QUIZ_GROUP";
 export type EssaySubmissionMode = "TEXT" | "DOCUMENT";
@@ -94,6 +94,18 @@ export interface CourseLink {
   description: string | null;
 }
 
+export type LiveSessionStatus = "SCHEDULED" | "LIVE" | "ENDED" | "CANCELLED";
+
+export interface CourseLiveSession {
+  scheduled_start_at: string;
+  duration_minutes: number;
+  guest_name: string | null;
+  guest_title: string | null;
+  status: LiveSessionStatus;
+  recording_status: VideoStatus | null;
+  recording_playback_url: string | null;
+}
+
 export interface CourseQuizOption {
   id: string;
   text: string;
@@ -162,6 +174,7 @@ export interface CourseItem {
   document: CourseDocument | null;
   assessment: CourseAssessment | null;
   link: CourseLink | null;
+  live_session: CourseLiveSession | null;
 }
 
 export interface CourseSection {
@@ -239,6 +252,10 @@ export interface CreateItemPayload {
   url?: string;
   label?: string | null;
   description?: string | null;
+  scheduled_start_at?: string;
+  duration_minutes?: number;
+  guest_name?: string | null;
+  guest_title?: string | null;
 }
 
 export interface UpdateItemPayload {
@@ -250,6 +267,10 @@ export interface UpdateItemPayload {
   url?: string;
   label?: string | null;
   description?: string | null;
+  scheduled_start_at?: string;
+  duration_minutes?: number;
+  guest_name?: string | null;
+  guest_title?: string | null;
 }
 
 export interface UpdateAssessmentPayload {
