@@ -27,6 +27,7 @@ import type {
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
   GradeEssayPayload,
+  LearningItemDetail,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
@@ -218,6 +219,27 @@ export async function updateAssessmentSettings(
 
 export async function deleteItem(itemId: string): Promise<void> {
   await request(`/items/${itemId}`, { method: "DELETE" });
+}
+
+// The recording link is short-lived (daily.co issues signed links, not a
+// permanent URL), so this must be called on demand right before use — never
+// fetched ahead of time or cached.
+export async function getLiveSessionRecordingUrl(
+  courseId: string,
+  itemId: string,
+): Promise<string | null> {
+  const res = await fetch(`/api/learning/courses/${courseId}/items/${itemId}`);
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+  if (!res.ok) {
+    const message =
+      payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+  const envelope = payload as { data: LearningItemDetail };
+  return envelope.data?.live_session_recording_url ?? null;
 }
 
 export async function reorderItems(

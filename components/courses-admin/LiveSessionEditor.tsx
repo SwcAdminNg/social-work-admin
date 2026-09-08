@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api/client";
-import { updateItem } from "@/lib/api/courses-client";
+import { getLiveSessionRecordingUrl, updateItem } from "@/lib/api/courses-client";
 import type { CourseItem, CourseLiveSession } from "@/lib/api/courses.types";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { VideoStatusBadge } from "./StatusBadge";
@@ -15,14 +15,17 @@ function toLocalInputValue(iso: string): string {
 }
 
 export function LiveSessionEditor({
+  courseId,
   item,
   onLiveSessionUpdate,
 }: {
+  courseId: string;
   item: CourseItem;
   onLiveSessionUpdate: (liveSession: CourseLiveSession) => void;
 }) {
   const liveSession = item.live_session;
   const editable = liveSession?.status === "SCHEDULED";
+  const [fetchingRecording, setFetchingRecording] = useState(false);
 
   const [scheduledStartAt, setScheduledStartAt] = useState(
     liveSession ? toLocalInputValue(liveSession.scheduled_start_at) : "",
@@ -90,6 +93,28 @@ export function LiveSessionEditor({
       setConfirmReschedule(true);
     } else {
       persist();
+    }
+  }
+
+  async function handleViewRecording() {
+    // Open the tab synchronously (within the click's user-gesture window) and
+    // point it at the signed URL once fetched — awaiting first would risk the
+    // browser's popup blocker treating window.open as no longer gesture-initiated.
+    const tab = window.open("", "_blank", "noopener,noreferrer");
+    setFetchingRecording(true);
+    try {
+      const url = await getLiveSessionRecordingUrl(courseId, item.id);
+      if (!url) {
+        tab?.close();
+        toast.error("No recording link is available yet.");
+        return;
+      }
+      if (tab) tab.location.href = url;
+    } catch (error) {
+      tab?.close();
+      toast.error(error instanceof ApiError ? error.message : "Failed to fetch the recording link.");
+    } finally {
+      setFetchingRecording(false);
     }
   }
 
@@ -188,15 +213,15 @@ export function LiveSessionEditor({
           ) : (
             <span className="text-xs text-gray-400 dark:text-gray-600">Not available yet</span>
           )}
-          {liveSession.recording_status === "READY" && liveSession.recording_playback_url && (
-            <a
-              href={liveSession.recording_playback_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline"
+          {liveSession.recording_status === "READY" && (
+            <button
+              type="button"
+              onClick={handleViewRecording}
+              disabled={fetchingRecording}
+              className="text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
-              View recording
-            </a>
+              {fetchingRecording ? "Fetching link..." : "View recording"}
+            </button>
           )}
         </div>
       )}

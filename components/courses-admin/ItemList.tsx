@@ -72,6 +72,7 @@ export function ItemList({
           {section.items.map((item) => (
             <ItemRow
               key={item.id}
+              courseId={courseId}
               item={item}
               dispatch={dispatch}
               onRequestRefresh={onRefresh}

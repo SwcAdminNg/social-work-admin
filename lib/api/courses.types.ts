@@ -103,7 +103,17 @@ export interface CourseLiveSession {
   guest_title: string | null;
   status: LiveSessionStatus;
   recording_status: VideoStatus | null;
-  recording_playback_url: string | null;
+}
+
+/**
+ * Partial shape of GET /learning/courses/{course_id}/items/{item_id} — the
+ * student-facing single-item endpoint. daily.co only issues short-lived signed
+ * recording links, so there's no stored playback URL; this is minted fresh on
+ * every call and must be fetched on demand, never cached.
+ */
+export interface LearningItemDetail {
+  id: string;
+  live_session_recording_url?: string | null;
 }
 
 export interface CourseQuizOption {

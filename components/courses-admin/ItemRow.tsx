@@ -79,12 +79,14 @@ function liveSessionSummary(item: CourseItem): string | null {
 }
 
 export function ItemRow({
+  courseId,
   item,
   dispatch,
   onRequestRefresh,
   documentUploadCredentials,
   defaultExpanded = false,
 }: {
+  courseId: string;
   item: CourseItem;
   dispatch: React.Dispatch<CourseEditorAction>;
   onRequestRefresh?: () => void;
@@ -331,6 +333,7 @@ export function ItemRow({
           )}
           {item.item_type === "LIVE_SESSION" && (
             <LiveSessionEditor
+              courseId={courseId}
               item={item}
               onLiveSessionUpdate={(live_session) =>
                 dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { live_session } })
