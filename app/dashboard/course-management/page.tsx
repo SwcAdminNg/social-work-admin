@@ -3,6 +3,8 @@ import { auth } from "@/auth";
 import { listManagedCourses } from "@/lib/api/courses";
 import { CourseManagementList } from "@/components/courses-admin/CourseManagementList";
 
+export const dynamic = "force-dynamic";
+
 export default async function CourseManagementPage() {
   const session = await auth();
 
