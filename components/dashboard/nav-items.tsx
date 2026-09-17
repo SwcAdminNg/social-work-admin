@@ -13,6 +13,7 @@ import {
   IconLifeBuoy,
   IconClipboardCheck,
   IconMessageCircle,
+  IconUserPlus,
 } from "./icons";
 
 export type NavItem = {
@@ -77,6 +78,12 @@ export const dashboardNavItems: NavItem[] = [
     label: "User Management",
     href: "/dashboard/user-management",
     icon: IconUsers,
+    adminOnly: true,
+  },
+  {
+    label: "Instructor Applications",
+    href: "/dashboard/instructor-applications",
+    icon: IconUserPlus,
     adminOnly: true,
   },
   {
