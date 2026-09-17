@@ -10,6 +10,7 @@ import type {
   FaqCategory,
   FaqCategoryWithItems,
   FaqItem,
+  GetFaqItemsParams,
   GetTicketsParams,
   SendTicketMessagePayload,
   SetTicketStatusPayload,
@@ -99,9 +100,11 @@ export async function deleteFaqCategory(id: string): Promise<void> {
 
 // FAQ items
 
-export async function getFaqItems(page = 1, pageSize = 50): Promise<PaginatedResult<FaqItem>> {
+export async function getFaqItems(params: GetFaqItemsParams = {}): Promise<PaginatedResult<FaqItem>> {
+  const page = params.page ?? 1;
+  const pageSize = params.page_size ?? 50;
   const res = await request<ApiEnvelope<FaqItem[]>>(
-    `/api/support/faq/items${buildQuery({ page, page_size: pageSize })}`
+    `/api/support/faq/items${buildQuery({ audience: params.audience, page, page_size: pageSize })}`
   );
   return toPaginated(res, page, pageSize);
 }

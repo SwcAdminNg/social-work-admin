@@ -14,6 +14,8 @@ export interface FaqCategoryWithItems {
   items: FaqItem[];
 }
 
+export type FaqAudience = "STUDENT" | "INSTRUCTOR" | "BOTH";
+
 export interface FaqItem {
   id: string;
   category_id: string;
@@ -21,6 +23,10 @@ export interface FaqItem {
   answer: string;
   order: number;
   is_published: boolean;
+  audience: FaqAudience;
+  keywords: string[];
+  escalation_route?: string | null;
+  related_article_ids: string[];
   created_at?: string;
   updated_at?: string;
 }
@@ -41,6 +47,10 @@ export interface CreateFaqItemPayload {
   answer: string;
   order?: number;
   is_published?: boolean;
+  audience?: FaqAudience;
+  keywords?: string[];
+  escalation_route?: string | null;
+  related_article_ids?: string[];
 }
 
 export interface UpdateFaqItemPayload {
@@ -49,6 +59,16 @@ export interface UpdateFaqItemPayload {
   answer?: string;
   order?: number;
   is_published?: boolean;
+  audience?: FaqAudience;
+  keywords?: string[];
+  escalation_route?: string | null;
+  related_article_ids?: string[];
+}
+
+export interface GetFaqItemsParams {
+  audience?: FaqAudience;
+  page?: number;
+  page_size?: number;
 }
 
 export type TicketStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";

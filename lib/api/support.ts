@@ -4,6 +4,7 @@ import type {
   FaqCategory,
   FaqCategoryWithItems,
   FaqItem,
+  GetFaqItemsParams,
   GetTicketsParams,
   Ticket,
   TicketMessage,
@@ -31,7 +32,7 @@ export async function getFaqCategories(token: string): Promise<FaqCategory[]> {
 }
 
 export async function getFaqItems(
-  params: { page?: number; page_size?: number },
+  params: GetFaqItemsParams,
   token: string
 ): Promise<PaginatedResult<FaqItem>> {
   const res = await apiClient.get<ApiEnvelope<FaqItem[]>>(`/support/faq/items${buildQuery(params)}`, { token });

@@ -11,7 +11,7 @@ import {
   updateFaqCategory,
   updateFaqItem,
 } from "@/lib/api/support-client";
-import type { FaqCategory, FaqItem } from "@/lib/api/support.types";
+import type { FaqAudience, FaqCategory, FaqItem } from "@/lib/api/support.types";
 import type { PaginatedResult } from "@/lib/api/courses.types";
 import {
   IconMessageQuestion,
@@ -215,6 +215,7 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
       <ItemModal
         state={itemModal}
         categories={categories}
+        allItems={items}
         defaultCategoryId={selectedCategoryId !== "all" ? selectedCategoryId : undefined}
         onClose={() => setItemModal({ open: false, item: null })}
         onSaved={(item) => {
@@ -276,11 +277,16 @@ function FaqItemCard({
           <IconChevronDown className={`flex-shrink-0 mt-0.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.question}</p>
-            {categoryLabel && (
-              <span className="inline-block mt-1 text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
-                {categoryLabel}
+            <div className="flex items-center gap-2 mt-1">
+              {categoryLabel && (
+                <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+                  {categoryLabel}
+                </span>
+              )}
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+                {item.audience === "BOTH" ? "Student & Instructor" : item.audience === "INSTRUCTOR" ? "Instructor" : "Student"}
               </span>
-            )}
+            </div>
           </div>
         </button>
 
@@ -315,9 +321,26 @@ function FaqItemCard({
       </div>
 
       {expanded && (
-        <p className="mt-3 pl-6 text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
-          {item.answer}
-        </p>
+        <div className="mt-3 pl-6 flex flex-col gap-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+            {item.answer}
+          </p>
+          {item.keywords.length > 0 && (
+            <p className="text-xs text-gray-400">
+              <span className="font-semibold">Keywords:</span> {item.keywords.join(", ")}
+            </p>
+          )}
+          {item.escalation_route && (
+            <p className="text-xs text-gray-400">
+              <span className="font-semibold">Escalation route:</span> {item.escalation_route}
+            </p>
+          )}
+          {item.related_article_ids.length > 0 && (
+            <p className="text-xs text-gray-400">
+              <span className="font-semibold">Related articles:</span> {item.related_article_ids.length}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -406,15 +429,23 @@ function CategoryModal({
   );
 }
 
+const AUDIENCE_OPTIONS: { value: FaqAudience; label: string }[] = [
+  { value: "BOTH", label: "Student & Instructor" },
+  { value: "STUDENT", label: "Student" },
+  { value: "INSTRUCTOR", label: "Instructor" },
+];
+
 function ItemModal({
   state,
   categories,
+  allItems,
   defaultCategoryId,
   onClose,
   onSaved,
 }: {
   state: ItemModalState;
   categories: FaqCategory[];
+  allItems: FaqItem[];
   defaultCategoryId?: string;
   onClose: () => void;
   onSaved: (item: FaqItem) => void;
@@ -424,6 +455,10 @@ function ItemModal({
   const [answer, setAnswer] = useState(state.item?.answer ?? "");
   const [order, setOrder] = useState(state.item?.order ?? 0);
   const [isPublished, setIsPublished] = useState(state.item?.is_published ?? true);
+  const [audience, setAudience] = useState<FaqAudience>(state.item?.audience ?? "BOTH");
+  const [keywordsText, setKeywordsText] = useState(state.item?.keywords.join(", ") ?? "");
+  const [escalationRoute, setEscalationRoute] = useState(state.item?.escalation_route ?? "");
+  const [relatedArticleIds, setRelatedArticleIds] = useState<string[]>(state.item?.related_article_ids ?? []);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -432,20 +467,43 @@ function ItemModal({
     setAnswer(state.item?.answer ?? "");
     setOrder(state.item?.order ?? 0);
     setIsPublished(state.item?.is_published ?? true);
+    setAudience(state.item?.audience ?? "BOTH");
+    setKeywordsText(state.item?.keywords.join(", ") ?? "");
+    setEscalationRoute(state.item?.escalation_route ?? "");
+    setRelatedArticleIds(state.item?.related_article_ids ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.item, state.open]);
 
   if (!state.open) return null;
+
+  const relatedOptions = allItems.filter((i) => i.id !== state.item?.id);
+
+  const toggleRelatedArticle = (id: string) => {
+    setRelatedArticleIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = question.trim();
     const a = answer.trim();
     if (!q || !a || !categoryId) return;
+    const keywords = keywordsText
+      .split(",")
+      .map((k) => k.trim())
+      .filter(Boolean);
+    const payload = {
+      category_id: categoryId,
+      question: q,
+      answer: a,
+      order,
+      is_published: isPublished,
+      audience,
+      keywords,
+      escalation_route: escalationRoute.trim() || null,
+      related_article_ids: relatedArticleIds,
+    };
     setSaving(true);
-    const run = state.item
-      ? updateFaqItem(state.item.id, { category_id: categoryId, question: q, answer: a, order, is_published: isPublished })
-      : createFaqItem({ category_id: categoryId, question: q, answer: a, order, is_published: isPublished });
+    const run = state.item ? updateFaqItem(state.item.id, payload) : createFaqItem(payload);
     run
       .then((item) => {
         toast.success(state.item ? "Question updated." : "Question created.");
@@ -502,6 +560,20 @@ function ItemModal({
               className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
             />
           </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Audience</label>
+            <select
+              value={audience}
+              onChange={(e) => setAudience(e.target.value as FaqAudience)}
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            >
+              {AUDIENCE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer pt-6">
             <input
               type="checkbox"
@@ -512,6 +584,52 @@ function ItemModal({
             Published
           </label>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Keywords <span className="text-gray-400 font-normal">(comma-separated)</span>
+          </label>
+          <input
+            value={keywordsText}
+            onChange={(e) => setKeywordsText(e.target.value)}
+            placeholder="e.g. certificate, download, pdf certificate"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Escalation Route <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            value={escalationRoute}
+            onChange={(e) => setEscalationRoute(e.target.value)}
+            placeholder="e.g. Certificate Issue"
+            maxLength={150}
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+          />
+        </div>
+        {relatedOptions.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Related Articles <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-300 dark:border-gray-700 p-2 flex flex-col gap-1">
+              {relatedOptions.map((opt) => (
+                <label
+                  key={opt.id}
+                  className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={relatedArticleIds.includes(opt.id)}
+                    onChange={() => toggleRelatedArticle(opt.id)}
+                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                  />
+                  <span className="truncate">{opt.question}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex justify-end gap-3 mt-2">
           <button
             type="button"
