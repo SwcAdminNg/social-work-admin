@@ -14,6 +14,7 @@ import type {
   CreateCoursePayload,
   CreateItemPayload,
   CreateItemResult,
+  CreateLiveSessionGuestInvitesPayload,
   CreateQuizOptionPayload,
   CreateQuizQuestionPayload,
   GenerateQuizFromDocumentPayload,
@@ -28,6 +29,7 @@ import type {
   FinalizeDocumentPayload,
   GradeEssayPayload,
   LearningItemDetail,
+  LiveSessionGuestInvite,
   ManagedCourseListParams,
   PaginatedResult,
   ReorderItemsPayload,
@@ -240,6 +242,36 @@ export async function getLiveSessionRecordingUrl(
   }
   const envelope = payload as { data: LearningItemDetail };
   return envelope.data?.live_session_recording_url ?? null;
+}
+
+export async function inviteLiveSessionGuests(
+  itemId: string,
+  payload: CreateLiveSessionGuestInvitesPayload,
+): Promise<LiveSessionGuestInvite[]> {
+  const res = await request<LiveSessionGuestInvite[]>(
+    `/items/${itemId}/live-session/guests`,
+    { method: "POST", body: payload },
+  );
+  return res.data;
+}
+
+export async function getLiveSessionGuests(
+  itemId: string,
+): Promise<LiveSessionGuestInvite[]> {
+  const res = await request<LiveSessionGuestInvite[]>(
+    `/items/${itemId}/live-session/guests`,
+    { method: "GET" },
+  );
+  return res.data;
+}
+
+export async function revokeLiveSessionGuest(
+  itemId: string,
+  inviteId: string,
+): Promise<void> {
+  await request(`/items/${itemId}/live-session/guests/${inviteId}`, {
+    method: "DELETE",
+  });
 }
 
 export async function reorderItems(

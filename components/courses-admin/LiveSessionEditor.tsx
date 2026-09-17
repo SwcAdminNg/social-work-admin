@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/api/client";
 import { getLiveSessionRecordingUrl, updateItem } from "@/lib/api/courses-client";
 import type { CourseItem, CourseLiveSession } from "@/lib/api/courses.types";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { LiveSessionGuestInvites } from "./LiveSessionGuestInvites";
 import { VideoStatusBadge } from "./StatusBadge";
 
 function toLocalInputValue(iso: string): string {
@@ -225,6 +226,8 @@ export function LiveSessionEditor({
           )}
         </div>
       )}
+
+      <LiveSessionGuestInvites itemId={item.id} status={liveSession.status} />
 
       <ConfirmDialog
         open={confirmReschedule}

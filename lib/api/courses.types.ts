@@ -105,6 +105,35 @@ export interface CourseLiveSession {
   recording_status: VideoStatus | null;
 }
 
+/** A guest invite grants call access to someone without a platform account, for one session occurrence. */
+export interface LiveSessionGuestInvite {
+  id: string;
+  live_session_id: string;
+  email: string;
+  name: string | null;
+  invited_by_id: string;
+  expires_at: string;
+  revoked_at: string | null;
+  last_joined_at: string | null;
+  join_count: number;
+  created_at: string;
+}
+
+export interface GuestInviteInput {
+  email: string;
+  name?: string;
+}
+
+export interface CreateLiveSessionGuestInvitesPayload {
+  invites: GuestInviteInput[];
+}
+
+/** What GET /courses/live-session/guest-join returns — same shape as the authenticated join response, minus is_owner. */
+export interface GuestJoinCredentials {
+  join_url: string;
+  expires_at: string;
+}
+
 /**
  * Partial shape of GET /learning/courses/{course_id}/items/{item_id} — the
  * student-facing single-item endpoint. daily.co only issues short-lived signed
