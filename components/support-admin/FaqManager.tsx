@@ -459,6 +459,7 @@ function ItemModal({
   const [keywordsText, setKeywordsText] = useState(state.item?.keywords.join(", ") ?? "");
   const [escalationRoute, setEscalationRoute] = useState(state.item?.escalation_route ?? "");
   const [relatedArticleIds, setRelatedArticleIds] = useState<string[]>(state.item?.related_article_ids ?? []);
+  const [showRelated, setShowRelated] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -471,6 +472,7 @@ function ItemModal({
     setKeywordsText(state.item?.keywords.join(", ") ?? "");
     setEscalationRoute(state.item?.escalation_route ?? "");
     setRelatedArticleIds(state.item?.related_article_ids ?? []);
+    setShowRelated(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.item, state.open]);
 
@@ -513,124 +515,140 @@ function ItemModal({
       .finally(() => setSaving(false));
   };
 
+  const inputClass =
+    "w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]";
+  const labelClass = "block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1";
+
   return (
     <Modal isOpen={state.open} onClose={onClose} title={state.item ? "Edit Question" : "New Question"} maxWidth="lg">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          >
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Question</label>
-          <input
-            autoFocus
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="e.g. How do I reset my password?"
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Answer</label>
-          <textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            rows={5}
-            placeholder="Write the answer shown to users..."
-            className="w-full resize-y rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          />
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Display Order</label>
-            <input
-              type="number"
-              value={order}
-              onChange={(e) => setOrder(Number(e.target.value))}
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Audience</label>
-            <select
-              value={audience}
-              onChange={(e) => setAudience(e.target.value as FaqAudience)}
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-            >
-              {AUDIENCE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer pt-6">
-            <input
-              type="checkbox"
-              checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
-            />
-            Published
-          </label>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Keywords <span className="text-gray-400 font-normal">(comma-separated)</span>
-          </label>
-          <input
-            value={keywordsText}
-            onChange={(e) => setKeywordsText(e.target.value)}
-            placeholder="e.g. certificate, download, pdf certificate"
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Escalation Route <span className="text-gray-400 font-normal">(optional)</span>
-          </label>
-          <input
-            value={escalationRoute}
-            onChange={(e) => setEscalationRoute(e.target.value)}
-            placeholder="e.g. Certificate Issue"
-            maxLength={150}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-          />
-        </div>
-        {relatedOptions.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Related Articles <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-300 dark:border-gray-700 p-2 flex flex-col gap-1">
-              {relatedOptions.map((opt) => (
-                <label
-                  key={opt.id}
-                  className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={relatedArticleIds.includes(opt.id)}
-                    onChange={() => toggleRelatedArticle(opt.id)}
-                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
-                  />
-                  <span className="truncate">{opt.question}</span>
-                </label>
-              ))}
+      <form onSubmit={handleSubmit} className="flex flex-col -mx-4 sm:-mx-6 -my-4 sm:-my-5">
+        <div className="flex flex-col gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label className={labelClass}>Category</label>
+              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className={inputClass}>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Audience</label>
+              <select value={audience} onChange={(e) => setAudience(e.target.value as FaqAudience)} className={inputClass}>
+                {AUDIENCE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
-        )}
-        <div className="flex justify-end gap-3 mt-2">
+
+          <div>
+            <label className={labelClass}>Question</label>
+            <input
+              autoFocus
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="e.g. How do I reset my password?"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Answer</label>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              rows={4}
+              placeholder="Write the answer shown to users..."
+              className={`${inputClass} resize-y`}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-3 sm:gap-4 items-end">
+            <div>
+              <label className={labelClass}>Order</label>
+              <input
+                type="number"
+                value={order}
+                onChange={(e) => setOrder(Number(e.target.value))}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Escalation Route</label>
+              <input
+                value={escalationRoute}
+                onChange={(e) => setEscalationRoute(e.target.value)}
+                placeholder="Optional"
+                maxLength={150}
+                className={inputClass}
+              />
+            </div>
+            <label className="col-span-2 sm:col-span-1 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer h-[38px]">
+              <input
+                type="checkbox"
+                checked={isPublished}
+                onChange={(e) => setIsPublished(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
+              />
+              Published
+            </label>
+          </div>
+
+          <div>
+            <label className={labelClass}>
+              Keywords <span className="text-gray-400 font-normal">(comma-separated)</span>
+            </label>
+            <input
+              value={keywordsText}
+              onChange={(e) => setKeywordsText(e.target.value)}
+              placeholder="e.g. certificate, download, pdf certificate"
+              className={inputClass}
+            />
+          </div>
+
+          {relatedOptions.length > 0 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowRelated((v) => !v)}
+                className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer py-1"
+              >
+                <span>
+                  Related Articles{" "}
+                  {relatedArticleIds.length > 0 && (
+                    <span className="ml-1 text-[#2D6A4F] dark:text-[#52b788]">({relatedArticleIds.length} selected)</span>
+                  )}
+                </span>
+                <IconChevronDown className={`transition-transform ${showRelated ? "rotate-180" : ""}`} />
+              </button>
+              {showRelated && (
+                <div className="mt-2 max-h-36 overflow-y-auto rounded-xl border border-gray-300 dark:border-gray-700 p-2 flex flex-col gap-0.5">
+                  {relatedOptions.map((opt) => (
+                    <label
+                      key={opt.id}
+                      className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={relatedArticleIds.includes(opt.id)}
+                        onChange={() => toggleRelatedArticle(opt.id)}
+                        className="w-4 h-4 flex-shrink-0 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                      />
+                      <span className="truncate">{opt.question}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="sticky bottom-0 flex justify-end gap-3 px-4 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
           <button
             type="button"
             onClick={onClose}

@@ -22,20 +22,22 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
-      <div 
-        className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" 
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div
+        className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      
-      <div className={`relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full ${maxWidthClasses[maxWidth]} overflow-hidden transform transition-all`}>
-        <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+
+      <div
+        className={`relative bg-white dark:bg-gray-900 shadow-xl w-full ${maxWidthClasses[maxWidth]} max-h-[100dvh] sm:max-h-[85vh] sm:m-4 rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden transform transition-all`}
+      >
+        <div className="shrink-0 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
             {title}
           </h3>
-          <button 
+          <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+            className="p-1 -m-1 text-gray-400 hover:text-gray-500 focus:outline-none cursor-pointer"
           >
             <span className="sr-only">Close</span>
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,7 +46,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "md" }: Mod
           </button>
         </div>
 
-        <div className="px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
           {children}
         </div>
       </div>
