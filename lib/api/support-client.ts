@@ -104,7 +104,12 @@ export async function getFaqItems(params: GetFaqItemsParams = {}): Promise<Pagin
   const page = params.page ?? 1;
   const pageSize = params.page_size ?? 50;
   const res = await request<ApiEnvelope<FaqItem[]>>(
-    `/api/support/faq/items${buildQuery({ audience: params.audience, page, page_size: pageSize })}`
+    `/api/support/faq/items${buildQuery({
+      audience: params.audience,
+      visibility: params.visibility,
+      page,
+      page_size: pageSize,
+    })}`
   );
   return toPaginated(res, page, pageSize);
 }

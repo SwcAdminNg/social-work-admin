@@ -11,7 +11,7 @@ import {
   updateFaqCategory,
   updateFaqItem,
 } from "@/lib/api/support-client";
-import type { FaqAudience, FaqCategory, FaqItem } from "@/lib/api/support.types";
+import type { FaqAudience, FaqCategory, FaqItem, FaqVisibility } from "@/lib/api/support.types";
 import type { PaginatedResult } from "@/lib/api/courses.types";
 import {
   IconMessageQuestion,
@@ -39,6 +39,8 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
   );
   const [items, setItems] = useState<FaqItem[]>(initialItems.items);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | "all">("all");
+  const [selectedAudience, setSelectedAudience] = useState<FaqAudience | "all">("all");
+  const [selectedVisibility, setSelectedVisibility] = useState<FaqVisibility | "all">("all");
 
   const [categoryModal, setCategoryModal] = useState<CategoryModalState>({ open: false, category: null });
   const [itemModal, setItemModal] = useState<ItemModalState>({ open: false, item: null });
@@ -46,9 +48,14 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
   const [deleting, setDeleting] = useState(false);
 
   const filteredItems = useMemo(() => {
-    const base = selectedCategoryId === "all" ? items : items.filter((i) => i.category_id === selectedCategoryId);
+    const base = items.filter((item) => {
+      const matchesCategory = selectedCategoryId === "all" || item.category_id === selectedCategoryId;
+      const matchesAudience = selectedAudience === "all" || item.audience === selectedAudience;
+      const matchesVisibility = selectedVisibility === "all" || item.visibility === selectedVisibility;
+      return matchesCategory && matchesAudience && matchesVisibility;
+    });
     return [...base].sort((a, b) => a.order - b.order);
-  }, [items, selectedCategoryId]);
+  }, [items, selectedCategoryId, selectedAudience, selectedVisibility]);
 
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? "Unknown category";
 
@@ -157,7 +164,43 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="flex justify-end">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  Audience
+                </span>
+                <select
+                  value={selectedAudience}
+                  onChange={(e) => setSelectedAudience(e.target.value as FaqAudience | "all")}
+                  className="px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] text-gray-900 dark:text-white"
+                >
+                  <option value="all">All Audiences</option>
+                  {AUDIENCE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  Visibility
+                </span>
+                <select
+                  value={selectedVisibility}
+                  onChange={(e) => setSelectedVisibility(e.target.value as FaqVisibility | "all")}
+                  className="px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] text-gray-900 dark:text-white"
+                >
+                  <option value="all">All Visibility</option>
+                  {VISIBILITY_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <button
               type="button"
               onClick={() => setItemModal({ open: true, item: null })}
@@ -285,6 +328,9 @@ function FaqItemCard({
               )}
               <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
                 {item.audience === "BOTH" ? "Student & Instructor" : item.audience === "INSTRUCTOR" ? "Instructor" : "Student"}
+              </span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+                {item.visibility === "ACCOUNT" ? "Account-only" : "Public"}
               </span>
             </div>
           </div>
@@ -435,6 +481,11 @@ const AUDIENCE_OPTIONS: { value: FaqAudience; label: string }[] = [
   { value: "INSTRUCTOR", label: "Instructor" },
 ];
 
+const VISIBILITY_OPTIONS: { value: FaqVisibility; label: string }[] = [
+  { value: "GENERAL", label: "Public" },
+  { value: "ACCOUNT", label: "Account-only" },
+];
+
 function ItemModal({
   state,
   categories,
@@ -455,6 +506,7 @@ function ItemModal({
   const [answer, setAnswer] = useState(state.item?.answer ?? "");
   const [order, setOrder] = useState(state.item?.order ?? 0);
   const [isPublished, setIsPublished] = useState(state.item?.is_published ?? true);
+  const [visibility, setVisibility] = useState<FaqVisibility>(state.item?.visibility ?? "GENERAL");
   const [audience, setAudience] = useState<FaqAudience>(state.item?.audience ?? "BOTH");
   const [keywordsText, setKeywordsText] = useState(state.item?.keywords.join(", ") ?? "");
   const [escalationRoute, setEscalationRoute] = useState(state.item?.escalation_route ?? "");
@@ -468,6 +520,7 @@ function ItemModal({
     setAnswer(state.item?.answer ?? "");
     setOrder(state.item?.order ?? 0);
     setIsPublished(state.item?.is_published ?? true);
+    setVisibility(state.item?.visibility ?? "GENERAL");
     setAudience(state.item?.audience ?? "BOTH");
     setKeywordsText(state.item?.keywords.join(", ") ?? "");
     setEscalationRoute(state.item?.escalation_route ?? "");
@@ -499,6 +552,7 @@ function ItemModal({
       answer: a,
       order,
       is_published: isPublished,
+      visibility,
       audience,
       keywords,
       escalation_route: escalationRoute.trim() || null,
@@ -538,6 +592,20 @@ function ItemModal({
               <label className={labelClass}>Audience</label>
               <select value={audience} onChange={(e) => setAudience(e.target.value as FaqAudience)} className={inputClass}>
                 {AUDIENCE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Visibility</label>
+              <select
+                value={visibility}
+                onChange={(e) => setVisibility(e.target.value as FaqVisibility)}
+                className={inputClass}
+              >
+                {VISIBILITY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>

@@ -15,6 +15,7 @@ export interface FaqCategoryWithItems {
 }
 
 export type FaqAudience = "STUDENT" | "INSTRUCTOR" | "BOTH";
+export type FaqVisibility = "GENERAL" | "ACCOUNT";
 
 export interface FaqItem {
   id: string;
@@ -23,6 +24,7 @@ export interface FaqItem {
   answer: string;
   order: number;
   is_published: boolean;
+  visibility: FaqVisibility;
   audience: FaqAudience;
   keywords: string[];
   escalation_route?: string | null;
@@ -47,6 +49,7 @@ export interface CreateFaqItemPayload {
   answer: string;
   order?: number;
   is_published?: boolean;
+  visibility?: FaqVisibility;
   audience?: FaqAudience;
   keywords?: string[];
   escalation_route?: string | null;
@@ -59,6 +62,7 @@ export interface UpdateFaqItemPayload {
   answer?: string;
   order?: number;
   is_published?: boolean;
+  visibility?: FaqVisibility;
   audience?: FaqAudience;
   keywords?: string[];
   escalation_route?: string | null;
@@ -67,6 +71,7 @@ export interface UpdateFaqItemPayload {
 
 export interface GetFaqItemsParams {
   audience?: FaqAudience;
+  visibility?: FaqVisibility;
   page?: number;
   page_size?: number;
 }
