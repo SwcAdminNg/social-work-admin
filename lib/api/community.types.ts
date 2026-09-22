@@ -10,6 +10,12 @@ export interface CommunityMemberUser {
   last_name?: string;
   email?: string;
   username?: string;
+  user_type?: "USER" | "INSTRUCTOR" | "ADMIN" | string;
+  role?: "USER" | "INSTRUCTOR" | "ADMIN" | string;
+  profile_picture_url?: string | null;
+  profile_image_url?: string | null;
+  avatar_url?: string | null;
+  image_url?: string | null;
 }
 
 export interface Community {

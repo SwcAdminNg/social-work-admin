@@ -30,6 +30,7 @@ import {
 } from "@/components/dashboard/icons";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Avatar, displayName } from "./Avatar";
+import { CommunityUserProfileModal } from "./CommunityUserProfileModal";
 import { ResourcePicker } from "./ResourcePicker";
 
 const FALLBACK_POLL_MS = 8_000;
@@ -84,6 +85,7 @@ export function CommunityChatPanel({
   const [isNearBottom, setIsNearBottom] = useState(true);
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [profileUser, setProfileUser] = useState<CommunityMessage["sender"]>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -153,6 +155,10 @@ export function CommunityChatPanel({
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     setHighlightedId(id);
     setTimeout(() => setHighlightedId((current) => (current === id ? null : current)), 1500);
+  }
+
+  function openUserProfile(user: CommunityMessage["sender"]) {
+    if (user) setProfileUser(user);
   }
 
   const prevCount = useRef(0);
@@ -289,12 +295,25 @@ export function CommunityChatPanel({
                 id={`community-message-${msg.id}`}
                 className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : ""}`}
               >
-                {!isOwn && <Avatar user={msg.sender} size="sm" />}
+                {!isOwn && (
+                  <button
+                    type="button"
+                    onClick={() => openUserProfile(msg.sender)}
+                    className="rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-[#52b788] dark:focus:ring-offset-gray-900"
+                    aria-label={`View ${displayName(msg.sender)}'s profile`}
+                  >
+                    <Avatar user={msg.sender} size="sm" />
+                  </button>
+                )}
                 <div className={`flex flex-col max-w-[85%] sm:max-w-[70%] ${isOwn ? "items-end" : "items-start"}`}>
                   {!isOwn && (
-                    <span className="text-[0.65rem] font-semibold text-gray-400 dark:text-gray-500 px-1 mb-0.5">
+                    <button
+                      type="button"
+                      onClick={() => openUserProfile(msg.sender)}
+                      className="text-[0.65rem] font-semibold text-gray-400 dark:text-gray-500 hover:text-[#2D6A4F] dark:hover:text-[#52b788] px-1 mb-0.5 cursor-pointer"
+                    >
                       {displayName(msg.sender)}
-                    </span>
+                    </button>
                   )}
                   <div
                     className={`group relative rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words flex flex-col gap-2 transition-colors duration-500 ${
@@ -485,6 +504,8 @@ export function CommunityChatPanel({
           </button>
         </div>
       </form>
+
+      <CommunityUserProfileModal user={profileUser} onClose={() => setProfileUser(null)} />
     </div>
   );
 }

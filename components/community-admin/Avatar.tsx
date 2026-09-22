@@ -2,7 +2,7 @@
 
 import type { CommunityMemberUser } from "@/lib/api/community.types";
 
-function initials(user: CommunityMemberUser | null | undefined): string {
+export function initials(user: CommunityMemberUser | null | undefined): string {
   if (!user) return "?";
   const fromName = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase();
   if (fromName) return fromName;
@@ -19,7 +19,18 @@ const SIZE_CLASSES = {
   sm: "w-7 h-7 text-[0.65rem]",
   md: "w-9 h-9 text-xs",
   lg: "w-11 h-11 text-sm",
+  xl: "w-20 h-20 text-2xl",
 };
+
+export function profileImageUrl(user: CommunityMemberUser | null | undefined): string | null {
+  return (
+    user?.profile_picture_url ??
+    user?.profile_image_url ??
+    user?.avatar_url ??
+    user?.image_url ??
+    null
+  );
+}
 
 export function Avatar({
   user,
@@ -27,15 +38,22 @@ export function Avatar({
   isOnline,
 }: {
   user: CommunityMemberUser | null | undefined;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   isOnline?: boolean;
 }) {
+  const imageUrl = profileImageUrl(user);
+
   return (
     <div className="relative shrink-0">
       <div
-        className={`${SIZE_CLASSES[size]} rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center font-bold`}
+        className={`${SIZE_CLASSES[size]} rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center font-bold overflow-hidden`}
       >
-        {initials(user)}
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+        ) : (
+          initials(user)
+        )}
       </div>
       {isOnline !== undefined && (
         <span
