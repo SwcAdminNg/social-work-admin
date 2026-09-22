@@ -4,11 +4,12 @@ import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getUserTransactions, getUserCourses, getUserCards } from "@/lib/api/customer-support";
-import { getUserDetails } from "@/lib/api/users";
-import { IconReceipt, IconBookOpen, IconLock } from "@/components/dashboard/icons";
+import { getInstructorCvDownloadUrl, getInstructorDocuments, getUserDetails } from "@/lib/api/users";
+import { IconReceipt, IconBookOpen, IconLock, IconDocument } from "@/components/dashboard/icons";
 import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Pagination } from "@/components/generic/ui/Pagination";
+import type { InstructorDocument } from "@/lib/api/users.types";
 
 const PAGE_SIZE = 20;
 
@@ -18,6 +19,18 @@ function formatDate(dateString: string) {
     month: "short",
     day: "numeric",
   });
+}
+
+function formatFileSize(bytes?: number | null) {
+  if (!bytes) return "Size unavailable";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unitIndex = 0;
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+  return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -34,33 +47,52 @@ export default function UserProfilePage() {
   const params = useParams() as { id: string };
   const router = useRouter();
   const userId = params.id;
-  const [tab, setTab] = React.useState<"transactions" | "courses" | "cards">("transactions");
+  const [tab, setTab] = React.useState<"transactions" | "courses" | "cards" | "documents">("transactions");
   const [page, setPage] = React.useState(1);
 
-  // Reset page when tab changes
-  React.useEffect(() => { setPage(1); }, [tab]);
+  const { data: user } = useQuery({
+    queryKey: ["user_details", userId],
+    queryFn: () => getUserDetails(userId),
+  });
+
+  const isInstructor = user?.user_type === "INSTRUCTOR";
+  const activeTab = tab === "documents" && !isInstructor ? "transactions" : tab;
+
+  function handleTabChange(nextTab: typeof tab) {
+    setTab(nextTab);
+    setPage(1);
+  }
 
   const { data: txData, isLoading: txLoading } = useQuery({
     queryKey: ["user_transactions", userId, page],
     queryFn: () => getUserTransactions(userId, page, PAGE_SIZE),
-    enabled: tab === "transactions",
+    enabled: activeTab === "transactions",
   });
 
   const { data: coursesData, isLoading: coursesLoading } = useQuery({
     queryKey: ["user_courses", userId, page],
     queryFn: () => getUserCourses(userId, page, PAGE_SIZE),
-    enabled: tab === "courses",
+    enabled: activeTab === "courses",
   });
 
   const { data: cardsData, isLoading: cardsLoading } = useQuery({
     queryKey: ["user_cards", userId],
     queryFn: () => getUserCards(userId),
-    enabled: tab === "cards",
+    enabled: activeTab === "cards",
   });
 
-  const { data: user, isLoading: userLoading } = useQuery({
-    queryKey: ["user_details", userId],
-    queryFn: () => getUserDetails(userId),
+  const { data: cvDownload, isLoading: cvLoading, isError: cvError } = useQuery({
+    queryKey: ["instructor_cv_download", userId],
+    queryFn: () => getInstructorCvDownloadUrl(userId),
+    enabled: activeTab === "documents" && isInstructor && !!user?.cv_file_name,
+    retry: false,
+  });
+
+  const { data: instructorDocuments, isLoading: documentsLoading, isError: documentsError } = useQuery({
+    queryKey: ["instructor_documents", userId],
+    queryFn: () => getInstructorDocuments(userId),
+    enabled: activeTab === "documents" && isInstructor,
+    retry: false,
   });
 
   return (
@@ -112,31 +144,45 @@ export default function UserProfilePage() {
               </span>
             </div>
           )}
+          {user?.user_type && (
+            <div className="flex flex-col">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Role</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-300">{user.user_type}</span>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start">
         <button
-          onClick={() => setTab("transactions")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "transactions" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          onClick={() => handleTabChange("transactions")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "transactions" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
         >
           Transactions
         </button>
         <button
-          onClick={() => setTab("courses")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "courses" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          onClick={() => handleTabChange("courses")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "courses" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
         >
           Courses
         </button>
         <button
-          onClick={() => setTab("cards")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === "cards" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          onClick={() => handleTabChange("cards")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "cards" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
         >
           Cards
         </button>
+        {isInstructor && (
+          <button
+            onClick={() => handleTabChange("documents")}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "documents" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          >
+            Documents
+          </button>
+        )}
       </div>
 
-      {tab === "transactions" && (
+      {activeTab === "transactions" && (
         <div className="flex flex-col gap-4">
           <DataTable
             columns={[
@@ -155,7 +201,7 @@ export default function UserProfilePage() {
         </div>
       )}
 
-      {tab === "courses" && (
+      {activeTab === "courses" && (
         <div className="flex flex-col gap-4">
           <DataTable
             columns={[
@@ -172,7 +218,7 @@ export default function UserProfilePage() {
         </div>
       )}
 
-      {tab === "cards" && (
+      {activeTab === "cards" && (
         <div className="flex flex-col gap-4">
           {cardsLoading ? (
             <div className="animate-pulse flex gap-4">
@@ -198,6 +244,109 @@ export default function UserProfilePage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "documents" && isInstructor && (
+        <div className="flex flex-col gap-4">
+          <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Instructor CV</p>
+              <h2 className="text-base font-bold text-gray-900 dark:text-white truncate mt-1">
+                {user?.cv_file_name ?? "No CV uploaded"}
+              </h2>
+              {cvError && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">The CV download link could not be generated.</p>
+              )}
+            </div>
+            {user?.cv_file_name && cvDownload?.download_url ? (
+              <a
+                href={cvDownload.download_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors shadow-sm"
+              >
+                Download CV
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 dark:text-gray-500 rounded-xl cursor-not-allowed"
+              >
+                {cvLoading ? "Preparing link…" : "No download"}
+              </button>
+            )}
+          </div>
+
+          {documentsError && (
+            <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-400">
+              Failed to load instructor documents. Please try again later.
+            </div>
+          )}
+
+          {!documentsError && (
+            <DataTable<InstructorDocument>
+              columns={[
+                {
+                  key: "name",
+                  header: "Name",
+                  render: (doc) => (
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{doc.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{doc.file_name}</p>
+                    </div>
+                  ),
+                  hideInCard: true,
+                },
+                {
+                  key: "type",
+                  header: "Type",
+                  render: (doc) => <span className="text-xs text-gray-500">{doc.mime_type ?? "Unknown"}</span>,
+                },
+                {
+                  key: "size",
+                  header: "Size",
+                  render: (doc) => <span className="text-xs text-gray-500">{formatFileSize(doc.file_size_bytes)}</span>,
+                },
+                {
+                  key: "updated",
+                  header: "Updated",
+                  render: (doc) => <span className="text-sm">{formatDate(doc.updated_at)}</span>,
+                },
+                {
+                  key: "download",
+                  header: "",
+                  render: (doc) => (
+                    <a
+                      href={doc.download_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/15 dark:hover:bg-[#52b788]/25 rounded-lg transition-colors"
+                    >
+                      Download
+                    </a>
+                  ),
+                },
+              ]}
+              data={instructorDocuments ?? []}
+              keyExtractor={(doc) => doc.id}
+              loading={documentsLoading}
+              skeletonRows={3}
+              cardTitle={(doc) => (
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 shrink-0 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center">
+                    <IconDocument />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{doc.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{doc.file_name}</p>
+                  </div>
+                </div>
+              )}
+              emptyState={<EmptyState icon={IconDocument} title="No supporting documents" description="This instructor has not uploaded any additional documents." />}
+            />
           )}
         </div>
       )}

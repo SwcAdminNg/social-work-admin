@@ -8,6 +8,8 @@ import {
   User,
   ChangeUserRoleRequestDTO,
   UserUpdateDTO,
+  CvDownloadUrlResponse,
+  InstructorDocument,
 } from "./users.types";
 
 export type GetUsersParams = {
@@ -228,4 +230,40 @@ export async function getUserDetails(userId: string): Promise<User> {
   }
 
   return (payload as ApiResponse<User>).data;
+}
+
+export async function getInstructorCvDownloadUrl(userId: string): Promise<CvDownloadUrlResponse> {
+  const path = `/api/users/${userId}/cv-download-url`;
+  const res = await fetch(path);
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return (payload as ApiResponse<CvDownloadUrlResponse>).data;
+}
+
+export async function getInstructorDocuments(userId: string): Promise<InstructorDocument[]> {
+  const path = `/api/users/${userId}/documents`;
+  const res = await fetch(path);
+
+  const isJson = res.headers.get("content-type")?.includes("application/json");
+  const payload = isJson ? await res.json().catch(() => null) : null;
+
+  if (!res.ok) {
+    const message =
+      (payload && typeof payload === "object" && "message" in payload
+        ? String((payload as { message?: unknown }).message)
+        : undefined) ?? res.statusText;
+    throw new ApiError(message, res.status, payload);
+  }
+
+  return (payload as ApiResponse<InstructorDocument[]>).data ?? [];
 }

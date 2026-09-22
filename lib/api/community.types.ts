@@ -1,4 +1,4 @@
-export type CommunityType = "COURSE" | "GENERAL" | "HELP" | "CUSTOM";
+export type CommunityType = "COURSE" | "GENERAL" | "INSTRUCTOR_GENERAL" | "ADMIN_GENERAL" | "HELP" | "CUSTOM";
 
 export type CommunityAddedVia = "MANUAL" | "COURSE_SNAPSHOT";
 

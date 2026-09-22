@@ -15,6 +15,7 @@ export interface User {
   is_active: boolean;
   is_suspended?: boolean;
   last_login_at?: string;
+  cv_file_name?: string | null;
 }
 
 export interface UsersApiResponse {
@@ -66,4 +67,20 @@ export interface UserUpdateDTO {
   phone_number?: string;
   gender?: "MALE" | "FEMALE" | "OTHER";
   address?: string;
+}
+
+export interface CvDownloadUrlResponse {
+  download_url: string;
+  cv_file_name: string;
+}
+
+export interface InstructorDocument {
+  id: string;
+  name: string;
+  file_name: string;
+  mime_type?: string | null;
+  file_size_bytes?: number | null;
+  download_url: string;
+  created_at: string;
+  updated_at: string;
 }
