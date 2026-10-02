@@ -13,6 +13,7 @@ import type {
 } from "@/lib/api/governance.types";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { Badge, DashboardCard, formatDate, humanize, ItemLink, riskTone } from "./GovernanceUtils";
+import { CourseSearchSelect, type SelectedCourse } from "./SearchSelects";
 
 const views: { key: ApprovalCentreView; label: string; countKey?: keyof ApprovalCentreCounts }[] = [
   { key: "awaiting_me", label: "Awaiting me", countKey: "awaiting_me" },
@@ -27,24 +28,24 @@ const views: { key: ApprovalCentreView; label: string; countKey?: keyof Approval
 export function ApprovalCentre() {
   const [view, setView] = useState<ApprovalCentreView>("awaiting_me");
   const [kind, setKind] = useState<ApprovalItemKind | "">("");
-  const [courseId, setCourseId] = useState("");
+  const [course, setCourse] = useState<SelectedCourse | null>(null);
   const [page, setPage] = useState(1);
   const [counts, setCounts] = useState<ApprovalCentreCounts | null>(null);
   const [result, setResult] = useState<PaginatedResult<ApprovalCentreRow> | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function load(next: { view?: ApprovalCentreView; page?: number; kind?: ApprovalItemKind | ""; courseId?: string } = {}) {
+  function load(next: { view?: ApprovalCentreView; page?: number; kind?: ApprovalItemKind | ""; course?: SelectedCourse | null } = {}) {
     const nextView = next.view ?? view;
     const nextPage = next.page ?? page;
     const nextKind = next.kind ?? kind;
-    const nextCourseId = next.courseId ?? courseId;
+    const nextCourse = next.course === undefined ? course : next.course;
     startTransition(async () => {
       try {
         const [rows, badgeCounts] = await Promise.all([
           listApprovalCentre({
             view: nextView,
             kind: nextKind,
-            course_id: nextCourseId.trim(),
+            course_id: nextCourse?.id,
             page: nextPage,
             page_size: 20,
           }),
@@ -119,8 +120,8 @@ export function ApprovalCentre() {
             </select>
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Course ID
-            <input value={courseId} onChange={(e) => setCourseId(e.target.value)} placeholder="Optional" className="input" />
+            Course
+            <CourseSearchSelect value={course} onChange={setCourse} placeholder="Search course title" />
           </label>
           <button className="h-10 rounded-xl bg-[#2D6A4F] px-4 text-sm font-bold text-white">Apply</button>
         </form>

@@ -34,6 +34,7 @@ import type {
 } from "@/lib/api/governance.types";
 import { IconSpinner } from "@/components/dashboard/icons";
 import { Badge, DashboardCard, formatDate, humanize, riskTone } from "./GovernanceUtils";
+import { UserSearchSelect, type SelectedUser } from "./SearchSelects";
 
 type Tab = "diff" | "timeline" | "preview" | "comments" | "evidence";
 
@@ -49,6 +50,9 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
   const [acting, setActing] = useState<string | null>(null);
   const [commentBody, setCommentBody] = useState("");
   const [evidenceLink, setEvidenceLink] = useState({ title: "", url: "" });
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignUser, setAssignUser] = useState<SelectedUser | null>(null);
+  const [assignDueAt, setAssignDueAt] = useState("");
 
   async function load() {
     setLoading(true);
@@ -137,12 +141,17 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
     );
   }
 
-  async function handleAssign() {
-    const reviewerId = window.prompt("Reviewer user ID");
-    if (!reviewerId?.trim()) return;
-    const dueInput = window.prompt("Due date/time (optional, local datetime accepted)") ?? "";
-    const due_at = dueInput.trim() ? new Date(dueInput).toISOString() : undefined;
-    await runAction("ASSIGN_REVIEWER", () => assignRevision(revisionId, reviewerId, due_at), "Reviewer assigned.");
+  async function handleAssign(e: React.FormEvent) {
+    e.preventDefault();
+    if (!assignUser) {
+      toast.error("Select a reviewer first.");
+      return;
+    }
+    const due_at = assignDueAt ? new Date(assignDueAt).toISOString() : undefined;
+    await runAction("ASSIGN_REVIEWER", () => assignRevision(revisionId, assignUser.id, due_at), "Reviewer assigned.");
+    setAssignOpen(false);
+    setAssignUser(null);
+    setAssignDueAt("");
   }
 
   async function addComment(e: React.FormEvent) {
@@ -219,7 +228,7 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
             onWithdraw={() => runAction("WITHDRAW", () => withdrawRevision(revisionId), "Revision withdrawn.")}
             onDiscard={() => runAction("DISCARD", () => discardRevision(revisionId), "Revision discarded.")}
             onClaim={() => runAction("CLAIM", () => claimRevision(revisionId), "Revision claimed.")}
-            onAssign={handleAssign}
+            onAssign={() => setAssignOpen((value) => !value)}
             onDecision={handleDecision}
             onForceApprove={() => {
               const justification = window.prompt("Justification (20+ characters)");
@@ -234,6 +243,29 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
           />
         </div>
       </DashboardCard>
+
+      {assignOpen && actions.has("ASSIGN_REVIEWER") && (
+        <DashboardCard className="p-5">
+          <form onSubmit={handleAssign} className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px_auto] lg:items-end">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Reviewer
+              <UserSearchSelect value={assignUser} onChange={setAssignUser} placeholder="Search reviewers by name or email" />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Due date
+              <input type="datetime-local" value={assignDueAt} onChange={(e) => setAssignDueAt(e.target.value)} className="input" />
+            </label>
+            <button
+              type="submit"
+              disabled={!assignUser || acting === "ASSIGN_REVIEWER"}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#2D6A4F] px-4 text-sm font-bold text-white disabled:opacity-60"
+            >
+              {acting === "ASSIGN_REVIEWER" && <IconSpinner />}
+              Assign reviewer
+            </button>
+          </form>
+        </DashboardCard>
+      )}
 
       <div className="flex gap-1 overflow-x-auto rounded-xl bg-gray-100 p-1 dark:bg-gray-900 self-start">
         {(["diff", "timeline", "preview", "comments", "evidence"] as const).map((key) => (

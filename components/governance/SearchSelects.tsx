@@ -1,0 +1,295 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { listManagedCourses } from "@/lib/api/courses-client";
+import type { Course } from "@/lib/api/courses.types";
+import { getUsers } from "@/lib/api/users";
+import type { User } from "@/lib/api/users.types";
+import { IconSearch, IconSpinner, IconX } from "@/components/dashboard/icons";
+
+const SEARCH_DEBOUNCE_MS = 250;
+
+export interface SelectedUser {
+  id: string;
+  name: string;
+  email?: string | null;
+  username?: string | null;
+  userType?: string | null;
+}
+
+export interface SelectedCourse {
+  id: string;
+  title: string;
+  status?: string | null;
+  version?: string | null;
+}
+
+function userLabel(user: User): string {
+  return [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username || user.email;
+}
+
+function toSelectedUser(user: User): SelectedUser {
+  return {
+    id: user.id,
+    name: userLabel(user),
+    email: user.email,
+    username: user.username,
+    userType: user.user_type,
+  };
+}
+
+function toSelectedCourse(course: Course): SelectedCourse {
+  return {
+    id: course.id,
+    title: course.title,
+    status: course.governance_status ?? (course.is_published ? "PUBLISHED" : "DRAFT"),
+    version: course.current_version_label,
+  };
+}
+
+export function UserSearchSelect({
+  value,
+  onChange,
+  placeholder = "Search users by name, username, or email",
+  userType,
+}: {
+  value: SelectedUser | null;
+  onChange: (user: SelectedUser | null) => void;
+  placeholder?: string;
+  userType?: "USER" | "INSTRUCTOR" | "ADMIN";
+}) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!query.trim() || value) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      getUsers({ search: query.trim(), page: 1, pageSize: 8, userType })
+        .then((res) => {
+          if (!cancelled) setResults(res.data ?? []);
+        })
+        .catch(() => {
+          if (!cancelled) setResults([]);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [query, userType, value]);
+
+  useEffect(() => {
+    function onPointerDown(event: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, []);
+
+  return (
+    <div ref={rootRef} className="relative">
+      {value ? (
+        <SelectedPill
+          title={value.name}
+          subtitle={[value.email, value.userType].filter(Boolean).join(" · ")}
+          onClear={() => {
+            onChange(null);
+            setQuery("");
+            setOpen(false);
+          }}
+        />
+      ) : (
+        <div className="relative">
+          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            placeholder={placeholder}
+            className="input pl-9"
+          />
+          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+        </div>
+      )}
+
+      {open && !value && query.trim() && (
+        <ResultPanel>
+          {!loading && results.length === 0 ? (
+            <EmptyResult>No matching users.</EmptyResult>
+          ) : (
+            results.map((user) => (
+              <button
+                key={user.id}
+                type="button"
+                onClick={() => {
+                  onChange(toSelectedUser(user));
+                  setQuery("");
+                  setOpen(false);
+                }}
+                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <span className="block text-sm font-semibold text-gray-900 dark:text-white">{userLabel(user)}</span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                  {user.email} · {user.username} · {user.user_type}
+                </span>
+              </button>
+            ))
+          )}
+        </ResultPanel>
+      )}
+    </div>
+  );
+}
+
+export function CourseSearchSelect({
+  value,
+  onChange,
+  placeholder = "Search courses by title",
+}: {
+  value: SelectedCourse | null;
+  onChange: (course: SelectedCourse | null) => void;
+  placeholder?: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!query.trim() || value) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      listManagedCourses({ search: query.trim(), page: 1, page_size: 8 })
+        .then((res) => {
+          if (!cancelled) setResults(res.items ?? []);
+        })
+        .catch(() => {
+          if (!cancelled) setResults([]);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [query, value]);
+
+  useEffect(() => {
+    function onPointerDown(event: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, []);
+
+  return (
+    <div ref={rootRef} className="relative">
+      {value ? (
+        <SelectedPill
+          title={value.title}
+          subtitle={[value.status, value.version ? `v${value.version}` : null].filter(Boolean).join(" · ")}
+          onClear={() => {
+            onChange(null);
+            setQuery("");
+            setOpen(false);
+          }}
+        />
+      ) : (
+        <div className="relative">
+          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            placeholder={placeholder}
+            className="input pl-9"
+          />
+          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+        </div>
+      )}
+
+      {open && !value && query.trim() && (
+        <ResultPanel>
+          {!loading && results.length === 0 ? (
+            <EmptyResult>No matching courses.</EmptyResult>
+          ) : (
+            results.map((course) => (
+              <button
+                key={course.id}
+                type="button"
+                onClick={() => {
+                  onChange(toSelectedCourse(course));
+                  setQuery("");
+                  setOpen(false);
+                }}
+                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <span className="block text-sm font-semibold text-gray-900 dark:text-white">{course.title}</span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                  {course.governance_status ?? (course.is_published ? "Published" : "Draft")}
+                  {course.current_version_label ? ` · v${course.current_version_label}` : ""}
+                </span>
+              </button>
+            ))
+          )}
+        </ResultPanel>
+      )}
+    </div>
+  );
+}
+
+function SelectedPill({ title, subtitle, onClear }: { title: string; subtitle?: string; onClear: () => void }) {
+  return (
+    <div className="flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#2D6A4F]/20 bg-[#2D6A4F]/5 px-3 py-2 dark:border-[#52b788]/20 dark:bg-[#52b788]/10">
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-bold text-gray-900 dark:text-white">{title}</span>
+        {subtitle && <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{subtitle}</span>}
+      </span>
+      <button type="button" onClick={onClear} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" aria-label="Clear selection">
+        <IconX size={16} />
+      </button>
+    </div>
+  );
+}
+
+function ResultPanel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900">
+      {children}
+    </div>
+  );
+}
+
+function EmptyResult({ children }: { children: React.ReactNode }) {
+  return <p className="px-3 py-2.5 text-sm text-gray-400">{children}</p>;
+}

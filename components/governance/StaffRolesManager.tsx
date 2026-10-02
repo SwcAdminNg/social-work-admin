@@ -7,28 +7,27 @@ import { grantStaffRole, listStaffRoles, revokeStaffRole } from "@/lib/api/gover
 import type { GovernanceRole, StaffRoleAssignment } from "@/lib/api/governance.types";
 import { IconSpinner } from "@/components/dashboard/icons";
 import { Badge, DashboardCard, formatDate, humanize, roleOptions } from "./GovernanceUtils";
+import { CourseSearchSelect, UserSearchSelect, type SelectedCourse, type SelectedUser } from "./SearchSelects";
 
 export function StaffRolesManager() {
   const [items, setItems] = useState<StaffRoleAssignment[]>([]);
   const [loading, startTransition] = useTransition();
-  const [filters, setFilters] = useState({ user_id: "", course_id: "", role: "" as GovernanceRole | "" });
+  const [filterUser, setFilterUser] = useState<SelectedUser | null>(null);
+  const [filterCourse, setFilterCourse] = useState<SelectedCourse | null>(null);
+  const [roleFilter, setRoleFilter] = useState<GovernanceRole | "">("");
   const [includeRevoked, setIncludeRevoked] = useState(false);
-  const [form, setForm] = useState({
-    user_id: "",
-    course_id: "",
-    role: "ACADEMIC_REVIEWER" as GovernanceRole,
-    reason: "",
-    expires_at: "",
-  });
+  const [selectedUser, setSelectedUser] = useState<SelectedUser | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<SelectedCourse | null>(null);
+  const [form, setForm] = useState({ role: "ACADEMIC_REVIEWER" as GovernanceRole, reason: "", expires_at: "" });
   const [saving, setSaving] = useState(false);
 
   function load() {
     startTransition(async () => {
       try {
         const result = await listStaffRoles({
-          user_id: filters.user_id.trim(),
-          course_id: filters.course_id.trim(),
-          role: filters.role,
+          user_id: filterUser?.id,
+          course_id: filterCourse?.id,
+          role: roleFilter,
           include_revoked: includeRevoked,
         });
         setItems(result.items);
@@ -45,17 +44,23 @@ export function StaffRolesManager() {
 
   async function handleGrant(e: React.FormEvent) {
     e.preventDefault();
+    if (!selectedUser) {
+      toast.error("Select a user first.");
+      return;
+    }
     setSaving(true);
     try {
       await grantStaffRole({
-        user_id: form.user_id.trim(),
+        user_id: selectedUser.id,
         role: form.role,
-        course_id: form.course_id.trim() || null,
+        course_id: selectedCourse?.id ?? null,
         reason: form.reason.trim() || null,
         expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
       });
       toast.success("Staff role granted.");
-      setForm((prev) => ({ ...prev, user_id: "", course_id: "", reason: "", expires_at: "" }));
+      setSelectedUser(null);
+      setSelectedCourse(null);
+      setForm((prev) => ({ ...prev, reason: "", expires_at: "" }));
       load();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to grant role.");
@@ -87,8 +92,8 @@ export function StaffRolesManager() {
 
       <DashboardCard className="p-5">
         <form onSubmit={handleGrant} className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
-          <Field label="User ID">
-            <input required value={form.user_id} onChange={(e) => setForm({ ...form, user_id: e.target.value })} className="input" />
+          <Field label="User">
+            <UserSearchSelect value={selectedUser} onChange={setSelectedUser} placeholder="Search staff by name or email" />
           </Field>
           <Field label="Role">
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as GovernanceRole })} className="input">
@@ -97,13 +102,13 @@ export function StaffRolesManager() {
               ))}
             </select>
           </Field>
-          <Field label="Course ID (optional)">
-            <input value={form.course_id} onChange={(e) => setForm({ ...form, course_id: e.target.value })} className="input" />
+          <Field label="Course scope">
+            <CourseSearchSelect value={selectedCourse} onChange={setSelectedCourse} placeholder="Search course, or leave platform-wide" />
           </Field>
           <Field label="Expires (optional)">
             <input type="datetime-local" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })} className="input" />
           </Field>
-          <button disabled={saving} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#2D6A4F] px-4 text-sm font-bold text-white disabled:opacity-60">
+          <button disabled={saving || !selectedUser} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#2D6A4F] px-4 text-sm font-bold text-white disabled:opacity-60">
             {saving && <IconSpinner />}
             Grant role
           </button>
@@ -116,14 +121,14 @@ export function StaffRolesManager() {
 
       <DashboardCard>
         <div className="flex flex-col gap-3 border-b border-gray-200 dark:border-gray-800 p-4 lg:flex-row lg:items-end">
-          <Field label="Filter by user ID">
-            <input value={filters.user_id} onChange={(e) => setFilters({ ...filters, user_id: e.target.value })} className="input" />
+          <Field label="Filter by user">
+            <UserSearchSelect value={filterUser} onChange={setFilterUser} placeholder="Search user" />
           </Field>
-          <Field label="Filter by course ID">
-            <input value={filters.course_id} onChange={(e) => setFilters({ ...filters, course_id: e.target.value })} className="input" />
+          <Field label="Filter by course">
+            <CourseSearchSelect value={filterCourse} onChange={setFilterCourse} placeholder="Search course" />
           </Field>
           <Field label="Filter by role">
-            <select value={filters.role} onChange={(e) => setFilters({ ...filters, role: e.target.value as GovernanceRole | "" })} className="input">
+            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as GovernanceRole | "")} className="input">
               <option value="">All roles</option>
               {roleOptions.map((role) => (
                 <option key={role} value={role}>{humanize(role)}</option>
