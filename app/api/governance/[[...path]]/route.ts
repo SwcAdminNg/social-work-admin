@@ -7,7 +7,7 @@ type RouteParams = { params: Promise<{ path?: string[] }> };
 async function forward(
   request: NextRequest,
   { params }: RouteParams,
-  method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
 ) {
   const session = await auth();
 
@@ -20,28 +20,19 @@ async function forward(
 
   if (session.user.userType !== "ADMIN" && session.user.userType !== "INSTRUCTOR") {
     return NextResponse.json(
-      {
-        success: false,
-        message: "You do not have permission to manage courses",
-        errors: null,
-      },
+      { success: false, message: "You do not have permission to access governance", errors: null },
       { status: 403 },
     );
   }
 
   const { path } = await params;
   const segments = path ?? [];
-  const backendPath = `/courses${segments.length ? "/" + segments.join("/") : ""}${request.nextUrl.search}`;
+  const backendPath = `/governance${segments.length ? "/" + segments.join("/") : ""}${request.nextUrl.search}`;
 
   let body: unknown;
-  if (method === "POST" || method === "PATCH" || method === "PUT") {
-    const contentType = request.headers.get("content-type") ?? "";
-    if (contentType.includes("multipart/form-data")) {
-      body = await request.formData();
-    } else {
-      const text = await request.text();
-      body = text ? JSON.parse(text) : undefined;
-    }
+  if (method === "POST" || method === "PATCH") {
+    const text = await request.text();
+    body = text ? JSON.parse(text) : undefined;
   }
 
   try {
@@ -53,25 +44,16 @@ async function forward(
           ? await apiClient.post(backendPath, body, options)
           : method === "PATCH"
             ? await apiClient.patch(backendPath, body, options)
-            : method === "PUT"
-              ? await apiClient.put(backendPath, body, options)
-              : await apiClient.delete(backendPath, options);
+            : await apiClient.delete(backendPath, options);
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof ApiError) {
-      return NextResponse.json(
-        error.data ?? { success: false, message: error.message, errors: null },
-        {
-          status: error.status,
-        },
-      );
+      return NextResponse.json(error.data ?? { success: false, message: error.message, errors: null }, {
+        status: error.status,
+      });
     }
     return NextResponse.json(
-      {
-        success: false,
-        message: "Unexpected error contacting the course service",
-        errors: null,
-      },
+      { success: false, message: "Unexpected error contacting the governance service", errors: null },
       { status: 500 },
     );
   }
@@ -91,8 +73,4 @@ export async function PATCH(request: NextRequest, ctx: RouteParams) {
 
 export async function DELETE(request: NextRequest, ctx: RouteParams) {
   return forward(request, ctx, "DELETE");
-}
-
-export async function PUT(request: NextRequest, ctx: RouteParams) {
-  return forward(request, ctx, "PUT");
 }

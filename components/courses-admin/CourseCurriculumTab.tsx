@@ -33,6 +33,7 @@ export function CourseCurriculumTab({
         order_index: course.sections.length,
       });
       dispatch({ type: "ADD_SECTION", section: { ...section, items: [] } });
+      onRefresh();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to add section.");
     } finally {
@@ -48,6 +49,7 @@ export function CourseCurriculumTab({
       setDocumentUploadCredentials((prev) => ({ ...prev, [item.id]: document_upload }));
     }
     toast.success("Item added.");
+    onRefresh();
     void video_upload;
   }
 

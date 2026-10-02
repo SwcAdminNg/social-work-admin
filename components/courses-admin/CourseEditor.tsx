@@ -32,6 +32,7 @@ import { CourseTransactionsTab } from "./CourseTransactionsTab";
 import { CourseCertificateTab } from "./CourseCertificateTab";
 import { CourseResourcesTab } from "./CourseResourcesTab";
 import { CourseCommunityTab } from "./CourseCommunityTab";
+import { CourseGovernanceTab } from "./CourseGovernanceTab";
 
 const VIDEO_POLL_INTERVAL_MS = 5000;
 
@@ -44,12 +45,14 @@ function formatDuration(totalMinutes: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-type Tab = "details" | "curriculum" | "resources" | "chat" | "sales" | "certificate";
+type Tab = "details" | "curriculum" | "governance" | "resources" | "chat" | "sales" | "certificate";
+type CourseLayer = "auto" | "live" | "draft";
 
 export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail }) {
   const router = useRouter();
   const [course, dispatch] = useReducer(courseEditorReducer, initialCourse);
   const [tab, setTab] = useState<Tab>("details");
+  const [layer, setLayer] = useState<CourseLayer>((initialCourse.governance?.layer as CourseLayer | undefined) ?? "auto");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const courseRef = useRef(course);
@@ -88,10 +91,20 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
 
   async function refreshCourse() {
     try {
-      const fresh = await getManagedCourse(course.id);
+      const fresh = await getManagedCourse(course.id, { layer });
       dispatch({ type: "SET_COURSE", course: fresh });
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to refresh course.");
+    }
+  }
+
+  async function handleLayerChange(nextLayer: CourseLayer) {
+    setLayer(nextLayer);
+    try {
+      const fresh = await getManagedCourse(course.id, { layer: nextLayer });
+      dispatch({ type: "SET_COURSE", course: fresh });
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : "Failed to load selected course layer.");
     }
   }
 
@@ -144,6 +157,16 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
                 {course.title}
               </h1>
               <PublishedBadge isPublished={course.is_published} tone="banner" />
+              {course.governance_status && (
+                <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase text-white/80">
+                  {course.governance_status}
+                </span>
+              )}
+              {course.current_version_label && (
+                <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase text-white/80">
+                  v{course.current_version_label}
+                </span>
+              )}
             </div>
             <p className="text-sm text-white/80 mt-2">
               {course.is_free ? "Free course" : `₦${(course.price ?? 0).toLocaleString()}`}
@@ -167,6 +190,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
             [
               { key: "details", label: "Details", icon: IconBookOpen, count: undefined },
               { key: "curriculum", label: "Curriculum", icon: IconGrid, count: stats.itemCount },
+              { key: "governance", label: "Governance", icon: IconClipboardCheck, count: course.governance?.open_revision ? 1 : undefined },
               { key: "resources", label: "Resources", icon: IconLink, count: undefined },
               { key: "chat", label: "Class Chat", icon: IconMessageCircle, count: undefined },
               { key: "certificate", label: "Certificate", icon: IconCertificate, count: undefined },
@@ -204,7 +228,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
           <PublishControl
             course={course}
             canPublish={hasAnyCurriculumItem(course)}
-            onPublished={(fields) => dispatch({ type: "UPDATE_COURSE_FIELDS", fields })}
+            onPublished={refreshCourse}
           />
           <button
             type="button"
@@ -224,8 +248,33 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
         />
       )}
       {tab === "curriculum" && (
-        <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
+        <div className="flex flex-col gap-4">
+          {course.governance?.governance_enabled && (
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
+              <span className="text-xs font-bold uppercase text-gray-500">Layer</span>
+              {(["auto", "draft", "live"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => handleLayerChange(option)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold ${
+                    layer === option
+                      ? "bg-[#2D6A4F] text-white"
+                      : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                  }`}
+                >
+                  {option.toUpperCase()}
+                </button>
+              ))}
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Current response: {course.governance.layer ?? layer}
+              </span>
+            </div>
+          )}
+          <CourseCurriculumTab course={course} dispatch={dispatch} onRefresh={refreshCourse} />
+        </div>
       )}
+      {tab === "governance" && <CourseGovernanceTab course={course} onRefresh={refreshCourse} />}
       {tab === "resources" && <CourseResourcesTab courseId={course.id} courseTitle={course.title} />}
       {tab === "chat" && <CourseCommunityTab courseId={course.id} />}
       {tab === "certificate" && (

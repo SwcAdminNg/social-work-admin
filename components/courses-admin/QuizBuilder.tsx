@@ -18,9 +18,11 @@ function newDraftOption(): CreateQuizOptionPayload & { key: string } {
 export function QuizBuilder({
   item,
   dispatch,
+  onRequestRefresh,
 }: {
   item: CourseItem;
   dispatch: React.Dispatch<CourseEditorAction>;
+  onRequestRefresh?: () => void;
 }) {
   const [adding, setAdding] = useState(false);
   const [draftText, setDraftText] = useState("");
@@ -85,6 +87,7 @@ export function QuizBuilder({
         })),
       });
       dispatch({ type: "ADD_QUIZ_QUESTION", itemId: item.id, question });
+      onRequestRefresh?.();
       resetDraft();
       toast.success("Question added.");
     } catch (error) {
@@ -120,6 +123,7 @@ export function QuizBuilder({
       });
       setEditingSettings(false);
       toast.success("Quiz settings updated.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to save settings.");
     } finally {

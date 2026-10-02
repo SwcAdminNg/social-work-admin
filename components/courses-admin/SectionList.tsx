@@ -51,6 +51,7 @@ export function SectionList({
       await reorderSections(course.id, {
         sections: reordered.map((s) => ({ id: s.id, order_index: s.order_index })),
       });
+      onRefresh();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to reorder sections.");
       onRefresh();

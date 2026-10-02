@@ -62,6 +62,8 @@ export interface Course {
   access_end_date: string | null;
   instructors: CourseInstructorReadDTO[];
   certificate_enabled?: boolean;
+  governance_status?: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string;
+  current_version_label?: string | null;
 }
 
 export interface FeaturedCourse extends Course {
@@ -174,6 +176,7 @@ export interface CourseEssaySettings {
   submission_mode: EssaySubmissionMode;
   pass_mark_percentage: number;
   max_attempts: number | null;
+  requires_moderation?: boolean;
 }
 
 export interface CourseQuizGroupSection {
@@ -226,6 +229,19 @@ export interface CourseSection {
 
 export interface CourseDetail extends Course {
   sections: CourseSection[];
+  governance?: {
+    governance_enabled: boolean;
+    lifecycle: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string;
+    current_version_label?: string | null;
+    layer?: "auto" | "live" | "draft" | string;
+    open_revision?: {
+      id: string;
+      kind: string;
+      status: string;
+      round?: number;
+      is_editable?: boolean;
+    } | null;
+  };
 }
 
 // Request payloads
@@ -445,12 +461,17 @@ export interface EssaySubmission {
   score: number | null;
   is_published: boolean;
   feedback: string | null;
+  result_status?: string | null;
+  current_mark_id?: string | null;
+  working_score?: number | null;
 }
 
 export interface GradeEssayPayload {
   score: number;
   feedback?: string | null;
   is_published?: boolean;
+  recommendation?: "PASS" | "FAIL";
+  submit_for_moderation?: boolean;
 }
 
 export interface ManagedCourseListParams {

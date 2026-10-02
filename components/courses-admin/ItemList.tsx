@@ -51,6 +51,7 @@ export function ItemList({
       await reorderItems(courseId, section.id, {
         items: reordered.map((i) => ({ id: i.id, order_index: i.order_index })),
       });
+      onRefresh();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to reorder items.");
       onRefresh();

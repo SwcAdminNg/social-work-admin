@@ -19,10 +19,12 @@ export function LiveSessionEditor({
   courseId,
   item,
   onLiveSessionUpdate,
+  onRequestRefresh,
 }: {
   courseId: string;
   item: CourseItem;
   onLiveSessionUpdate: (liveSession: CourseLiveSession) => void;
+  onRequestRefresh?: () => void;
 }) {
   const liveSession = item.live_session;
   const editable = liveSession?.status === "SCHEDULED";
@@ -76,6 +78,7 @@ export function LiveSessionEditor({
         guest_title: guestTitleChanged ? (guestTitle.trim() || null) : liveSession!.guest_title,
       };
       onLiveSessionUpdate(next);
+      onRequestRefresh?.();
       toast.success(
         scheduleChanged
           ? "Session rescheduled — enrolled students have been notified."

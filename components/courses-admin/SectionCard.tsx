@@ -74,6 +74,7 @@ export function SectionCard({
     try {
       await updateSection(course.id, section.id, { title: trimmed });
       dispatch({ type: "UPDATE_SECTION", sectionId: section.id, fields: { title: trimmed } });
+      onRefresh();
     } catch (error) {
       setTitle(section.title);
       toast.error(error instanceof ApiError ? error.message : "Failed to rename section.");
@@ -86,6 +87,7 @@ export function SectionCard({
       await deleteSection(course.id, section.id);
       dispatch({ type: "REMOVE_SECTION", sectionId: section.id });
       toast.success("Section deleted.");
+      onRefresh();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to delete section.");
       setDeleting(false);

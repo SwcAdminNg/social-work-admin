@@ -9,9 +9,11 @@ import type { CourseItem, CourseLink } from "@/lib/api/courses.types";
 export function LinkEditor({
   item,
   onLinkUpdate,
+  onRequestRefresh,
 }: {
   item: CourseItem;
   onLinkUpdate: (link: CourseLink) => void;
+  onRequestRefresh?: () => void;
 }) {
   const link = item.link;
   const [url, setUrl] = useState(link?.url ?? "");
@@ -38,6 +40,7 @@ export function LinkEditor({
         description: next.description,
       });
       onLinkUpdate(next);
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update link.");
       setUrl(link?.url ?? "");

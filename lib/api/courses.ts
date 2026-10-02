@@ -65,8 +65,12 @@ export async function listManagedCourses(
   return { items: res.data, meta: res.meta! };
 }
 
-export async function getManagedCourse(id: string, token: string): Promise<CourseDetail> {
-  const res = await apiClient.get<ApiEnvelope<CourseDetail>>(`/courses/manage/${id}`, { token });
+export async function getManagedCourse(
+  id: string,
+  token: string,
+  params: { layer?: "auto" | "live" | "draft" } = {},
+): Promise<CourseDetail> {
+  const res = await apiClient.get<ApiEnvelope<CourseDetail>>(`/courses/manage/${id}${buildQuery(params)}`, { token });
   return res.data;
 }
 
@@ -354,8 +358,9 @@ export async function gradeEssaySubmission(
   userId: string,
   payload: GradeEssayPayload,
   token: string
-): Promise<void> {
-  await apiClient.post(`/courses/items/${itemId}/essay/submissions/${userId}/grade`, payload, { token });
+): Promise<unknown> {
+  const res = await apiClient.post<ApiEnvelope<unknown>>(`/courses/items/${itemId}/essay/submissions/${userId}/grade`, payload, { token });
+  return res.data;
 }
 
 export async function getFeaturedCourses(

@@ -34,6 +34,18 @@ export const dashboardNavItems: NavItem[] = [
     adminOnly: true,
   },
   {
+    label: "Approval Centre",
+    href: "/dashboard/approval-centre",
+    icon: IconClipboardCheck,
+    staffOnly: true,
+  },
+  {
+    label: "Staff Roles",
+    href: "/dashboard/staff-roles",
+    icon: IconUsers,
+    adminOnly: true,
+  },
+  {
     label: "Featured Courses",
     href: "/dashboard/featured-courses",
     icon: IconSparkles,

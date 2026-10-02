@@ -30,9 +30,11 @@ function newDraftOption(): CreateQuizOptionPayload & { key: string } {
 export function QuizGroupBuilder({
   item,
   dispatch,
+  onRequestRefresh,
 }: {
   item: CourseItem;
   dispatch: React.Dispatch<CourseEditorAction>;
+  onRequestRefresh?: () => void;
 }) {
   const quizGroup = item.assessment?.quiz_group;
 
@@ -83,6 +85,7 @@ export function QuizGroupBuilder({
       });
       setEditingSettings(false);
       toast.success("Quiz group settings updated.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to save settings.");
     } finally {
@@ -105,6 +108,7 @@ export function QuizGroupBuilder({
       setSectionQuestionsToAsk("");
       setAddingSection(false);
       toast.success("Section added.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to add section.");
     } finally {
@@ -168,6 +172,7 @@ export function QuizGroupBuilder({
           section={section}
           maxAttempts={quizGroup.max_attempts}
           dispatch={dispatch}
+          onRequestRefresh={onRequestRefresh}
         />
       ))}
 
@@ -232,11 +237,13 @@ function QuizGroupSectionPanel({
   section,
   maxAttempts,
   dispatch,
+  onRequestRefresh,
 }: {
   itemId: string;
   section: CourseQuizGroupSection;
   maxAttempts: number | null;
   dispatch: React.Dispatch<CourseEditorAction>;
+  onRequestRefresh?: () => void;
 }) {
   const [expanded, setExpanded] = useState(true);
   const [title, setTitle] = useState(section.title);
@@ -265,6 +272,7 @@ function QuizGroupSectionPanel({
     try {
       await updateQuizGroupSection(section.id, { title: trimmed });
       dispatch({ type: "UPDATE_QUIZ_GROUP_SECTION", sectionId: section.id, fields: { title: trimmed } });
+      onRequestRefresh?.();
     } catch (error) {
       setTitle(section.title);
       toast.error(error instanceof ApiError ? error.message : "Failed to rename section.");
@@ -276,6 +284,7 @@ function QuizGroupSectionPanel({
     try {
       await updateQuizGroupSection(section.id, { questions_to_ask: newVal });
       dispatch({ type: "UPDATE_QUIZ_GROUP_SECTION", sectionId: section.id, fields: { questions_to_ask: newVal } });
+      onRequestRefresh?.();
     } catch (error) {
       // Revert the toggle/input to whatever the server still has.
       setAskAll(section.questions_to_ask == null);
@@ -314,6 +323,7 @@ function QuizGroupSectionPanel({
       await deleteQuizGroupSection(section.id);
       dispatch({ type: "REMOVE_QUIZ_GROUP_SECTION", sectionId: section.id });
       toast.success("Section deleted.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to delete section.");
       setDeleting(false);
@@ -336,6 +346,7 @@ function QuizGroupSectionPanel({
       });
       dispatch({ type: "ADD_QUIZ_GROUP_SECTION_QUESTION", sectionId: section.id, question });
       toast.success("Question duplicated — edit the copy to make it a distinct variant.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to duplicate question.");
     } finally {
@@ -435,6 +446,7 @@ function QuizGroupSectionPanel({
       dispatch({ type: "ADD_QUIZ_GROUP_SECTION_QUESTION", sectionId: section.id, question });
       resetDraft();
       toast.success("Question added.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to add question.");
     } finally {

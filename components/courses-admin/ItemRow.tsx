@@ -136,6 +136,7 @@ export function ItemRow({
     try {
       await updateItem(item.id, { title: trimmed });
       dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { title: trimmed } });
+      onRequestRefresh?.();
     } catch (error) {
       setTitle(item.title);
       toast.error(error instanceof ApiError ? error.message : "Failed to rename item.");
@@ -156,6 +157,7 @@ export function ItemRow({
       await updateItem(item.id, { estimated_minutes: newVal });
       dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { estimated_minutes: newVal } });
       setEstimatedMinutes(newVal ? String(newVal) : "");
+      onRequestRefresh?.();
     } catch (error) {
       setEstimatedMinutes(item.estimated_minutes ? String(item.estimated_minutes) : "");
       toast.error(error instanceof ApiError ? error.message : "Failed to update estimated time.");
@@ -167,6 +169,7 @@ export function ItemRow({
     try {
       await updateItem(item.id, { is_preview: next });
       dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { is_preview: next } });
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update preview setting.");
     }
@@ -182,6 +185,7 @@ export function ItemRow({
         itemId: item.id,
         fields: { document: { ...item.document, downloadable: next } },
       });
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to update downloadable setting.");
     }
@@ -193,6 +197,7 @@ export function ItemRow({
       await deleteItem(item.id);
       dispatch({ type: "REMOVE_ITEM", itemId: item.id });
       toast.success("Item deleted.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to delete item.");
       setDeleting(false);
@@ -329,6 +334,7 @@ export function ItemRow({
             <LinkEditor
               item={item}
               onLinkUpdate={(link) => dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { link } })}
+              onRequestRefresh={onRequestRefresh}
             />
           )}
           {item.item_type === "LIVE_SESSION" && (
@@ -338,16 +344,17 @@ export function ItemRow({
               onLiveSessionUpdate={(live_session) =>
                 dispatch({ type: "UPDATE_ITEM", itemId: item.id, fields: { live_session } })
               }
+              onRequestRefresh={onRequestRefresh}
             />
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ" && (
-            <QuizBuilder item={item} dispatch={dispatch} />
+            <QuizBuilder item={item} dispatch={dispatch} onRequestRefresh={onRequestRefresh} />
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "ESSAY" && (
-            <EssayBuilder item={item} dispatch={dispatch} />
+            <EssayBuilder item={item} dispatch={dispatch} onRequestRefresh={onRequestRefresh} />
           )}
           {item.item_type === "ASSESSMENT" && item.assessment?.assessment_type === "QUIZ_GROUP" && (
-            <QuizGroupBuilder item={item} dispatch={dispatch} />
+            <QuizGroupBuilder item={item} dispatch={dispatch} onRequestRefresh={onRequestRefresh} />
           )}
         </div>
       )}

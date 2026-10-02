@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/api/client";
 import { publishCourse } from "@/lib/api/courses-client";
 import type { Course } from "@/lib/api/courses.types";
 import { IconSpinner } from "@/components/dashboard/icons";
+import { archiveCourse, publishRevision, reinstateCourse } from "@/lib/api/governance-client";
 
 export function PublishControl({
   course,
@@ -14,7 +15,7 @@ export function PublishControl({
 }: {
   course: Course;
   canPublish: boolean;
-  onPublished: (fields: Partial<Course>) => void;
+  onPublished: () => void;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -22,9 +23,28 @@ export function PublishControl({
     const next = !course.is_published;
     setLoading(true);
     try {
-      const updated = await publishCourse(course.id, next);
-      onPublished(updated);
-      toast.success(next ? "Course published." : "Course unpublished.");
+      const governance = "governance" in course ? (course as Course & { governance?: { governance_enabled?: boolean; open_revision?: { id: string } | null } }).governance : undefined;
+      if (governance?.governance_enabled) {
+        if (course.governance_status === "ARCHIVED") {
+          const reason = window.prompt("Reason for reinstating this course?") ?? undefined;
+          await reinstateCourse(course.id, reason);
+          toast.success("Reinstatement revision created.");
+        } else if (course.is_published) {
+          const reason = window.prompt("Reason for archiving this course?") ?? undefined;
+          await archiveCourse(course.id, reason);
+          toast.success("Course archived.");
+        } else if (governance.open_revision?.id) {
+          await publishRevision(governance.open_revision.id);
+          toast.success("Approved revision published.");
+        } else {
+          await publishCourse(course.id, next);
+          toast.success("Course publish requested.");
+        }
+      } else {
+        await publishCourse(course.id, next);
+        toast.success(next ? "Course published." : "Course unpublished.");
+      }
+      onPublished();
     } catch (error) {
       toast.error(
         error instanceof ApiError ? error.message : "Failed to update publish status."
@@ -34,7 +54,16 @@ export function PublishControl({
     }
   }
 
-  const disabled = loading || (!course.is_published && !canPublish);
+  const governance = "governance" in course ? (course as Course & { governance?: { governance_enabled?: boolean; open_revision?: { id: string } | null } }).governance : undefined;
+  const disabled = loading || (!course.is_published && course.governance_status !== "ARCHIVED" && !governance?.open_revision?.id && !canPublish);
+  const label =
+    governance?.governance_enabled && course.governance_status === "ARCHIVED"
+      ? "Reinstate"
+      : governance?.governance_enabled && course.is_published
+        ? "Archive"
+        : course.is_published
+          ? "Unpublish"
+          : "Publish";
 
   return (
     <button
@@ -49,7 +78,7 @@ export function PublishControl({
       }`}
     >
       {loading && <IconSpinner className={course.is_published ? "text-gray-500" : "text-white/80"} />}
-      {course.is_published ? "Unpublish" : "Publish"}
+      {label}
     </button>
   );
 }

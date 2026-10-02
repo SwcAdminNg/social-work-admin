@@ -114,8 +114,8 @@ export async function listManagedCourses(
   return { items: res.data, meta: res.meta! };
 }
 
-export async function getManagedCourse(id: string): Promise<CourseDetail> {
-  const res = await request<CourseDetail>(`/manage/${id}`, { method: "GET" });
+export async function getManagedCourse(id: string, params: { layer?: "auto" | "live" | "draft" } = {}): Promise<CourseDetail> {
+  const res = await request<CourseDetail>(`/manage/${id}${buildQuery(params)}`, { method: "GET" });
   return res.data;
 }
 
@@ -501,11 +501,12 @@ export async function gradeEssaySubmission(
   itemId: string,
   userId: string,
   payload: GradeEssayPayload,
-): Promise<void> {
-  await request(`/items/${itemId}/essay/submissions/${userId}/grade`, {
+): Promise<unknown> {
+  const res = await request<unknown>(`/items/${itemId}/essay/submissions/${userId}/grade`, {
     method: "POST",
     body: payload,
   });
+  return res.data;
 }
 
 export async function getThumbnailUploadUrl(

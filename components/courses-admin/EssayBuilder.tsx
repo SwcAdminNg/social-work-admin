@@ -13,9 +13,11 @@ import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentCo
 export function EssayBuilder({
   item,
   dispatch,
+  onRequestRefresh,
 }: {
   item: CourseItem;
   dispatch: React.Dispatch<CourseEditorAction>;
+  onRequestRefresh?: () => void;
 }) {
   const essay = item.assessment?.essay;
 
@@ -25,6 +27,7 @@ export function EssayBuilder({
   const [dueDate, setDueDate] = useState<string>(item.assessment?.due_date ? item.assessment.due_date.slice(0, 16) : "");
   const [passMark, setPassMark] = useState(String(essay?.pass_mark_percentage ?? 70));
   const [maxAttempts, setMaxAttempts] = useState(essay?.max_attempts ? String(essay.max_attempts) : "");
+  const [requiresModeration, setRequiresModeration] = useState(essay?.requires_moderation ?? item.assessment?.is_final_assessment ?? false);
   const [isFinalAssessment, setIsFinalAssessment] = useState(item.assessment?.is_final_assessment ?? false);
 
   const [saving, setSaving] = useState(false);
@@ -44,6 +47,7 @@ export function EssayBuilder({
           submission_mode: submissionMode,
           pass_mark_percentage: parseInt(passMark) || 70,
           max_attempts: maxAttempts ? parseInt(maxAttempts) : null,
+          requires_moderation: requiresModeration,
         },
       };
       await updateAssessmentSettings(item.id, payload);
@@ -58,6 +62,7 @@ export function EssayBuilder({
         },
       });
       toast.success("Essay settings saved.");
+      onRequestRefresh?.();
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to save essay settings.");
     } finally {
@@ -147,6 +152,20 @@ export function EssayBuilder({
           </div>
           <div className="h-px bg-gray-100 dark:bg-gray-800" />
           <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={requiresModeration}
+              onChange={(e) => setRequiresModeration(e.target.checked)}
+              className="mt-1 accent-[#2D6A4F]"
+            />
+            <span>
+              <span className="block text-sm font-bold text-gray-700 dark:text-gray-300">Requires moderation</span>
+              <span className="block text-xs text-gray-500 dark:text-gray-400">
+                When governance is enabled, marks flow through Marker, Moderator, and Approver before learners see results.
+              </span>
+            </span>
+          </label>
         </div>
 
         <button
@@ -260,6 +279,8 @@ function EssaySubmissionRow({
   const [score, setScore] = useState(submission.score !== null ? String(submission.score) : "");
   const [feedback, setFeedback] = useState(submission.feedback ?? "");
   const [isPublished, setIsPublished] = useState(submission.is_published);
+  const [recommendation, setRecommendation] = useState<"PASS" | "FAIL">("PASS");
+  const [submitForModeration, setSubmitForModeration] = useState(false);
   const [grading, setGrading] = useState(false);
 
   async function handleGrade(e: React.FormEvent) {
@@ -271,12 +292,23 @@ function EssaySubmissionRow({
     }
     setGrading(true);
     try {
-      await gradeEssaySubmission(itemId, submission.user_id, {
+      const mark = await gradeEssaySubmission(itemId, submission.user_id, {
         score: parsedScore,
         feedback: feedback.trim() || null,
         is_published: isPublished,
+        recommendation,
+        submit_for_moderation: submitForModeration,
       });
-      onGraded({ score: parsedScore, feedback: feedback.trim() || null, is_published: isPublished });
+      const currentMarkId =
+        mark && typeof mark === "object" && "id" in mark ? String((mark as { id: unknown }).id) : submission.current_mark_id;
+      onGraded({
+        score: parsedScore,
+        feedback: feedback.trim() || null,
+        is_published: isPublished,
+        working_score: parsedScore,
+        current_mark_id: currentMarkId,
+        result_status: submitForModeration ? "AWAITING_MODERATION" : submission.result_status ?? "DRAFT_MARK",
+      });
       toast.success("Essay graded.");
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to grade essay.");
@@ -294,6 +326,18 @@ function EssaySubmissionRow({
         <div>
           <p className="text-sm font-semibold text-gray-900 dark:text-white">{submission.user_full_name}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{submission.user_email}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {submission.result_status && (
+              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                {submission.result_status.replaceAll("_", " ")}
+              </span>
+            )}
+            {submission.working_score !== undefined && submission.working_score !== null && (
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                Working score {submission.working_score}
+              </span>
+            )}
+          </div>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
           Submitted {new Date(submission.submitted_at).toLocaleString()}
@@ -341,15 +385,42 @@ function EssaySubmissionRow({
       </div>
 
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300">
-          <input
-            type="checkbox"
-            checked={isPublished}
-            onChange={(e) => setIsPublished(e.target.checked)}
-            className="accent-[#2D6A4F]"
-          />
-          Publish to student
-        </label>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={isPublished}
+              onChange={(e) => setIsPublished(e.target.checked)}
+              className="accent-[#2D6A4F]"
+            />
+            Publish to student
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={submitForModeration}
+              onChange={(e) => setSubmitForModeration(e.target.checked)}
+              className="accent-[#2D6A4F]"
+            />
+            Submit for moderation
+          </label>
+          <select
+            value={recommendation}
+            onChange={(e) => setRecommendation(e.target.value as "PASS" | "FAIL")}
+            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-xs text-gray-900 dark:text-white"
+          >
+            <option value="PASS">Recommend pass</option>
+            <option value="FAIL">Recommend fail</option>
+          </select>
+          {submission.current_mark_id && (
+            <a
+              href={`/dashboard/approval-centre/marks/${submission.current_mark_id}`}
+              className="text-xs font-bold text-[#2D6A4F] dark:text-[#52b788] hover:underline"
+            >
+              Open mark workflow
+            </a>
+          )}
+        </div>
         <button
           type="submit"
           disabled={grading}
