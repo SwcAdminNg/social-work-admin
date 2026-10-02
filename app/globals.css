@@ -48,3 +48,7 @@ body {
   background: rgb(17 24 39);
   color: white;
 }
+
+.input-with-icon {
+  padding-left: 2.25rem;
+}

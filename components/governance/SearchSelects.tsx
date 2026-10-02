@@ -65,7 +65,7 @@ export function UserSearchSelect({
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!query.trim() || value) {
+    if (value || !open) {
       setResults([]);
       setLoading(false);
       return;
@@ -73,7 +73,7 @@ export function UserSearchSelect({
     let cancelled = false;
     setLoading(true);
     const timeout = setTimeout(() => {
-      getUsers({ search: query.trim(), page: 1, pageSize: 8, userType })
+      getUsers({ search: query.trim() || undefined, page: 1, pageSize: query.trim() ? 8 : 5, userType })
         .then((res) => {
           if (!cancelled) setResults(res.data ?? []);
         })
@@ -88,7 +88,7 @@ export function UserSearchSelect({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [query, userType, value]);
+  }, [open, query, userType, value]);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -123,13 +123,13 @@ export function UserSearchSelect({
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
-            className="input pl-9"
+            className="input input-with-icon"
           />
           {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
         </div>
       )}
 
-      {open && !value && query.trim() && (
+      {open && !value && (
         <ResultPanel>
           {!loading && results.length === 0 ? (
             <EmptyResult>No matching users.</EmptyResult>
@@ -174,7 +174,7 @@ export function CourseSearchSelect({
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!query.trim() || value) {
+    if (value || !open) {
       setResults([]);
       setLoading(false);
       return;
@@ -182,7 +182,7 @@ export function CourseSearchSelect({
     let cancelled = false;
     setLoading(true);
     const timeout = setTimeout(() => {
-      listManagedCourses({ search: query.trim(), page: 1, page_size: 8 })
+      listManagedCourses({ search: query.trim() || undefined, page: 1, page_size: query.trim() ? 8 : 5 })
         .then((res) => {
           if (!cancelled) setResults(res.items ?? []);
         })
@@ -197,7 +197,7 @@ export function CourseSearchSelect({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [query, value]);
+  }, [open, query, value]);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -232,13 +232,13 @@ export function CourseSearchSelect({
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
-            className="input pl-9"
+            className="input input-with-icon"
           />
           {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
         </div>
       )}
 
-      {open && !value && query.trim() && (
+      {open && !value && (
         <ResultPanel>
           {!loading && results.length === 0 ? (
             <EmptyResult>No matching courses.</EmptyResult>
