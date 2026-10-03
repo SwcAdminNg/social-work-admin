@@ -14,7 +14,7 @@ import { TemplateFormFields, type TemplateFormState } from "./TemplateFormFields
 import { CertificateImageUploader } from "./CertificateImageUploader";
 import { CertificatePreview } from "./CertificatePreview";
 
-function toFormState(template: CertificateTemplate): TemplateFormState {
+export function toFormState(template: CertificateTemplate): TemplateFormState {
   return {
     name: template.name,
     titleText: template.title_text,

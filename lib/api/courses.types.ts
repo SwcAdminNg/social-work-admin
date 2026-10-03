@@ -62,6 +62,7 @@ export interface Course {
   access_end_date: string | null;
   instructors: CourseInstructorReadDTO[];
   certificate_enabled?: boolean;
+  certificate_pass_mark_percentage?: number;
   governance_status?: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string;
   current_version_label?: string | null;
 }
@@ -264,6 +265,7 @@ export interface CreateCoursePayload {
   access_start_date?: string | null;
   access_end_date?: string | null;
   certificate_enabled?: boolean;
+  certificate_pass_mark_percentage?: number;
 }
 
 export type UpdateCoursePayload = Partial<CreateCoursePayload> & { is_exclusive?: boolean };

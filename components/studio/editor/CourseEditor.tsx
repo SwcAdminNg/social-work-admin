@@ -15,7 +15,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Button, ButtonLink, Card, EmptyState, Skeleton, Tabs, type TabDef } from "@/components/ui/primitives";
-import { CourseCertificateTab } from "@/components/courses-admin/CourseCertificateTab";
 import { CourseCommunityTab } from "@/components/courses-admin/CourseCommunityTab";
 import { CourseGovernanceTab } from "@/components/courses-admin/CourseGovernanceTab";
 import { CourseResourcesTab } from "@/components/courses-admin/CourseResourcesTab";
@@ -24,6 +23,7 @@ import type { CourseDetail } from "@/lib/api/courses.types";
 import { curriculumHealth } from "@/lib/studio/health";
 import { CurriculumBuilder } from "../curriculum/CurriculumBuilder";
 import { CourseUploadsProvider } from "../curriculum/uploads";
+import { CertificateTab } from "./CertificateTab";
 import { useCourseEditor } from "./CourseEditorContext";
 import { DetailsTab } from "./DetailsTab";
 import { EditorHeader } from "./EditorHeader";
@@ -138,13 +138,7 @@ export function CourseEditor() {
           <PricingTab />
         </div>
         <div role="tabpanel" aria-label="Certificate" hidden={tab !== "certificate"}>
-          <CourseCertificateTab
-            courseId={course.id}
-            certificateEnabled={course.certificate_enabled}
-            accessMode={course.access_mode}
-            accessEndDate={course.access_end_date}
-            onUpdated={() => void refresh()}
-          />
+          <CertificateTab />
         </div>
         {/* Operational tabs load their own data, so they only mount when opened. */}
         {tab === "review" && (

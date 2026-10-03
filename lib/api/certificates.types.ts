@@ -63,6 +63,8 @@ export interface CertificateImageUploadResponse {
 
 export interface CourseCertificateSettingsPayload {
   certificate_enabled?: boolean | null;
+  /** 0–100: overall score a learner must reach to earn the certificate. */
+  certificate_pass_mark_percentage?: number | null;
   certificate_template_id?: string | null;
   clear_template?: boolean;
 }

@@ -29,7 +29,7 @@ export function CourseUnavailable({ status }: { status: number }) {
               </Button>
             )}
             <ButtonLink href="/dashboard/course-management" variant={notFound || forbidden ? "primary" : "outline"} icon={ArrowLeft}>
-              Back to my courses
+              Back to all courses
             </ButtonLink>
           </>
         }

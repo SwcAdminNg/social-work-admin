@@ -385,7 +385,7 @@ export function CourseLibrary({ initialCourses, initialDrafts, initialReturned }
         <Callout
           tone="danger"
           icon={AlertTriangle}
-          title="We couldn't load your courses"
+          title="We couldn't load courses"
           actions={
             <Button variant="outline" size="sm" icon={RotateCcw} onClick={() => coursesQuery.refetch()} loading={coursesQuery.isFetching}>
               Try again

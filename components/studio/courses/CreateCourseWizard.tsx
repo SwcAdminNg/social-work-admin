@@ -58,6 +58,7 @@ import type { AccessMode, CourseCategory, CourseLevel, CoursePayload } from "@/l
 import { CATEGORY_ICONS, CourseCover } from "./CourseCover";
 import { StringListField, cleanList } from "./StringListField";
 import { InstructorPicker, type Credit } from "../editor/InstructorPicker";
+import { DEFAULT_PASS_MARK, PassMarkField } from "../editor/PassMarkField";
 
 /* ───────────────────────── Form model ───────────────────────── */
 
@@ -77,6 +78,7 @@ type FormState = {
   access_start_date: string;
   access_end_date: string;
   certificate_enabled: boolean;
+  certificate_pass_mark_percentage: number;
   instructors: Credit[];
 };
 
@@ -99,6 +101,7 @@ const INITIAL: FormState = {
   access_start_date: "",
   access_end_date: "",
   certificate_enabled: false,
+  certificate_pass_mark_percentage: DEFAULT_PASS_MARK,
   instructors: [],
 };
 
@@ -130,6 +133,7 @@ const FIELD_STEP: Record<FieldKey, number> = {
   access_start_date: 2,
   access_end_date: 2,
   certificate_enabled: 2,
+  certificate_pass_mark_percentage: 2,
   instructors: 0,
 };
 
@@ -180,6 +184,7 @@ function toPayload(f: FormState): CoursePayload {
     is_exclusive: f.is_exclusive,
     access_mode: f.access_mode,
     certificate_enabled: f.certificate_enabled,
+    certificate_pass_mark_percentage: f.certificate_pass_mark_percentage,
     instructors: f.instructors.map((c) => (c.user_id ? { user_id: c.user_id, name: c.name } : { name: c.name })),
   };
   if (f.prerequisite.trim()) payload.prerequisite = f.prerequisite.trim();
@@ -305,7 +310,7 @@ export function CreateCourseWizard({ currentUser }: { currentUser?: Credit | nul
           action={
             <>
               <ButtonLink href="/dashboard/course-management" variant="outline" icon={ArrowLeft}>
-                Back to my courses
+                Back to all courses
               </ButtonLink>
             </>
           }
@@ -325,7 +330,7 @@ export function CreateCourseWizard({ currentUser }: { currentUser?: Credit | nul
             onClick={() => router.push("/dashboard/course-management")}
             className="inline-flex cursor-pointer items-center gap-1 hover:underline"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> My courses
+            <ArrowLeft className="h-3.5 w-3.5" /> All courses
           </button>
         }
         title="Create a new course"
@@ -771,8 +776,21 @@ function PricingStep({ form, errors, set }: StepProps) {
               <Award className="h-4 w-4 text-brand-600 dark:text-brand-300" strokeWidth={2} /> Award a certificate
             </span>
           }
-          description="Learners receive a certificate when they complete the course. You can fine-tune the rules in the editor."
+          description="Learners earn a certificate when they finish the course and reach the pass mark below."
         />
+        {form.certificate_enabled && (
+          <div className="mt-5 border-t border-slate-100 pt-5 dark:border-ink-line">
+            <p className="mb-1 text-[13px] font-semibold text-slate-700 dark:text-slate-200">Pass mark</p>
+            <p className="mb-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
+              The average of each learner&apos;s best score on every quiz, quiz group and essay in the course. A course with no assessments has
+              nothing to fail.
+            </p>
+            <PassMarkField
+              value={form.certificate_pass_mark_percentage}
+              onChange={(v) => set("certificate_pass_mark_percentage", v)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -819,7 +837,9 @@ function ReviewStep({
             ? "Self-paced"
             : `${formatDateTime(fromLocalInput(form.access_start_date))} → ${formatDateTime(fromLocalInput(form.access_end_date))}`}
         </SummaryRow>
-        <SummaryRow label="Certificate">{form.certificate_enabled ? "Awarded on completion" : "Off"}</SummaryRow>
+        <SummaryRow label="Certificate">
+          {form.certificate_enabled ? `Awarded at ${form.certificate_pass_mark_percentage}% overall or above` : "Off"}
+        </SummaryRow>
       </SummarySection>
 
       <Callout tone="brand" icon={ShieldCheck} title="Nothing is visible to learners yet">
@@ -908,7 +928,7 @@ function LivePreview({ form }: { form: FormState }) {
             </Badge>
             {form.certificate_enabled && (
               <Badge tone="success" size="xs" icon={BadgeCheck}>
-                Certificate
+                Certificate · pass {form.certificate_pass_mark_percentage}%
               </Badge>
             )}
             {form.is_exclusive && (
