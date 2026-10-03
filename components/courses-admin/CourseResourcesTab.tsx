@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import { deleteResource, listManagedResources } from "@/lib/api/resources-client";
 import type { Resource } from "@/lib/api/resources.types";
-import { IconLink, IconPlus, IconSpinner } from "@/components/dashboard/icons";
-import { EmptyState } from "@/components/dashboard/EmptyState";
-import { ResourceCard } from "@/components/resources-admin/ResourceCard";
-import { ConfirmDialog } from "./ConfirmDialog";
+import { ButtonLink, Card, CardHeader, EmptyState } from "@/components/ui/primitives";
+import { ConfirmDialog } from "@/components/ui/overlays";
+import { ResourceCard, ResourceCardSkeleton } from "@/components/studio/resources/ResourceCard";
+import { resourceKeys } from "@/components/studio/resources/ResourceEditorContext";
+import { RESOURCE_ICON } from "@/components/studio/resources/resourceMeta";
 
 export function CourseResourcesTab({
   courseId,
@@ -26,69 +27,65 @@ export function CourseResourcesTab({
     queryFn: async () => (await listManagedResources({ course_id: courseId, page_size: 50 })).items,
   });
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return;
-    setDeleting(true);
     try {
       await deleteResource(deleteTarget.id);
-      toast.success(`"${deleteTarget.name}" was deleted.`);
-      setDeleteTarget(null);
-      queryClient.invalidateQueries({ queryKey });
+      toast.success(`"${deleteTarget.name}" was deleted`);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey }),
+        queryClient.invalidateQueries({ queryKey: resourceKeys.all }),
+      ]);
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : "Failed to delete resource.");
-    } finally {
-      setDeleting(false);
+      throw error;
     }
   }
 
-  const newResourceHref = `/dashboard/resource-management/new?course_id=${encodeURIComponent(
-    courseId
-  )}&course_title=${encodeURIComponent(courseTitle)}`;
+  const newResourceHref = `/dashboard/resource-management/new?course_id=${encodeURIComponent(courseId)}&course_title=${encodeURIComponent(courseTitle)}`;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Reference material tied to this course — policies, templates, recordings, and links. Lives
-          in the general Resources library, separate from the curriculum above.
-        </p>
-        <Link
-          href={newResourceHref}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start flex-shrink-0"
-        >
-          <IconPlus />
-          New Resource
-        </Link>
-      </div>
+    <Card>
+      <CardHeader
+        title="Course resources"
+        description="Reference material tied to this course — policies, templates, recordings and links. It lives in the resource library, separate from the curriculum."
+        actions={
+          <ButtonLink href={newResourceHref} icon={Plus}>
+            New resource
+          </ButtonLink>
+        }
+      />
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-16 text-slate-400">
-          <IconSpinner />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <ResourceCardSkeleton key={i} view="grid" />
+          ))}
         </div>
-      ) : resources && resources.length === 0 ? (
+      ) : !resources?.length ? (
         <EmptyState
-          icon={IconLink}
+          icon={RESOURCE_ICON}
+          compact
           title="No resources tied to this course yet"
-          description="Add a client-intake template, recommended reading, or a session recording — without burying it in the curriculum."
+          description="Add a client-intake template, recommended reading or a session recording — without burying it in the curriculum."
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {resources?.map((resource) => (
-            <ResourceCard key={resource.id} resource={resource} onDelete={() => setDeleteTarget(resource)} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {resources.map((resource) => (
+            <ResourceCard key={resource.id} resource={resource} onDelete={setDeleteTarget} />
           ))}
         </div>
       )}
 
       <ConfirmDialog
         open={!!deleteTarget}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
         title="Delete this resource?"
-        description={`"${deleteTarget?.name}" will be removed from the library.`}
-        loading={deleting}
+        description={`“${deleteTarget?.name}” and its attachments will be removed from the library. This can't be undone.`}
+        confirmLabel="Delete resource"
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeleteTarget(null)}
       />
-    </div>
+    </Card>
   );
 }

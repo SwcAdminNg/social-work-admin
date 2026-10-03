@@ -66,6 +66,12 @@ export function parseValue(value?: string | null): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+/** Accept a min/max given as a value string or a Date. */
+export function toBound(bound?: string | Date | null): Date | null {
+  if (!bound) return null;
+  return bound instanceof Date ? bound : parseValue(bound);
+}
+
 export function formatValue(d: Date | null, mode: PickerMode): string {
   if (!d) return "";
   const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;

@@ -1,14 +1,14 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getManagedResource } from "@/lib/api/resources";
 import { ApiError } from "@/lib/api/client";
-import { ResourceEditor } from "@/components/resources-admin/ResourceEditor";
+import { ResourceEditor } from "@/components/studio/resources/ResourceEditor";
+import { ResourceEditorProvider } from "@/components/studio/resources/ResourceEditorContext";
 
-export default async function ResourceEditorPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export const dynamic = "force-dynamic";
+
+export default async function ResourceEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await auth();
 
@@ -18,7 +18,14 @@ export default async function ResourceEditorPage({
   }
 
   const resource = await fetchResource(id, session.accessToken);
-  return <ResourceEditor initialResource={resource} />;
+  return (
+    <ResourceEditorProvider resourceId={id} initialResource={resource}>
+      {/* Suspense: the editor reads ?tab= with useSearchParams. */}
+      <Suspense>
+        <ResourceEditor />
+      </Suspense>
+    </ResourceEditorProvider>
+  );
 }
 
 async function fetchResource(id: string, token: string) {

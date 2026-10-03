@@ -16,6 +16,7 @@ import {
   parseValue,
   startOfDay,
   startOfMonth,
+  toBound,
   withTime,
   type PickerMode,
   type RangePreset,
@@ -29,8 +30,8 @@ export type DateRangePickerProps = {
   end: string;
   onChange: (range: DateRangeValue) => void;
   mode?: PickerMode;
-  min?: string;
-  max?: string;
+  min?: string | Date | null;
+  max?: string | Date | null;
   placeholder?: string;
   title?: string;
   /** "past" for report/filter ranges, "future" for windows and schedules. */
@@ -44,7 +45,8 @@ export type DateRangePickerProps = {
   clearable?: boolean;
   disabled?: boolean;
   required?: boolean;
-  invalid?: boolean;
+  /** true, or which end is invalid. */
+  invalid?: boolean | "start" | "end";
   id?: string;
   size?: "sm" | "md";
   className?: string;
@@ -86,8 +88,8 @@ export function DateRangePicker({
   const isDateTime = mode === "datetime";
   const currentStart = parseValue(start);
   const currentEnd = parseValue(end);
-  const minDate = parseValue(min);
-  const maxDate = parseValue(max);
+  const minDate = toBound(min);
+  const maxDate = toBound(max);
   const presetList = presets === "past" ? PAST_RANGE_PRESETS : presets === "future" ? FUTURE_RANGE_PRESETS : presets || [];
 
   const [open, setOpen] = useState(false);
@@ -153,7 +155,7 @@ export function DateRangePicker({
         icon={CalendarRange}
         disabled={disabled}
         required={required}
-        invalid={invalid}
+        invalid={!!invalid}
         size={size}
         className={className}
         aria-label={ariaLabel}

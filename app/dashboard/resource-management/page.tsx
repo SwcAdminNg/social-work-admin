@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { listManagedResources } from "@/lib/api/resources";
-import { ResourceManagementList } from "@/components/resources-admin/ResourceManagementList";
+import { ResourceLibrary } from "@/components/studio/resources/ResourceLibrary";
+
+export const dynamic = "force-dynamic";
 
 export default async function ResourceManagementPage() {
   const session = await auth();
@@ -11,7 +13,8 @@ export default async function ResourceManagementPage() {
     redirect("/dashboard/not-authorized");
   }
 
-  const initialData = await listManagedResources({ page: 1, page_size: 12 }, session.accessToken);
+  // The client re-fetches through react-query if this first load fails.
+  const initialData = await listManagedResources({ page: 1, page_size: 24 }, session.accessToken).catch(() => null);
 
-  return <ResourceManagementList initialData={initialData} />;
+  return <ResourceLibrary initialData={initialData} />;
 }

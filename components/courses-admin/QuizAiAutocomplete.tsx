@@ -261,7 +261,7 @@ export function QuizAiAutocomplete({
         )}
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-          <div className="grid grid-cols-2 gap-2 sm:w-64">
+          <div className="grid grid-cols-2 gap-2 sm:w-[22rem] sm:flex-shrink-0">
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Provider
               <Select
@@ -292,7 +292,7 @@ export function QuizAiAutocomplete({
             </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:w-64">
+          <div className="grid grid-cols-2 gap-2 sm:w-[22rem] sm:flex-shrink-0">
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Questions
               <input

@@ -145,8 +145,8 @@ export function CourseCertificateTab({
           <IconClock className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600 dark:text-amber-500" />
           <p className="text-sm text-amber-800 dark:text-amber-400">
             This course is scheduled with an end date of{" "}
-            <strong>
-              {new Date(accessEndDate as string).toLocaleDateString(undefined, {
+            <strong suppressHydrationWarning>
+              {new Date(accessEndDate as string).toLocaleDateString("en-NG", {
                 month: "long",
                 day: "numeric",
                 year: "numeric",

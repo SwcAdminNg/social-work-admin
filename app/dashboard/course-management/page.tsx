@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { listManagedCourses } from "@/lib/api/courses";
-import { CourseManagementList } from "@/components/courses-admin/CourseManagementList";
+import { AccessProvider } from "@/components/studio/AccessContext";
+import { CourseLibrary } from "@/components/studio/courses/CourseLibrary";
+import { adminAccess, readAccess, readCourses } from "@/lib/studio/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,11 @@ export default async function CourseManagementPage() {
     redirect("/dashboard/not-authorized");
   }
 
-  const initialData = await listManagedCourses({ page: 1, page_size: 12 }, session.accessToken);
+  const [access, courses] = await Promise.all([readAccess(session.accessToken), readCourses(session.accessToken)]);
 
-  return <CourseManagementList initialData={initialData} />;
+  return (
+    <AccessProvider access={adminAccess(access)}>
+      <CourseLibrary initialCourses={courses} initialDrafts={null} initialReturned={null} />
+    </AccessProvider>
+  );
 }

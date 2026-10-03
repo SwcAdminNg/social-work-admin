@@ -13,6 +13,7 @@ import {
   isSameDay,
   parseValue,
   startOfDay,
+  toBound,
   startOfMonth,
   withTime,
   type DatePreset,
@@ -24,9 +25,9 @@ export type DatePickerProps = {
   value: string;
   onChange: (value: string) => void;
   mode?: PickerMode;
-  /** Same format as `value`. In datetime mode the time part is enforced too. */
-  min?: string;
-  max?: string;
+  /** Same format as `value` (or a Date). In datetime mode the time part is enforced too. */
+  min?: string | Date | null;
+  max?: string | Date | null;
   placeholder?: string;
   /** Dialog heading, e.g. "Due date". */
   title?: string;
@@ -73,8 +74,8 @@ export function DatePicker({
   "aria-label": ariaLabel,
 }: DatePickerProps) {
   const current = parseValue(value);
-  const minDate = parseValue(min);
-  const maxDate = parseValue(max);
+  const minDate = toBound(min);
+  const maxDate = toBound(max);
   const isDateTime = mode === "datetime";
   const presetList = presets === "future" ? FUTURE_DATE_PRESETS : presets ?? [];
 
