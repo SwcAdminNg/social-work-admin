@@ -91,16 +91,14 @@ export function Sidebar() {
             className={`flex min-w-0 items-center overflow-hidden no-underline ${collapsed ? "lg:hidden" : ""}`}
             aria-label="Social Work Nigeria admin home"
           >
-            <div className="relative h-24 w-[180px] overflow-hidden">
-              <Image
-                src="/images/swc-dark-logo.png"
-                alt="SWC Logo"
-                width={220}
-                height={96}
-                priority
-                className="h-24 w-[220px] max-w-none origin-left scale-125 object-contain object-left"
-              />
-            </div>
+            <Image
+              src="/images/logo/swc-logo.png"
+              alt="Social Work Consultancy Ltd."
+              width={176}
+              height={49}
+              priority
+              className="h-auto w-[176px] max-w-full"
+            />
           </Link>
 
           <button
