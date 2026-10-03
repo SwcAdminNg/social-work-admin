@@ -13,6 +13,7 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
+import { Select } from "@/components/ui/select";
 
 const STATUS_OPTIONS: { value: TicketStatus | ""; label: string }[] = [
   { value: "", label: "All Statuses" },
@@ -266,17 +267,16 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</label>
-            <select
-              className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
+            <Select
               value={status}
-              onChange={(e) => handleStatusChange(e.target.value as TicketStatus | "")}
+              onChange={(value) => handleStatusChange(value as TicketStatus | "")}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="flex min-w-0 flex-col gap-1.5 xl:col-span-2">
             <label htmlFor="ticket-date-range" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Date Created</label>
@@ -291,10 +291,9 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</label>
-            <select
-              className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
+            <Select
               value={assignedFilter}
-              onChange={(e) => handleAssignedChange(e.target.value)}
+              onChange={(value) => handleAssignedChange(value)}
             >
               <option value="">Everyone</option>
               <option value="me">Assigned to me</option>
@@ -303,7 +302,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
                   {[member.first_name, member.last_name].filter(Boolean).join(" ") || member.username}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="flex items-end gap-2">
             <button

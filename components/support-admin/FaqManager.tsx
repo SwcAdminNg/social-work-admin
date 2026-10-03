@@ -23,6 +23,7 @@ import {
 import { Modal } from "@/components/generic/ui/Modal";
 import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { Select } from "@/components/ui/select";
 
 interface FaqManagerProps {
   initialCategories: FaqCategory[];
@@ -170,10 +171,9 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Audience
                 </span>
-                <select
+                <Select
                   value={selectedAudience}
-                  onChange={(e) => setSelectedAudience(e.target.value as FaqAudience | "all")}
-                  className="px-3 py-2 text-sm bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-900 dark:text-white"
+                  onChange={(value) => setSelectedAudience(value as FaqAudience | "all")}
                 >
                   <option value="all">All Audiences</option>
                   {AUDIENCE_OPTIONS.map((opt) => (
@@ -181,16 +181,15 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                       {opt.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Visibility
                 </span>
-                <select
+                <Select
                   value={selectedVisibility}
-                  onChange={(e) => setSelectedVisibility(e.target.value as FaqVisibility | "all")}
-                  className="px-3 py-2 text-sm bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-900 dark:text-white"
+                  onChange={(value) => setSelectedVisibility(value as FaqVisibility | "all")}
                 >
                   <option value="all">All Visibility</option>
                   {VISIBILITY_OPTIONS.map((opt) => (
@@ -198,7 +197,7 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                       {opt.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
             <button
@@ -580,37 +579,36 @@ function ItemModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className={labelClass}>Category</label>
-              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className={inputClass}>
+              <Select value={categoryId} onChange={(value) => setCategoryId(value)}>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <label className={labelClass}>Audience</label>
-              <select value={audience} onChange={(e) => setAudience(e.target.value as FaqAudience)} className={inputClass}>
+              <Select value={audience} onChange={(value) => setAudience(value as FaqAudience)}>
                 {AUDIENCE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <label className={labelClass}>Visibility</label>
-              <select
+              <Select
                 value={visibility}
-                onChange={(e) => setVisibility(e.target.value as FaqVisibility)}
-                className={inputClass}
+                onChange={(value) => setVisibility(value as FaqVisibility)}
               >
                 {VISIBILITY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 

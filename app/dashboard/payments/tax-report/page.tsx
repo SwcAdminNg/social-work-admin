@@ -10,6 +10,7 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconReceipt } from "@/components/dashboard/icons";
 import Link from "next/link";
+import { Avatar } from "@/components/ui/primitives";
 import { DateRangePicker, formatValue, type DateRangeValue } from "@/components/ui/date-picker";
 
 const todayValue = () => formatValue(new Date(), "date");
@@ -74,14 +75,27 @@ export default function TaxReportPage() {
     {
       key: "user",
       header: "User",
-      render: (txn) => (
-        <Link
-          href={`/dashboard/user-management/${txn.user_id}`}
-          className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline"
-        >
-          {txn.user_id}
-        </Link>
-      ),
+      render: (txn) =>
+        txn.user_name ? (
+          <Link
+            href={`/dashboard/user-management/${txn.user_id}`}
+            className="group flex min-w-0 items-center gap-2.5 no-underline"
+          >
+            <Avatar name={txn.user_name} size="sm" />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-semibold text-slate-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-300">
+                {txn.user_name}
+              </span>
+              {txn.user_email && (
+                <span className="block truncate text-xs text-slate-500 dark:text-slate-400">{txn.user_email}</span>
+              )}
+            </span>
+          </Link>
+        ) : (
+          <span className="text-sm italic text-slate-400" title={txn.user_id}>
+            Deleted account
+          </span>
+        ),
     },
     {
       key: "type",

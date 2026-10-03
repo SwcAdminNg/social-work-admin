@@ -9,6 +9,7 @@ import type { CertificateTemplate } from "@/lib/api/certificates.types";
 import { IconClock, IconSpinner } from "@/components/dashboard/icons";
 import { ToggleField } from "./FormControls";
 import type { AccessMode } from "@/lib/api/courses.types";
+import { Select } from "@/components/ui/select";
 
 function templateStorageKey(courseId: string): string {
   return `certificate-template:${courseId}`;
@@ -189,10 +190,9 @@ export function CourseCertificateTab({
               to assign it here.
             </p>
           ) : (
-            <select
+            <Select
               value={templateId}
-              onChange={(e) => setTemplateId(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+              onChange={(value) => setTemplateId(value)}
             >
               <option value="">Use global default</option>
               {templates.map((t) => (
@@ -201,7 +201,7 @@ export function CourseCertificateTab({
                   {t.is_global ? " (global)" : ""}
                 </option>
               ))}
-            </select>
+            </Select>
           )}
 
           <button

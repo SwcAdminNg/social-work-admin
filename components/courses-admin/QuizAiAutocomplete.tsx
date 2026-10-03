@@ -20,6 +20,7 @@ import type {
 } from "@/lib/api/courses.types";
 import { IconPlus, IconSparkles, IconSpinner, IconUpload } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
+import { Select } from "@/components/ui/select";
 
 const ACCEPTED_FILE_TYPES = [
   "application/pdf",
@@ -263,33 +264,31 @@ export function QuizAiAutocomplete({
           <div className="grid grid-cols-2 gap-2 sm:w-64">
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Provider
-              <select
+              <Select
                 value={provider}
-                onChange={(event) => {
-                  const newProvider = event.target.value as "GEMINI" | "OPENAI" | "DEEPSEEK";
+                onChange={(value) => {
+                  const newProvider = value as "GEMINI" | "OPENAI" | "DEEPSEEK";
                   setProvider(newProvider);
                   setModel(PROVIDER_MODELS[newProvider][0].id);
                 }}
-                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               >
                 <option value="DEEPSEEK">DeepSeek</option>
                 <option value="OPENAI">OpenAI</option>
                 <option value="GEMINI">Gemini</option>
-              </select>
+              </Select>
             </label>
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Model
-              <select
+              <Select
                 value={model}
-                onChange={(event) => setModel(event.target.value)}
-                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+                onChange={(value) => setModel(value)}
               >
                 {PROVIDER_MODELS[provider].map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
 

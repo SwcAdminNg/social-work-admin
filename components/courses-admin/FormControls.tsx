@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "@/components/ui/select";
+
 function FieldWrapper({
   label,
   htmlFor,
@@ -114,20 +116,19 @@ export function SelectField<T extends string>({
 }) {
   return (
     <FieldWrapper label={label} htmlFor={id} hint={hint} required={required}>
-      <select
+      <Select
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value as T)}
+        onChange={(value) => onChange(value as T)}
         required={required}
         disabled={disabled}
-        className={inputClass}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
         ))}
-      </select>
+      </Select>
     </FieldWrapper>
   );
 }

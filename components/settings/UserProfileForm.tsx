@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, updateCurrentUser } from "@/lib/api/users";
 import { UserUpdateDTO, User } from "@/lib/api/users.types";
+import { Select } from "@/components/ui/select";
 
 export function UserProfileForm() {
   const queryClient = useQueryClient();
@@ -200,17 +201,16 @@ export function UserProfileForm() {
             >
               Gender
             </label>
-            <select
+            <Select
               id="gender"
               name="gender"
               value={formData.gender}
-              onChange={handleChange}
-              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 appearance-none"
+              onChange={(value) => setFormData((prev) => ({ ...prev, gender: value as UserUpdateDTO["gender"] }))}
             >
               <option value="MALE">Male</option>
               <option value="FEMALE">Female</option>
               <option value="OTHER">Other</option>
-            </select>
+            </Select>
           </div>
 
           <div className="space-y-2">

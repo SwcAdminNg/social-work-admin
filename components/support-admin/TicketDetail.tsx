@@ -32,6 +32,7 @@ import {
 } from "@/components/dashboard/icons";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconLifeBuoy } from "@/components/dashboard/icons";
+import { Select } from "@/components/ui/select";
 
 const STATUS_OPTIONS: TicketStatus[] = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
 // The WebSocket keeps this live — these are just a safety net for whenever it's down
@@ -281,11 +282,13 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
             <div className="flex flex-col gap-1">
               <label className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Assign</label>
               {isAdmin ? (
-                <select
+                <Select
+                  size="sm"
+                  className="w-52"
+                  aria-label="Assign ticket"
                   value={ticket.assigned_admin_id ?? ""}
-                  onChange={(e) => e.target.value && assignMutation.mutate(e.target.value)}
+                  onChange={(value) => value && assignMutation.mutate(value)}
                   disabled={assignMutation.isPending}
-                  className="px-3 py-1.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 >
                   <option value="" disabled>
                     Unassigned
@@ -295,7 +298,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                       {[member.first_name, member.last_name].filter(Boolean).join(" ") || member.username}
                     </option>
                   ))}
-                </select>
+                </Select>
               ) : ticket.assigned_admin_id === currentUserId ? (
                 <span className="px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400">Assigned to you</span>
               ) : (
@@ -311,18 +314,20 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Status</label>
-              <select
+              <Select
+                size="sm"
+                className="w-40"
+                aria-label="Ticket status"
                 value={ticket.status}
-                onChange={(e) => statusMutation.mutate(e.target.value as TicketStatus)}
+                onChange={(value) => statusMutation.mutate(value as TicketStatus)}
                 disabled={statusMutation.isPending}
-                className="px-3 py-1.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
                     {s.replace("_", " ")}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
         </div>

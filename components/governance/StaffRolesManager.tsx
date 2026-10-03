@@ -23,6 +23,7 @@ import {
 } from "./GovernanceUtils";
 import { GrantRoleDrawer, type GrantPreset } from "./GrantRoleDrawer";
 import { CourseSearchSelect, type SelectedCourse } from "./SearchSelects";
+import { Select } from "@/components/ui/select";
 
 const PAGE_SIZE = 20;
 const EXPIRING_SOON_DAYS = 14;
@@ -126,17 +127,16 @@ export function StaffRolesManager() {
               />
             </div>
             <div className="lg:w-52 lg:shrink-0">
-              <select
+              <Select
                 value={role}
-                onChange={(e) => resetPage(setRole)(e.target.value as GovernanceRole | "")}
-                className="input"
+                onChange={(value) => resetPage(setRole)(value as GovernanceRole | "")}
                 aria-label="Filter by role"
               >
                 <option value="">All roles</option>
                 {roleOptions.map((r) => (
                   <option key={r} value={r}>{humanize(r)}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="lg:w-64 lg:shrink-0">
               <CourseSearchSelect value={course} onChange={resetPage(setCourse)} placeholder="Any course" />

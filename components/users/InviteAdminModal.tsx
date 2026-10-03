@@ -6,6 +6,7 @@ import { inviteAdmin } from "@/lib/api/users";
 import { getUsernameSuggestions, checkUsernameAvailability } from "@/lib/api/auth";
 import { InviteAdminRequestDTO } from "@/lib/api/users.types";
 import { Modal } from "@/components/generic/ui/Modal";
+import { Select } from "@/components/ui/select";
 
 interface InviteAdminModalProps {
   isOpen: boolean;
@@ -243,16 +244,15 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
               <label htmlFor="platform" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Platform
               </label>
-              <select
+              <Select
                 id="platform"
                 name="platform"
                 value={formData.platform}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+                onChange={(value) => setFormData((prev) => ({ ...prev, platform: value as InviteAdminRequestDTO["platform"] }))}
               >
                 <option value="NG">NG</option>
                 <option value="COM">COM</option>
-              </select>
+              </Select>
             </div>
           </div>
 

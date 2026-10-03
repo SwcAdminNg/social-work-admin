@@ -87,6 +87,9 @@ export interface PaginatedResponse<T> {
 export interface TaxReportTransaction {
   reference: string;
   user_id: string;
+  /** Purchaser's full name; null if the account no longer exists. */
+  user_name?: string | null;
+  user_email?: string | null;
   transaction_type: TransactionType;
   subtotal_amount: number;
   discount_amount: number;

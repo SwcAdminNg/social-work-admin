@@ -10,6 +10,7 @@ import type { CourseEditorAction } from "./courseEditorReducer";
 import { TextAreaField } from "./FormControls";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
+import { Select } from "@/components/ui/select";
 
 export function EssayBuilder({
   item,
@@ -101,14 +102,13 @@ export function EssayBuilder({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Submission Mode</label>
-            <select
+            <Select
               value={submissionMode}
-              onChange={(e) => setSubmissionMode(e.target.value as "TEXT" | "DOCUMENT")}
-              className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+              onChange={(value) => setSubmissionMode(value as "TEXT" | "DOCUMENT")}
             >
               <option value="TEXT">Text Field</option>
               <option value="DOCUMENT">File Upload (PDF, Word, etc.)</option>
-            </select>
+            </Select>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -409,14 +409,15 @@ function EssaySubmissionRow({
             />
             Submit for moderation
           </label>
-          <select
+          <Select
+            size="sm"
+            className="w-44"
             value={recommendation}
-            onChange={(e) => setRecommendation(e.target.value as "PASS" | "FAIL")}
-            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-xs text-slate-900 dark:text-white"
+            onChange={(value) => setRecommendation(value as "PASS" | "FAIL")}
           >
             <option value="PASS">Recommend pass</option>
             <option value="FAIL">Recommend fail</option>
-          </select>
+          </Select>
           {submission.current_mark_id && (
             <a
               href={`/dashboard/approval-centre/marks/${submission.current_mark_id}`}

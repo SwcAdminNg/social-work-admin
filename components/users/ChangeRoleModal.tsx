@@ -6,6 +6,7 @@ import { changeUserRole } from "@/lib/api/users";
 import { User } from "@/lib/api/users.types";
 import { Modal } from "@/components/generic/ui/Modal";
 import { toast } from "sonner";
+import { Select } from "@/components/ui/select";
 
 interface ChangeRoleModalProps {
   isOpen: boolean;
@@ -60,18 +61,17 @@ export function ChangeRoleModal({ isOpen, onClose, user }: ChangeRoleModalProps)
           <label htmlFor="role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Role for {user.first_name} {user.last_name}
           </label>
-          <select
+          <Select
             id="role"
             value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as User["user_type"])}
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+            onChange={(value) => setSelectedRole(value as User["user_type"])}
           >
             {ROLES.map((role) => (
               <option key={role} value={role}>
                 {role}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="mt-4 flex justify-end gap-3">

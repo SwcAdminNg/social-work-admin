@@ -1,9 +1,10 @@
 "use client";
 
-import { forwardRef, useId } from "react";
+import { forwardRef } from "react";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { CalendarDays, Clock, X, type LucideIcon } from "lucide-react";
 import { Button, Segmented, cn } from "../primitives";
+import { Select } from "../select";
 
 /* ───────────── Responsive dialog shell ───────────── */
 
@@ -161,9 +162,6 @@ export const PickerTrigger = forwardRef<HTMLButtonElement, TriggerProps>(functio
 
 export type TimeValue = { hours: number; minutes: number };
 
-const SELECT =
-  "h-10 min-w-0 flex-1 cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white bg-[url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")] bg-[length:1.1rem] bg-[right_0.4rem_center] bg-no-repeat pl-3 pr-7 text-sm tabular-nums text-slate-900 shadow-[0_1px_2px_rgba(16,24,40,0.04)] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 dark:border-ink-line dark:bg-ink-page/60 dark:text-white";
-
 /** 12-hour time entry: hour + minute selects and an AM/PM toggle. Fits ~260px. */
 export function TimeField({
   label,
@@ -176,7 +174,6 @@ export function TimeField({
   onChange: (value: TimeValue) => void;
   disabled?: boolean;
 }) {
-  const id = useId();
   const pm = value.hours >= 12;
   const hour12 = value.hours % 12 === 0 ? 12 : value.hours % 12;
   // 5-minute steps, plus the current minute if it's off-step (e.g. loaded from the API).
@@ -192,32 +189,25 @@ export function TimeField({
         {label}
       </legend>
       <div className="flex min-w-0 items-center gap-2">
-        <label htmlFor={`${id}-h`} className="sr-only">
-          Hour
-        </label>
-        <select id={`${id}-h`} value={hour12} onChange={(e) => setHour12(Number(e.target.value))} className={SELECT}>
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
-            <option key={h} value={h}>
-              {h}
-            </option>
-          ))}
-        </select>
+        <Select
+          size="md"
+          searchable={false}
+          aria-label={`${label} hour`}
+          value={String(hour12)}
+          onChange={(v) => setHour12(Number(v))}
+          options={Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
+          className="min-w-0 flex-1"
+        />
         <span className="font-bold text-slate-400">:</span>
-        <label htmlFor={`${id}-m`} className="sr-only">
-          Minute
-        </label>
-        <select
-          id={`${id}-m`}
-          value={value.minutes}
-          onChange={(e) => onChange({ ...value, minutes: Number(e.target.value) })}
-          className={SELECT}
-        >
-          {minuteOptions.map((m) => (
-            <option key={m} value={m}>
-              {String(m).padStart(2, "0")}
-            </option>
-          ))}
-        </select>
+        <Select
+          size="md"
+          searchable={false}
+          aria-label={`${label} minute`}
+          value={String(value.minutes)}
+          onChange={(v) => onChange({ ...value, minutes: Number(v) })}
+          options={minuteOptions.map((m) => ({ value: String(m), label: String(m).padStart(2, "0") }))}
+          className="min-w-0 flex-1"
+        />
         <Segmented
           size="sm"
           className="flex-shrink-0"

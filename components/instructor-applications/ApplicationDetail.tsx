@@ -23,6 +23,7 @@ import {
   IconUserPlus,
   IconMail,
 } from "@/components/dashboard/icons";
+import { Select } from "@/components/ui/select";
 
 function applicantName(app: InstructorApplicationDetailType): string {
   const name = [app.first_name, app.last_name].filter(Boolean).join(" ");
@@ -70,15 +71,14 @@ function ApproveModal({
           <label htmlFor="approve-platform" className="text-sm font-medium text-slate-700 dark:text-slate-300">
             Platform
           </label>
-          <select
+          <Select
             id="approve-platform"
             value={platform}
-            onChange={(e) => setPlatform(e.target.value as "NG" | "COM")}
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
+            onChange={(value) => setPlatform(value as "NG" | "COM")}
           >
             <option value="NG">NG</option>
             <option value="COM">COM</option>
-          </select>
+          </Select>
           <p className="text-xs text-slate-400">Determines which storefront&apos;s instructor account is created.</p>
         </div>
         <div className="flex justify-end gap-3">

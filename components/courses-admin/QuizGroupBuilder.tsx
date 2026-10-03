@@ -23,6 +23,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
 import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
+import { Select } from "@/components/ui/select";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -584,14 +585,15 @@ function QuizGroupSectionPanel({
                   Allow multiple correct answers
                 </label>
                 {allowMultiple && (
-                  <select
+                  <Select
+                    size="sm"
+                    className="w-56"
                     value={multiAnswerMode}
-                    onChange={(e) => setMultiAnswerMode(e.target.value as "AND" | "OR")}
-                    className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1 text-sm text-slate-900 dark:text-white focus:outline-none"
+                    onChange={(value) => setMultiAnswerMode(value as "AND" | "OR")}
                   >
                     <option value="OR">Partial Credit (OR)</option>
                     <option value="AND">All-or-Nothing (AND)</option>
-                  </select>
+                  </Select>
                 )}
               </div>
 

@@ -16,6 +16,7 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
+import { Select } from "@/components/ui/select";
 
 interface ContactMessagesListProps {
   initialData: PaginatedResult<ContactMessage>;
@@ -153,29 +154,27 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Platform</label>
-              <select
-                className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
+              <Select
                 value={filters.platform}
-                onChange={(e) => handleFilterChange("platform", e.target.value)}
+                onChange={(value) => handleFilterChange("platform", value)}
               >
                 <option value="">All Platforms</option>
                 <option value="NG">NG</option>
                 <option value="COM">COM</option>
-              </select>
+              </Select>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Category</label>
-              <select
-                className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
+              <Select
                 value={filters.category}
-                onChange={(e) => handleFilterChange("category", e.target.value)}
+                onChange={(value) => handleFilterChange("category", value)}
               >
                 <option value="">All Categories</option>
                 <option value="general">General</option>
                 <option value="mentorship">Mentorship</option>
                 <option value="pricing">Pricing</option>
                 <option value="courses">Courses</option>
-              </select>
+              </Select>
             </div>
             <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
               <label htmlFor="contact-date-range" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Date Received</label>

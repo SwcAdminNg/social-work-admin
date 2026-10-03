@@ -14,6 +14,7 @@ import type { CourseQuizQuestion } from "@/lib/api/courses.types";
 import { IconCopy, IconPlus, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { Select } from "@/components/ui/select";
 
 export function QuizQuestionCard({
   question,
@@ -180,14 +181,15 @@ export function QuizQuestionCard({
           Allow multiple correct answers
         </label>
         {question.allow_multiple_answers && (
-          <select
+          <Select
+            size="sm"
+            className="w-56"
             value={question.multi_answer_mode || "OR"}
-            onChange={(e) => updateMultiAnswerMode(e.target.value as "AND" | "OR")}
-            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-600 dark:focus:ring-brand-400"
+            onChange={(value) => updateMultiAnswerMode(value as "AND" | "OR")}
           >
             <option value="OR">Partial Credit (OR)</option>
             <option value="AND">All-or-Nothing (AND)</option>
-          </select>
+          </Select>
         )}
       </div>
 

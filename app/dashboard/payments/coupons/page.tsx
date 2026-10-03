@@ -18,6 +18,7 @@ import { EmptyState } from "@/components/dashboard/EmptyState";
 import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import * as Dialog from "@radix-ui/react-dialog";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Select } from "@/components/ui/select";
 
 const inputClass =
   "rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-page px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none disabled:opacity-50";
@@ -434,16 +435,15 @@ export default function CouponsPage() {
               <div className="flex gap-4">
                 <div className="flex flex-col gap-1.5 flex-1">
                   <label className={labelClass}>Discount Type</label>
-                  <select
+                  <Select
                     value={form.discount_type}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, discount_type: e.target.value as FormState["discount_type"] }))
+                    onChange={(value) =>
+                      setForm((f) => ({ ...f, discount_type: value as FormState["discount_type"] }))
                     }
-                    className={inputClass}
                   >
                     <option value="PERCENTAGE">Percentage</option>
                     <option value="FIXED_AMOUNT">Fixed Amount</option>
-                  </select>
+                  </Select>
                 </div>
                 <div className="flex flex-col gap-1.5 flex-1">
                   <label className={labelClass}>
@@ -548,10 +548,9 @@ export default function CouponsPage() {
 
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Applicable Category (optional)</label>
-                <select
+                <Select
                   value={form.applicable_category}
-                  onChange={(e) => setForm((f) => ({ ...f, applicable_category: e.target.value }))}
-                  className={inputClass}
+                  onChange={(value) => setForm((f) => ({ ...f, applicable_category: value }))}
                 >
                   <option value="">All categories</option>
                   {CATEGORY_OPTIONS.map((opt) => (
@@ -559,7 +558,7 @@ export default function CouponsPage() {
                       {opt.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="flex flex-col gap-1.5">
