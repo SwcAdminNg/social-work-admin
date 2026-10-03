@@ -99,9 +99,29 @@ export interface StaffRoleAssignment {
   expires_at?: string | null;
   revoked_at?: string | null;
   revoked_reason?: string | null;
+  revoke_reason?: string | null;
+  granted_by_user?: PersonRef | null;
   created_at?: string | null;
   granted_at?: string | null;
   implicit?: boolean;
+}
+
+export type StaffRoleStatus = "ACTIVE" | "REVOKED" | "ALL";
+
+/** One person with every grant they hold (GET /admin/staff-roles/members). */
+export interface StaffMemberRoles {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+    user_type: string;
+    profile_picture_url?: string | null;
+  };
+  roles: StaffRoleAssignment[];
+  active_role_count: number;
+  platform_role_count: number;
+  course_count: number;
 }
 
 export interface PermissionSummary {

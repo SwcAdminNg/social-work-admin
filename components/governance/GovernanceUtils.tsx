@@ -55,14 +55,19 @@ export function initialsOf(name?: string | null): string {
   return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase() || "?";
 }
 
-export function Avatar({ name, size = "md" }: { name?: string | null; size?: "sm" | "md" }) {
+export function Avatar({ name, src, size = "md" }: { name?: string | null; src?: string | null; size?: "sm" | "md" }) {
   const sizes = size === "sm" ? "h-6 w-6 text-[0.6rem]" : "h-9 w-9 text-xs";
   return (
     <span
-      className={`${sizes} inline-flex shrink-0 items-center justify-center rounded-full bg-[#2D6A4F]/10 font-bold text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]`}
+      className={`${sizes} inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2D6A4F]/10 font-bold text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]`}
       aria-hidden="true"
     >
-      {initialsOf(name)}
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt="" className="h-full w-full object-cover" />
+      ) : (
+        initialsOf(name)
+      )}
     </span>
   );
 }

@@ -17,7 +17,9 @@ import type {
   RevisionEvidence,
   RevisionTree,
   RiskLevel,
+  StaffMemberRoles,
   StaffRoleAssignment,
+  StaffRoleStatus,
 } from "./governance.types";
 
 type RequestOptions = {
@@ -97,6 +99,19 @@ export async function listStaffRoles(params: {
 } = {}): Promise<PaginatedResult<StaffRoleAssignment>> {
   const query = { page: 1, page_size: 50, ...params };
   const res = await request<StaffRoleAssignment[]>(`/api/admin/staff-roles${buildQuery(query)}`);
+  return toPaginated(res, query.page, query.page_size);
+}
+
+export async function listStaffMembers(params: {
+  search?: string;
+  role?: GovernanceRole | "";
+  course_id?: string;
+  status?: StaffRoleStatus;
+  page?: number;
+  page_size?: number;
+} = {}): Promise<PaginatedResult<StaffMemberRoles>> {
+  const query = { page: 1, page_size: 20, ...params };
+  const res = await request<StaffMemberRoles[]>(`/api/admin/staff-roles/members${buildQuery(query)}`);
   return toPaginated(res, query.page, query.page_size);
 }
 
