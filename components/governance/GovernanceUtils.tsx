@@ -50,7 +50,7 @@ export function daysUntil(value?: string | null): number | null {
 }
 
 export function initialsOf(name?: string | null): string {
-  if (!name) return "?";
+  if (!name || typeof name !== "string") return "?";
   const parts = name.trim().split(/\s+/);
   return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase() || "?";
 }
@@ -86,7 +86,7 @@ export function SkeletonRows({ rows = 5 }: { rows?: number }) {
 
 export function humanize(value?: string | null): string {
   if (!value) return "-";
-  return value
+  return String(value)
     .toLowerCase()
     .split("_")
     .map((part) => (part === "qa" ? "QA" : part.charAt(0).toUpperCase() + part.slice(1)))

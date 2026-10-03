@@ -55,6 +55,31 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   return payload as ApiEnvelope<T>;
 }
 
+/**
+ * Normalise a list response. Some governance endpoints return no `meta` (or wrap the list),
+ * so never trust `res.meta` / `res.data` to be present — callers read `meta.total_pages`.
+ */
+function toPaginated<T>(res: ApiEnvelope<T[]> | null, page: number, pageSize: number): PaginatedResult<T> {
+  const raw = res?.data as unknown;
+  const items: T[] = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === "object" && Array.isArray((raw as { items?: unknown }).items)
+      ? (raw as { items: T[] }).items
+      : [];
+  const meta = res?.meta;
+  return {
+    items,
+    meta: {
+      page: meta?.page ?? page,
+      page_size: meta?.page_size ?? pageSize,
+      total_items: meta?.total_items ?? items.length,
+      total_pages: meta?.total_pages ?? 1,
+      has_next: meta?.has_next ?? false,
+      has_previous: meta?.has_previous ?? page > 1,
+    },
+  };
+}
+
 export async function getMyGovernancePermissions(courseId?: string): Promise<PermissionSummary> {
   const res = await request<PermissionSummary>(
     `/api/governance/me/permissions${buildQuery({ course_id: courseId })}`,
@@ -70,10 +95,9 @@ export async function listStaffRoles(params: {
   page?: number;
   page_size?: number;
 } = {}): Promise<PaginatedResult<StaffRoleAssignment>> {
-  const res = await request<StaffRoleAssignment[]>(
-    `/api/admin/staff-roles${buildQuery({ page: 1, page_size: 50, ...params })}`,
-  );
-  return { items: res.data ?? [], meta: res.meta! };
+  const query = { page: 1, page_size: 50, ...params };
+  const res = await request<StaffRoleAssignment[]>(`/api/admin/staff-roles${buildQuery(query)}`);
+  return toPaginated(res, query.page, query.page_size);
 }
 
 export async function grantStaffRole(payload: {
@@ -110,10 +134,9 @@ export async function listApprovalCentre(params: {
   page?: number;
   page_size?: number;
 }): Promise<PaginatedResult<ApprovalCentreRow>> {
-  const res = await request<ApprovalCentreRow[]>(
-    `/api/governance/approval-centre${buildQuery({ page: 1, page_size: 20, ...params })}`,
-  );
-  return { items: res.data ?? [], meta: res.meta! };
+  const query = { page: 1, page_size: 20, ...params };
+  const res = await request<ApprovalCentreRow[]>(`/api/governance/approval-centre${buildQuery(query)}`);
+  return toPaginated(res, query.page, query.page_size);
 }
 
 export async function getRevision(id: string): Promise<GovernanceRevision> {

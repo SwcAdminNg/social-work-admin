@@ -67,8 +67,7 @@ export function StaffRolesManager() {
     if (term) {
       rows = rows.filter((item) =>
         [item.user?.name, item.user?.email, item.course?.title, humanize(item.role)]
-          .filter(Boolean)
-          .some((value) => value!.toLowerCase().includes(term)),
+          .some((value) => typeof value === "string" && value.toLowerCase().includes(term)),
       );
     }
     return rows;
