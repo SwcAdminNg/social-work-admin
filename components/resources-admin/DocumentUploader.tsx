@@ -59,10 +59,10 @@ export function DocumentUploader({
 
   if (doc?.is_uploaded) {
     return (
-      <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-        <span className="font-semibold text-gray-800 dark:text-gray-200">{doc.file_name}</span>
+      <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
+        <span className="font-semibold text-slate-800 dark:text-slate-200">{doc.file_name}</span>
         {doc.file_size_bytes != null && <span>{formatBytes(doc.file_size_bytes)}</span>}
-        <span className="text-[#2D6A4F] dark:text-[#52b788] font-semibold">Uploaded</span>
+        <span className="text-brand-600 dark:text-brand-400 font-semibold">Uploaded</span>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function DocumentUploader({
         type="button"
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
       >
         {uploading ? <IconSpinner /> : <IconUpload />}
         {uploading ? "Uploading…" : `Upload ${doc?.file_name ?? "file"}`}

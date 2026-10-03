@@ -99,21 +99,21 @@ export function ApplicationQueueList({ initialData }: ApplicationQueueListProps)
       hideInCard: true,
       render: (a) => (
         <div className="flex flex-col min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[220px]">{applicantName(a)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">{a.email}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-[220px]">{applicantName(a)}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px]">{a.email}</p>
         </div>
       ),
     },
     {
       key: "phone",
       header: "Phone",
-      render: (a) => <span className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">{a.phone_number || "—"}</span>,
+      render: (a) => <span className="text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">{a.phone_number || "—"}</span>,
     },
     {
       key: "cv",
       header: "CV",
       render: (a) => (
-        <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
           <IconDocument />
           {a.cv_file_name}
         </span>
@@ -128,7 +128,7 @@ export function ApplicationQueueList({ initialData }: ApplicationQueueListProps)
       key: "applied",
       header: "Applied",
       render: (a) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap" suppressHydrationWarning>
+        <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" suppressHydrationWarning>
           {formatRelativeTime(a.created_at)}
         </span>
       ),
@@ -137,11 +137,11 @@ export function ApplicationQueueList({ initialData }: ApplicationQueueListProps)
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col sm:flex-row sm:items-end gap-4">
+      <div className="bg-white dark:bg-ink-surface p-4 border border-slate-200 dark:border-ink-line rounded-2xl flex flex-col sm:flex-row sm:items-end gap-4">
         <div className="flex flex-col gap-1.5 sm:w-56">
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</label>
+          <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</label>
           <select
-            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
             value={status}
             onChange={(e) => handleStatusChange(e.target.value as InstructorApplicationStatus | "")}
           >
@@ -156,7 +156,7 @@ export function ApplicationQueueList({ initialData }: ApplicationQueueListProps)
           type="button"
           onClick={() => fetchPage(data.meta.page)}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
         >
           <IconRefresh className={loading ? "animate-spin" : ""} />
           Refresh
@@ -172,15 +172,15 @@ export function ApplicationQueueList({ initialData }: ApplicationQueueListProps)
           skeletonRows={5}
           cardTitle={(a) => (
             <div className="flex flex-col min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{applicantName(a)}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{a.email}</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{applicantName(a)}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{a.email}</p>
             </div>
           )}
           actions={(a) => (
             <button
               type="button"
               onClick={() => router.push(`/dashboard/instructor-applications/${a.id}`)}
-              className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors cursor-pointer"
             >
               Review
             </button>

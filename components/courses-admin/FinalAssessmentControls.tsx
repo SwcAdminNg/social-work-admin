@@ -15,11 +15,11 @@ export function FinalAssessmentToggle({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="accent-[#2D6A4F] mt-0.5"
+        className="accent-brand-600 mt-0.5"
       />
-      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
         Final assessment for this section
-        <span className="block text-[0.7rem] font-normal text-gray-400 dark:text-gray-600 mt-0.5">
+        <span className="block text-[0.7rem] font-normal text-slate-400 dark:text-slate-600 mt-0.5">
           Students must pass this before the next section unlocks. Exhausting retries without
           passing resets the section (or the whole course, if this is the last section).
         </span>

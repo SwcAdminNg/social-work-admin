@@ -10,6 +10,7 @@ import type { GovernanceRole } from "@/lib/api/governance.types";
 import { IconSpinner, IconX } from "@/components/dashboard/icons";
 import { Badge, humanize, roleDetails, roleOptions, Segmented } from "./GovernanceUtils";
 import { CourseSearchSelect, UserSearchSelect, type SelectedCourse, type SelectedUser } from "./SearchSelects";
+import { DatePicker, formatValue } from "@/components/ui/date-picker";
 
 const roleGroups = ["Authoring", "Review", "Approval"] as const;
 
@@ -40,17 +41,17 @@ export function GrantRoleDrawer({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-[2px] data-[state=open]:animate-[fadeIn_150ms_ease-out]" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-[2px] data-[state=open]:animate-[fadeIn_150ms_ease-out]" />
         <Dialog.Content
-          className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col bg-white shadow-2xl outline-none dark:bg-gray-900 data-[state=open]:animate-[slideInRight_220ms_cubic-bezier(0.16,1,0.3,1)]"
+          className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col bg-white shadow-2xl outline-none dark:bg-ink-surface data-[state=open]:animate-[slideInRight_220ms_cubic-bezier(0.16,1,0.3,1)]"
           aria-describedby={undefined}
         >
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5 dark:border-gray-800">
+          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5 dark:border-ink-line">
             <div>
-              <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-white">Grant a staff role</Dialog.Title>
-              <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Takes effect immediately.</p>
+              <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white">Grant a staff role</Dialog.Title>
+              <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Takes effect immediately.</p>
             </div>
-            <Dialog.Close className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200" aria-label="Close">
+            <Dialog.Close className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label="Close">
               <IconX size={18} />
             </Dialog.Close>
           </div>
@@ -130,7 +131,7 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
         <Step n={1} title="Who">
           <UserSearchSelect value={user} onChange={setUser} placeholder="Search by name or email" />
           {user && existingRoles.length > 0 && (
-            <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span>Already has:</span>
               {existingRoles.map((item) => (
                 <Badge key={item.assignment_id ?? item.id} tone="gray">
@@ -146,7 +147,7 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
           <div className="space-y-4">
             {roleGroups.map((group) => (
               <div key={group}>
-                <p className="mb-1.5 text-[0.7rem] font-bold uppercase tracking-wider text-gray-400">{group}</p>
+                <p className="mb-1.5 text-[0.7rem] font-bold uppercase tracking-wider text-slate-400">{group}</p>
                 <div className="grid gap-1.5" role="radiogroup" aria-label={`${group} roles`}>
                   {roleOptions
                     .filter((r) => roleDetails[r].group === group)
@@ -161,20 +162,20 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
                           onClick={() => setRole(r)}
                           className={`flex items-start gap-3 rounded-xl border px-3.5 py-2.5 text-left transition-colors ${
                             active
-                              ? "border-[#2D6A4F] bg-[#2D6A4F]/5 dark:border-[#52b788] dark:bg-[#52b788]/10"
-                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-gray-800/50"
+                              ? "border-brand-600 bg-brand-600/5 dark:border-brand-400 dark:bg-brand-400/10"
+                              : "border-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:border-ink-line dark:hover:border-slate-700 dark:hover:bg-slate-800/50"
                           }`}
                         >
                           <span
                             className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                              active ? "border-[#2D6A4F] dark:border-[#52b788]" : "border-gray-300 dark:border-gray-600"
+                              active ? "border-brand-600 dark:border-brand-400" : "border-slate-300 dark:border-slate-600"
                             }`}
                           >
-                            {active && <span className="h-1.5 w-1.5 rounded-full bg-[#2D6A4F] dark:bg-[#52b788]" />}
+                            {active && <span className="h-1.5 w-1.5 rounded-full bg-brand-600 dark:bg-brand-400" />}
                           </span>
                           <span>
-                            <span className="block text-sm font-semibold text-gray-900 dark:text-white">{humanize(r)}</span>
-                            <span className="block text-xs text-gray-500 dark:text-gray-400">{roleDetails[r].description}</span>
+                            <span className="block text-sm font-semibold text-slate-900 dark:text-white">{humanize(r)}</span>
+                            <span className="block text-xs text-slate-500 dark:text-slate-400">{roleDetails[r].description}</span>
                           </span>
                         </button>
                       );
@@ -210,20 +211,24 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
             ))}
           </div>
           {expiry === "custom" && (
-            <input
-              type="datetime-local"
-              value={customExpiry}
-              min={new Date().toISOString().slice(0, 16)}
-              onChange={(e) => setCustomExpiry(e.target.value)}
-              className="input mt-2.5"
-              aria-label="Custom expiry date"
-            />
+            <div className="mt-2.5">
+              <DatePicker
+                mode="datetime"
+                title="Role expires on"
+                presets="future"
+                min={formatValue(new Date(), "datetime")}
+                value={customExpiry}
+                onChange={setCustomExpiry}
+                aria-label="Custom expiry date"
+                placeholder="Choose an expiry date"
+              />
+            </div>
           )}
         </Step>
 
         <div>
-          <label htmlFor="grant-reason" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Note <span className="font-normal text-gray-400">(optional)</span>
+          <label htmlFor="grant-reason" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Note <span className="font-normal text-slate-400">(optional)</span>
           </label>
           <textarea
             id="grant-reason"
@@ -236,28 +241,28 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
         </div>
       </div>
 
-      <div className="border-t border-gray-200 bg-gray-50/60 px-6 py-4 dark:border-gray-800 dark:bg-gray-950/40">
-        <p className="mb-3 text-sm text-gray-600 dark:text-gray-300">
+      <div className="border-t border-slate-200 bg-slate-50/60 px-6 py-4 dark:border-ink-line dark:bg-ink-page/40">
+        <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">
           {user ? (
             <>
-              <strong className="text-gray-900 dark:text-white">{user.name}</strong> becomes{" "}
-              <strong className="text-gray-900 dark:text-white">{humanize(role)}</strong>{" "}
+              <strong className="text-slate-900 dark:text-white">{user.name}</strong> becomes{" "}
+              <strong className="text-slate-900 dark:text-white">{humanize(role)}</strong>{" "}
               {scope === "course" ? (course ? <>on {course.title}</> : "on a course") : "platform-wide"}
               {expiry === "never" ? "." : `, ${expiry === "custom" ? "until the chosen date" : `for ${expiryPresets.find((p) => p.key === expiry)?.label}`}.`}
             </>
           ) : (
-            <span className="text-gray-400">Choose a person to continue.</span>
+            <span className="text-slate-400">Choose a person to continue.</span>
           )}
         </p>
         <div className="flex items-center justify-end gap-2">
-          <Dialog.Close className="rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+          <Dialog.Close className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
             Cancel
           </Dialog.Close>
           <button
             type="submit"
             disabled={!!missing || grant.isPending}
             title={missing ?? undefined}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#2D6A4F] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#1e4d38] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {grant.isPending && <IconSpinner />}
             {duplicate ? "Already granted" : "Grant role"}
@@ -271,8 +276,8 @@ function GrantRoleForm({ preset, onDone }: { preset?: GrantPreset; onDone: () =>
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="mb-2.5 flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-[0.65rem] text-white dark:bg-white dark:text-gray-900">
+      <h3 className="font-display mb-2.5 flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[0.65rem] text-white dark:bg-white dark:text-slate-900">
           {n}
         </span>
         {title}
@@ -290,8 +295,8 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       aria-pressed={active}
       className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
         active
-          ? "border-[#2D6A4F] bg-[#2D6A4F] text-white dark:border-[#52b788] dark:bg-[#52b788] dark:text-gray-900"
-          : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          ? "border-brand-600 bg-brand-600 text-white dark:border-brand-400 dark:bg-brand-400 dark:text-slate-900"
+          : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
       }`}
     >
       {children}

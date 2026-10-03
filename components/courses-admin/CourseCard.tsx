@@ -12,8 +12,8 @@ export function CourseCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="flex flex-col rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-[#2D6A4F]/40 dark:hover:border-[#52b788]/40 hover:shadow-md transition-all duration-200">
-      <div className="h-32 bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-300 dark:text-gray-700">
+    <div className="flex flex-col rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line overflow-hidden hover:border-brand-600/40 dark:hover:border-brand-400/40 hover:shadow-md transition-all duration-200">
+      <div className="h-32 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700">
         {course.thumbnail_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={course.thumbnail_url} alt="" className="w-full h-full object-cover" />
@@ -31,17 +31,17 @@ export function CourseCard({
               </span>
             )}
           </div>
-          <span className="text-xs font-semibold text-gray-400 dark:text-gray-600">
+          <span className="text-xs font-semibold text-slate-400 dark:text-slate-600">
             {course.is_free ? "Free" : course.price != null ? `₦${course.price.toLocaleString()}` : "Paid"}
           </span>
         </div>
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug line-clamp-2">
+        <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
           {course.title}
         </h3>
         
         {/* Instructors */}
         {course.instructors && course.instructors.length > 0 && (
-          <p className="text-xs text-gray-600 dark:text-gray-400 font-medium flex items-center gap-1.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
             {course.instructors[0].name}
             {course.instructors[0].is_guest && (
               <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
@@ -49,7 +49,7 @@ export function CourseCard({
               </span>
             )}
             {course.instructors.length > 1 && (
-              <span className="text-gray-400"> +{course.instructors.length - 1}</span>
+              <span className="text-slate-400"> +{course.instructors.length - 1}</span>
             )}
           </p>
         )}
@@ -66,7 +66,7 @@ export function CourseCard({
           </div>
         )}
 
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           {categoryLabel(course.category)} &middot; {levelLabel(course.level)}
         </p>
         {(course.average_rating !== undefined && course.total_reviews !== undefined) && (
@@ -76,19 +76,19 @@ export function CourseCard({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
                   <path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 16.9l-5.9 3.3 1.3-6.5L2.5 9.2l6.6-.7L12 2.5z" />
                 </svg>
-                <span className="text-[0.65rem] font-bold text-gray-700 dark:text-gray-300">
+                <span className="text-[0.65rem] font-bold text-slate-700 dark:text-slate-300">
                   {course.average_rating.toFixed(1)}
                 </span>
-                <span className="text-[0.65rem] text-gray-400 dark:text-gray-500">
+                <span className="text-[0.65rem] text-slate-400 dark:text-slate-500">
                   ({course.total_reviews})
                 </span>
               </>
             ) : (
               <>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 dark:text-gray-600">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300 dark:text-slate-600">
                   <path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 16.9l-5.9 3.3 1.3-6.5L2.5 9.2l6.6-.7L12 2.5z" />
                 </svg>
-                <span className="text-[0.65rem] text-gray-400 dark:text-gray-500">
+                <span className="text-[0.65rem] text-slate-400 dark:text-slate-500">
                   No reviews
                 </span>
               </>
@@ -98,7 +98,7 @@ export function CourseCard({
         <div className="flex items-center gap-2 mt-auto pt-2">
           <Link
             href={`/dashboard/course-management/${course.id}`}
-            className="flex-1 text-center px-3 py-2 rounded-xl text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 no-underline transition-colors duration-150"
+            className="flex-1 text-center px-3 py-2 rounded-xl text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 no-underline transition-colors duration-150"
           >
             Manage
           </Link>
@@ -106,7 +106,7 @@ export function CourseCard({
             type="button"
             onClick={onDelete}
             aria-label={`Delete ${course.title}`}
-            className="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
           >
             <IconTrash />
           </button>

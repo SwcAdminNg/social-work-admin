@@ -1,10 +1,16 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
 
 export default function ThemeToggle() {
   const { theme, toggle } = useTheme();
+  const pathname = usePathname();
   const isDark = theme === "dark";
+
+  if (pathname.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <button
@@ -12,10 +18,10 @@ export default function ThemeToggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-300 cursor-pointer
-        bg-white dark:bg-gray-800
-        border-gray-200 dark:border-gray-700
+        bg-white dark:bg-slate-800
+        border-slate-200 dark:border-slate-700
         hover:scale-110 hover:shadow-xl
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2D6A4F]"
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
     >
       {/* Sun icon — shown in dark mode (click to go light) */}
       <svg
@@ -48,7 +54,7 @@ export default function ThemeToggle() {
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        className={`absolute transition-all duration-300 text-gray-700
+        className={`absolute transition-all duration-300 text-slate-700
           ${!isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"}`}
       >
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />

@@ -2,22 +2,25 @@ export function EmptyState({
   icon: Icon,
   title,
   description,
+  action,
 }: {
   icon: React.ComponentType;
   title: string;
   description: string;
+  action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center text-center gap-3 rounded-2xl bg-white dark:bg-gray-900 border border-dashed border-gray-300 dark:border-gray-700 p-10 sm:p-16">
-      <div className="w-14 h-14 rounded-2xl bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-14 text-center dark:border-ink-line dark:bg-white/[0.02]">
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 ring-1 ring-brand-200/60 dark:from-brand-400/15 dark:to-brand-400/5 dark:text-brand-300 dark:ring-brand-400/20 [&_svg]:h-6 [&_svg]:w-6">
         <Icon />
-      </div>
-      <h2 className="text-base font-bold text-gray-900 dark:text-white">
+      </span>
+      <h2 className="font-display text-[15px] font-bold text-slate-900 dark:text-white">
         {title}
       </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+      <p className="max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
         {description}
       </p>
+      {action && <div className="mt-2 flex flex-wrap justify-center gap-2">{action}</div>}
     </div>
   );
 }

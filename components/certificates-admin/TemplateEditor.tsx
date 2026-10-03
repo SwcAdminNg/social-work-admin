@@ -117,19 +117,19 @@ export function TemplateEditor({
       <div>
         <Link
           href="/dashboard/certificates"
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] no-underline transition-colors duration-150"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 no-underline transition-colors duration-150"
         >
           ← Back to Certificates
         </Link>
       </div>
 
-      <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#2D6A4F] to-[#1e4d38] text-white shadow-lg shadow-green-900/20">
+      <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-lg shadow-green-900/20">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-6 sm:p-8">
           <div className="min-w-0 flex-1">
             <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">
               {template.is_global ? "Global template" : "Private template"}
             </p>
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate">{template.name}</h1>
+            <h1 className="font-display text-xl sm:text-2xl font-extrabold tracking-tight truncate">{template.name}</h1>
           </div>
           {canManage && (
             <button
@@ -145,7 +145,7 @@ export function TemplateEditor({
       </div>
 
       {canManage ? (
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
           <ToggleField
             label="Template active"
             hint="Inactive templates can't be assigned to new courses and drop out of the global fallback pool."
@@ -155,19 +155,19 @@ export function TemplateEditor({
           />
         </div>
       ) : (
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">Read-only template</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">Read-only template</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Global templates can be assigned to your courses, but only their owner or an admin can edit them.
           </p>
         </div>
       )}
 
       {canManage && (
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 flex flex-col gap-4">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6 flex flex-col gap-4">
           <div>
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Logo &amp; signature</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Logo &amp; signature</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Uploads apply immediately — no separate save step needed.
             </p>
           </div>
@@ -198,8 +198,8 @@ export function TemplateEditor({
         </div>
 
         <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
-          <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">Preview</h3>
+          <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-5 flex flex-col gap-4">
+            <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Preview</h3>
             <CertificatePreview
               state={state}
               logoUrl={template.logo_url}
@@ -209,7 +209,7 @@ export function TemplateEditor({
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 {saving && <IconSpinner className="text-white/80" />}
                 {saving ? "Saving…" : "Save changes"}

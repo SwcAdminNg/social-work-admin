@@ -43,16 +43,16 @@ export function DataTable<T,>({
 
   return (
     <div className="w-full">
-      <div className="hidden sm:block rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="hidden sm:block rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-18px_rgba(16,24,40,0.18)] overflow-hidden dark:border-ink-line dark:bg-ink-surface dark:shadow-none">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-200 dark:border-gray-800">
+              <tr className="border-b border-slate-100 bg-slate-50/70 dark:border-ink-line dark:bg-white/[0.02]">
                 {columns.map((col) => (
                   <th
                     key={col.key}
                     scope="col"
-                    className={`px-4 py-3.5 text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400 ${col.headerClassName ?? ""}`}
+                    className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 ${col.headerClassName ?? ""}`}
                   >
                     {col.header}
                   </th>
@@ -64,18 +64,18 @@ export function DataTable<T,>({
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-ink-line">
               {loading
                 ? Array.from({ length: skeletonRows }).map((_, i) => (
                     <tr key={`skeleton-${i}`}>
                       {columns.map((col) => (
                         <td key={col.key} className="px-4 py-4">
-                          <div className="h-3.5 w-3/4 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                          <div className="h-3.5 w-3/4 rounded-full animate-shimmer bg-[linear-gradient(90deg,rgba(148,163,184,0.12)_0%,rgba(148,163,184,0.24)_50%,rgba(148,163,184,0.12)_100%)] bg-[length:800px_100%]" />
                         </td>
                       ))}
                       {actions && (
                         <td className="px-4 py-4">
-                          <div className="h-3.5 w-10 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse ml-auto" />
+                          <div className="h-3.5 w-10 rounded-full animate-shimmer bg-[linear-gradient(90deg,rgba(148,163,184,0.12)_0%,rgba(148,163,184,0.24)_50%,rgba(148,163,184,0.12)_100%)] bg-[length:800px_100%] ml-auto" />
                         </td>
                       )}
                     </tr>
@@ -83,12 +83,12 @@ export function DataTable<T,>({
                 : data.map((row) => (
                     <tr
                       key={keyExtractor(row)}
-                      className="transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                      className="transition-colors duration-150 hover:bg-slate-50/80 dark:hover:bg-white/[0.03]"
                     >
                       {columns.map((col) => (
                         <td
                           key={col.key}
-                          className={`px-4 py-4 align-middle text-sm text-gray-700 dark:text-gray-300 ${col.cellClassName ?? ""}`}
+                          className={`px-4 py-4 align-middle text-sm text-slate-700 dark:text-slate-300 ${col.cellClassName ?? ""}`}
                         >
                           {col.render(row)}
                         </td>
@@ -110,29 +110,29 @@ export function DataTable<T,>({
           ? Array.from({ length: skeletonRows }).map((_, i) => (
               <div
                 key={`skeleton-card-${i}`}
-                className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4"
+                className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-ink-line dark:bg-ink-surface dark:shadow-none"
               >
-                <div className="h-4 w-2/5 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse mb-3" />
-                <div className="h-3 w-3/5 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                <div className="h-4 w-2/5 rounded-full animate-shimmer bg-[linear-gradient(90deg,rgba(148,163,184,0.12)_0%,rgba(148,163,184,0.24)_50%,rgba(148,163,184,0.12)_100%)] bg-[length:800px_100%] mb-3" />
+                <div className="h-3 w-3/5 rounded-full animate-shimmer bg-[linear-gradient(90deg,rgba(148,163,184,0.12)_0%,rgba(148,163,184,0.24)_50%,rgba(148,163,184,0.12)_100%)] bg-[length:800px_100%]" />
               </div>
             ))
           : data.map((row) => (
               <div
                 key={keyExtractor(row)}
-                className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col gap-3"
+                className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-ink-line dark:bg-ink-surface dark:shadow-none flex flex-col gap-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">{cardTitle ? cardTitle(row) : null}</div>
                   {actions && <div className="flex items-center gap-1 shrink-0">{actions(row)}</div>}
                 </div>
                 {cardColumns.length > 0 && (
-                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5 pt-3 border-t border-slate-100 dark:border-ink-line">
                     {cardColumns.map((col) => (
                       <div key={col.key} className="min-w-0">
-                        <dt className="text-[0.65rem] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-600 mb-1">
+                        <dt className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
                           {col.header}
                         </dt>
-                        <dd className="text-sm text-gray-700 dark:text-gray-300 truncate">{col.render(row)}</dd>
+                        <dd className="text-sm text-slate-700 dark:text-slate-300 truncate">{col.render(row)}</dd>
                       </div>
                     ))}
                   </dl>

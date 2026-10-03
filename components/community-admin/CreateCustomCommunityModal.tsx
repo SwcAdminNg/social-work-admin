@@ -74,7 +74,7 @@ export function CreateCustomCommunityModal({
         className="flex flex-col gap-4"
       >
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <label className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Name
           </label>
           <input
@@ -84,35 +84,35 @@ export function CreateCustomCommunityModal({
             placeholder="e.g. March 2026 Cohort Leads"
             maxLength={255}
             required
-            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Description <span className="font-normal normal-case text-gray-400">(optional)</span>
+          <label className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Description <span className="font-normal normal-case text-slate-400">(optional)</span>
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-900 dark:text-white"
+            className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 resize-none text-slate-900 dark:text-white"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <label className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Add specific people
           </label>
           <UserPicker value={users} onChange={setUsers} />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <label className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Snapshot a course&apos;s enrollees
           </label>
           <CoursePicker value={courses} onChange={setCourses} multiple />
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             This copies in whoever is enrolled or instructing right now — a one-time snapshot,
             not a live sync. New enrollees won&apos;t be added automatically.
           </p>
@@ -131,14 +131,14 @@ export function CreateCustomCommunityModal({
               reset();
               onClose();
             }}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!canSubmit || createMutation.isPending}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {createMutation.isPending && <IconSpinner className="w-4 h-4" />}
             Create community

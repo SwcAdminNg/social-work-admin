@@ -96,23 +96,23 @@ export function ResourceManagementList({ initialData }: ResourceManagementListPr
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Resource Management
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Build a library of reference material — policies, templates, recordings, and links.
           </p>
         </div>
         <Link
           href="/dashboard/resource-management/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start"
         >
           <IconPlus />
           New Resource
         </Link>
       </div>
 
-      <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start">
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-ink-surface p-1 self-start">
         {tabs.map(({ key, label }) => (
           <button
             key={key}
@@ -120,8 +120,8 @@ export function ResourceManagementList({ initialData }: ResourceManagementListPr
             onClick={() => handleTabChange(key)}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-150 cursor-pointer ${
               tab === key
-                ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
             {label}

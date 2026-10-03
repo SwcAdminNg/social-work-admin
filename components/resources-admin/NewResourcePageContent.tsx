@@ -14,14 +14,14 @@ export function NewResourcePageContent() {
       <div>
         <Link
           href="/dashboard/resource-management"
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] no-underline transition-colors duration-150"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 no-underline transition-colors duration-150"
         >
           ← Back to Resource Management
         </Link>
-        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight mt-2">
+        <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-2">
           Create a new resource
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Start with the basics — you&apos;ll attach videos, documents, and links next.
         </p>
       </div>

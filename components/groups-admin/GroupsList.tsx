@@ -57,8 +57,8 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
       hideInCard: true,
       render: (g) => (
         <div className="flex flex-col">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">{g.name}</span>
-          {g.description && <span className="text-xs text-gray-500 dark:text-gray-400">{g.description}</span>}
+          <span className="text-sm font-semibold text-slate-900 dark:text-white">{g.name}</span>
+          {g.description && <span className="text-xs text-slate-500 dark:text-slate-400">{g.description}</span>}
         </div>
       ),
     },
@@ -70,7 +70,7 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
           className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider ${
             g.is_active
               ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-              : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+              : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
           }`}
         >
           {g.is_active ? "Active" : "Inactive"}
@@ -83,8 +83,8 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">Groups</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Groups</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Named staff sets used to target notifications and escalations — e.g. &ldquo;Support Desk&rdquo; receives
             Help &amp; Support escalation emails.
           </p>
@@ -92,7 +92,7 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
         <button
           type="button"
           onClick={() => setCreateOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors cursor-pointer flex-shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors cursor-pointer flex-shrink-0"
         >
           <IconPlus />
           New Group
@@ -108,7 +108,7 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
           skeletonRows={5}
           cardTitle={(g) => (
             <div className="flex flex-col min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{g.name}</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{g.name}</p>
             </div>
           )}
           actions={(g) => (
@@ -116,14 +116,14 @@ export function GroupsList({ initialData }: { initialData: PaginatedResult<Group
               <button
                 type="button"
                 onClick={() => router.push(`/dashboard/groups/${g.id}`)}
-                className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors cursor-pointer"
               >
                 Members
               </button>
               <button
                 type="button"
                 onClick={() => setEditingGroup(g)}
-                className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
               >
                 Edit
               </button>
@@ -229,38 +229,38 @@ function GroupFormModal({
     <Modal isOpen={isOpen} onClose={onClose} title={group ? "Edit Group" : "New Group"} maxWidth="sm">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Support Desk"
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Description <span className="text-gray-400 font-normal">(optional)</span>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Description <span className="text-slate-400 font-normal">(optional)</span>
           </label>
           <textarea
             value={description ?? ""}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full resize-y rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
         <div className="flex justify-end gap-3 mt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
           >
             {saving ? <IconSpinner className="w-4 h-4" /> : null}
             {group ? "Save Changes" : "Create Group"}

@@ -83,57 +83,57 @@ export function GroupMembersList({
       <div>
         <button
           onClick={() => router.push("/dashboard/groups")}
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors cursor-pointer"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer"
         >
           &larr; Back to Groups
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+      <div className="flex flex-col gap-2 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">{group.name}</h1>
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{group.name}</h1>
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider ${
               group.is_active
                 ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
             }`}
           >
             {group.is_active ? "Active" : "Inactive"}
           </span>
         </div>
-        {group.description && <p className="text-sm text-gray-500 dark:text-gray-400">{group.description}</p>}
+        {group.description && <p className="text-sm text-slate-500 dark:text-slate-400">{group.description}</p>}
       </div>
 
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 flex flex-col gap-3">
-        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+      <div className="bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl p-4 flex flex-col gap-3">
+        <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
           Add Member
         </label>
         <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, or username..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
           />
-          {searching && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />}
+          {searching && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />}
         </div>
         {results.length > 0 && (
-          <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800 border border-gray-100 dark:border-gray-800 rounded-lg overflow-hidden">
+          <div className="flex flex-col divide-y divide-slate-100 dark:divide-ink-line border border-slate-100 dark:border-ink-line rounded-lg overflow-hidden">
             {results.map((user) => {
               const already = memberIds.has(user.id);
               return (
                 <div key={user.id} className="flex items-center justify-between px-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{memberName(user)}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{memberName(user)}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                   </div>
                   <button
                     type="button"
                     disabled={already || adding === user.id}
                     onClick={() => handleAdd(user)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                   >
                     {adding === user.id ? <IconSpinner className="w-3.5 h-3.5" /> : <IconUserPlus />}
                     {already ? "Member" : "Add"}
@@ -146,23 +146,23 @@ export function GroupMembersList({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-bold text-gray-900 dark:text-white">Members ({members.length})</h2>
+        <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">Members ({members.length})</h2>
         {members.length === 0 ? (
           <EmptyState icon={IconUsers} title="No members yet" description="Search above to add staff to this group." />
         ) : (
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface overflow-hidden divide-y divide-slate-100 dark:divide-ink-line">
             {members.map((member) => (
               <div key={member.id} className="flex items-center justify-between px-4 py-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                     {memberName(member.user)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.user.email}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{member.user.email}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setRemoving(member)}
-                  className="p-2 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer flex-shrink-0"
+                  className="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer flex-shrink-0"
                   aria-label={`Remove ${memberName(member.user)}`}
                 >
                   <IconTrash />

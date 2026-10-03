@@ -210,8 +210,8 @@ export function QuizAiAutocomplete({
     <section className="rounded-xl border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/10 p-4">
       <form onSubmit={handleGenerate} className="flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">AI Autocomplete</span>
-          <div className="inline-grid grid-cols-2 rounded-lg border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-gray-900 p-0.5 text-xs font-semibold">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">AI Autocomplete</span>
+          <div className="inline-grid grid-cols-2 rounded-lg border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-ink-surface p-0.5 text-xs font-semibold">
             {(["FILE", "PROMPT"] as const).map((mode) => (
               <button
                 key={mode}
@@ -222,8 +222,8 @@ export function QuizAiAutocomplete({
                 }}
                 className={`rounded-md px-3 py-1.5 transition-colors ${
                   sourceMode === mode
-                    ? "bg-[#2D6A4F] text-white"
-                    : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                    ? "bg-brand-600 text-white"
+                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 {mode === "FILE" ? "File" : "Prompt"}
@@ -233,7 +233,7 @@ export function QuizAiAutocomplete({
         </div>
 
         {sourceMode === "FILE" ? (
-          <label className="flex min-h-11 items-center gap-2 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+          <label className="flex min-h-11 items-center gap-2 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-800 bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
             <IconUpload />
             <span className="truncate">{file ? file.name : "PDF or DOCX"}</span>
             <input
@@ -255,13 +255,13 @@ export function QuizAiAutocomplete({
             }}
             rows={4}
             placeholder="Generate case-study questions about trauma-informed care for beginner social workers."
-            className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         )}
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div className="grid grid-cols-2 gap-2 sm:w-64">
-            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Provider
               <select
                 value={provider}
@@ -270,19 +270,19 @@ export function QuizAiAutocomplete({
                   setProvider(newProvider);
                   setModel(PROVIDER_MODELS[newProvider][0].id);
                 }}
-                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               >
                 <option value="DEEPSEEK">DeepSeek</option>
                 <option value="OPENAI">OpenAI</option>
                 <option value="GEMINI">Gemini</option>
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Model
               <select
                 value={model}
                 onChange={(event) => setModel(event.target.value)}
-                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               >
                 {PROVIDER_MODELS[provider].map((m) => (
                   <option key={m.id} value={m.id}>
@@ -294,7 +294,7 @@ export function QuizAiAutocomplete({
           </div>
 
           <div className="grid grid-cols-2 gap-2 sm:w-64">
-            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Questions
               <input
                 type="number"
@@ -302,10 +302,10 @@ export function QuizAiAutocomplete({
                 max="50"
                 value={questionCount}
                 onChange={(event) => setQuestionCount(event.target.value)}
-                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </label>
-            <label className="flex flex-col gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
               Options
               <input
                 type="number"
@@ -313,12 +313,12 @@ export function QuizAiAutocomplete({
                 max="6"
                 value={optionsPerQuestion}
                 onChange={(event) => setOptionsPerQuestion(event.target.value)}
-                className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </label>
           </div>
 
-          <label className="flex items-center gap-2 rounded-lg px-1 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
+          <label className="flex items-center gap-2 rounded-lg px-1 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
             <input
               type="checkbox"
               checked={persist}
@@ -326,7 +326,7 @@ export function QuizAiAutocomplete({
                 setPersist(event.target.checked);
                 setResult(null);
               }}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
             Save directly
           </label>
@@ -334,7 +334,7 @@ export function QuizAiAutocomplete({
           <button
             type="submit"
             disabled={generating}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#2D6A4F] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#1e4d38] disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {generating ? <IconSpinner className="text-white/80" /> : <IconSparkles />}
             Generate
@@ -344,7 +344,7 @@ export function QuizAiAutocomplete({
 
       {result && (
         <div className="mt-4 flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <span>{sourceLabel}</span>
             <span>{result.model}</span>
             <span>{generatedQuestions.length} generated</span>
@@ -355,16 +355,16 @@ export function QuizAiAutocomplete({
               {generatedQuestions.slice(0, 3).map((question, index) => (
                 <div
                   key={`${question.text}-${index}`}
-                  className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 p-3"
+                  className="rounded-lg border border-slate-200 dark:border-ink-line bg-white/80 dark:bg-ink-surface/80 p-3"
                 >
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{question.text}</p>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">{question.text}</p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {question.options.length} options
                   </p>
                 </div>
               ))}
               {generatedQuestions.length > 3 && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   +{generatedQuestions.length - 3} more
                 </p>
               )}
@@ -376,7 +376,7 @@ export function QuizAiAutocomplete({
               type="button"
               onClick={handleAddPreviewQuestions}
               disabled={addingPreview}
-              className="self-start inline-flex items-center gap-1.5 rounded-xl bg-[#2D6A4F]/10 px-3.5 py-2 text-xs font-semibold text-[#2D6A4F] transition-colors hover:bg-[#2D6A4F]/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-[#52b788]/15 dark:text-[#52b788] dark:hover:bg-[#52b788]/25"
+              className="self-start inline-flex items-center gap-1.5 rounded-xl bg-brand-600/10 px-3.5 py-2 text-xs font-semibold text-brand-600 transition-colors hover:bg-brand-600/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-brand-400/15 dark:text-brand-400 dark:hover:bg-brand-400/25"
             >
               {addingPreview ? <IconSpinner /> : <IconPlus />}
               Add generated questions

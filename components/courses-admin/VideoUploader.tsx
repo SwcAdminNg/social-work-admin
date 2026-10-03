@@ -72,7 +72,7 @@ export function VideoUploader({
           <button
             type="button"
             onClick={onRequestRefresh}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors duration-150 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors duration-150 cursor-pointer"
           >
             <IconRefresh />
             Refresh status
@@ -102,15 +102,15 @@ export function VideoUploader({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             {uploading ? <IconSpinner /> : <IconUpload />}
             {status === "FAILED" ? "Retry upload" : "Upload video"}
           </button>
           {progress !== null && (
-            <div className="mt-2 w-full max-w-md h-2 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+            <div className="mt-2 w-full max-w-md h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
               <div
-                className="h-full bg-[#2D6A4F] dark:bg-[#52b788] transition-all duration-200"
+                className="h-full bg-brand-600 dark:bg-brand-400 transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>

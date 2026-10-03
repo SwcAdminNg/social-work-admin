@@ -230,28 +230,28 @@ export function CommunityChatPanel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+    <div className="flex flex-col h-full bg-white dark:bg-ink-surface overflow-hidden">
+      <div className="flex items-center justify-between gap-2 px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-ink-line shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           {onBack && (
             <button
               type="button"
               onClick={onBack}
               aria-label="Back to all communities"
-              className="sm:hidden -ml-1 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer shrink-0"
+              className="sm:hidden -ml-1 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer shrink-0"
             >
               <IconChevronLeft />
             </button>
           )}
           <div className="min-w-0">
-          <h2 className="text-sm font-bold text-gray-900 dark:text-white truncate">{communityName}</h2>
+          <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white truncate">{communityName}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             {memberCount !== undefined && (
               <button
                 type="button"
                 onClick={onOpenMembers}
                 disabled={!onOpenMembers}
-                className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] disabled:hover:text-gray-500 cursor-pointer disabled:cursor-default"
+                className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 disabled:hover:text-slate-500 cursor-pointer disabled:cursor-default"
               >
                 <IconUsers />
                 {memberCount} member{memberCount === 1 ? "" : "s"}
@@ -263,7 +263,7 @@ export function CommunityChatPanel({
         </div>
         <span
           className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-wider shrink-0 ${
-            connected ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"
+            connected ? "text-green-600 dark:text-green-400" : "text-slate-400 dark:text-slate-500"
           }`}
         >
           <IconWifi />
@@ -279,12 +279,12 @@ export function CommunityChatPanel({
         >
         {messagesQuery.isLoading ? (
           <div className="flex justify-center py-10">
-            <IconSpinner className="w-5 h-5 text-gray-400" />
+            <IconSpinner className="w-5 h-5 text-slate-400" />
           </div>
         ) : messagesQuery.isError ? (
           <EmptyState icon={IconAlertTriangle} title="Failed to load messages" description="Something went wrong. Try refreshing." />
         ) : messages.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-10">No messages yet — say hello!</p>
+          <p className="text-sm text-slate-400 text-center py-10">No messages yet — say hello!</p>
         ) : (
           messages.map((msg) => {
             const isOwn = msg.sender?.id === currentUserId;
@@ -299,7 +299,7 @@ export function CommunityChatPanel({
                   <button
                     type="button"
                     onClick={() => openUserProfile(msg.sender)}
-                    className="rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-[#52b788] dark:focus:ring-offset-gray-900"
+                    className="rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-brand-400 dark:focus:ring-offset-ink-surface"
                     aria-label={`View ${displayName(msg.sender)}'s profile`}
                   >
                     <Avatar user={msg.sender} size="sm" />
@@ -310,7 +310,7 @@ export function CommunityChatPanel({
                     <button
                       type="button"
                       onClick={() => openUserProfile(msg.sender)}
-                      className="text-[0.65rem] font-semibold text-gray-400 dark:text-gray-500 hover:text-[#2D6A4F] dark:hover:text-[#52b788] px-1 mb-0.5 cursor-pointer"
+                      className="text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 px-1 mb-0.5 cursor-pointer"
                     >
                       {displayName(msg.sender)}
                     </button>
@@ -318,16 +318,16 @@ export function CommunityChatPanel({
                   <div
                     className={`group relative rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words flex flex-col gap-2 transition-colors duration-500 ${
                       isOwn
-                        ? "bg-[#2D6A4F] text-white rounded-br-sm"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
-                    } ${isHighlighted ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-gray-900" : ""}`}
+                        ? "bg-brand-600 text-white rounded-br-sm"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm"
+                    } ${isHighlighted ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-ink-surface" : ""}`}
                   >
                     {msg.reply_to && (
                       <button
                         type="button"
                         onClick={() => msg.reply_to && jumpToMessage(msg.reply_to.id)}
                         className={`text-left text-xs rounded-lg px-2.5 py-1.5 border-l-2 cursor-pointer hover:brightness-95 dark:hover:brightness-110 ${
-                          isOwn ? "bg-white/10 border-white/40" : "bg-black/5 dark:bg-white/5 border-gray-300 dark:border-gray-600"
+                          isOwn ? "bg-white/10 border-white/40" : "bg-black/5 dark:bg-white/5 border-slate-300 dark:border-slate-600"
                         }`}
                       >
                         <p className="font-semibold opacity-80">{displayName(msg.reply_to.sender)}</p>
@@ -350,7 +350,7 @@ export function CommunityChatPanel({
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold underline underline-offset-2 ${
-                          isOwn ? "bg-white/10" : "bg-white dark:bg-gray-900"
+                          isOwn ? "bg-white/10" : "bg-white dark:bg-ink-surface"
                         }`}
                       >
                         <IconDocument />
@@ -361,7 +361,7 @@ export function CommunityChatPanel({
                       <a
                         href={`/dashboard/resource-management/${msg.resource_reference.id}`}
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold underline underline-offset-2 ${
-                          isOwn ? "bg-white/10" : "bg-white dark:bg-gray-900"
+                          isOwn ? "bg-white/10" : "bg-white dark:bg-ink-surface"
                         }`}
                       >
                         <IconLibrary />
@@ -375,12 +375,12 @@ export function CommunityChatPanel({
                       onClick={() => setReplyTo(msg)}
                       title="Reply"
                       aria-label="Reply"
-                      className={`absolute -top-2.5 ${isOwn ? "-left-2.5" : "-right-2.5"} w-6 h-6 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] flex items-center justify-center opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer`}
+                      className={`absolute -top-2.5 ${isOwn ? "-left-2.5" : "-right-2.5"} w-6 h-6 rounded-full bg-white dark:bg-ink-surface border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center justify-center opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer`}
                     >
                       <IconReply />
                     </button>
                   </div>
-                  <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 mt-1 px-1">
+                  <span className="text-[0.65rem] text-slate-400 dark:text-slate-500 mt-1 px-1">
                     {formatTimestamp(msg.created_at)}
                   </span>
                 </div>
@@ -395,7 +395,7 @@ export function CommunityChatPanel({
           <button
             type="button"
             onClick={() => scrollToBottom()}
-            className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+            className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 pl-3 pr-3.5 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <IconChevronDown />
             {newMessageCount > 0 ? `${newMessageCount} new` : ""}
@@ -403,19 +403,19 @@ export function CommunityChatPanel({
         )}
       </div>
 
-      <form onSubmit={handleSend} className="border-t border-gray-100 dark:border-gray-800 p-4 flex flex-col gap-2 shrink-0">
+      <form onSubmit={handleSend} className="border-t border-slate-100 dark:border-ink-line p-4 flex flex-col gap-2 shrink-0">
         {replyTo && (
-          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs">
+          <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs">
             <div className="min-w-0">
-              <span className="font-semibold text-gray-500 dark:text-gray-400">
+              <span className="font-semibold text-slate-500 dark:text-slate-400">
                 Replying to {displayName(replyTo.sender)}
               </span>
-              <p className="text-gray-400 dark:text-gray-500 truncate">{replyTo.body || "Attachment"}</p>
+              <p className="text-slate-400 dark:text-slate-500 truncate">{replyTo.body || "Attachment"}</p>
             </div>
             <button
               type="button"
               onClick={() => setReplyTo(null)}
-              className="text-gray-400 hover:text-red-500 cursor-pointer shrink-0"
+              className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0"
               aria-label="Cancel reply"
             >
               <IconX size={14} />
@@ -423,13 +423,13 @@ export function CommunityChatPanel({
           </div>
         )}
         {attachment && (
-          <div className="flex items-center gap-2 self-start px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-300">
+          <div className="flex items-center gap-2 self-start px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-300">
             <IconDocument />
             <span className="truncate max-w-[220px]">{attachment.name}</span>
             <button
               type="button"
               onClick={() => setAttachment(null)}
-              className="text-gray-400 hover:text-red-500 cursor-pointer"
+              className="text-slate-400 hover:text-red-500 cursor-pointer"
               aria-label="Remove attachment"
             >
               <IconX size={14} />
@@ -458,7 +458,7 @@ export function CommunityChatPanel({
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             title="Attach a file"
-            className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
+            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
           >
             <IconUpload />
           </button>
@@ -467,7 +467,7 @@ export function CommunityChatPanel({
               type="button"
               onClick={() => setResourcePickerOpen((v) => !v)}
               title="Share a resource"
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               <IconLibrary />
             </button>
@@ -493,12 +493,12 @@ export function CommunityChatPanel({
                 handleSend(e as unknown as React.FormEvent);
               }
             }}
-            className="flex-1 resize-none px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="flex-1 resize-none px-3 py-2.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
           />
           <button
             type="submit"
             disabled={!canSend}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             {sendMutation.isPending || uploading ? <IconSpinner className="w-4 h-4" /> : <IconSend />}
           </button>

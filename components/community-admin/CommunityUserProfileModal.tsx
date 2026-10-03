@@ -34,34 +34,34 @@ export function CommunityUserProfileModal({
       {user && (
         <div className="flex flex-col items-center text-center">
           <div className="relative mb-4">
-            <div className="absolute inset-0 rounded-full bg-[#2D6A4F]/15 blur-xl dark:bg-[#52b788]/20" />
-            <div className="relative rounded-full ring-4 ring-white dark:ring-gray-900 shadow-lg">
+            <div className="absolute inset-0 rounded-full bg-brand-600/15 blur-xl dark:bg-brand-400/20" />
+            <div className="relative rounded-full ring-4 ring-white dark:ring-ink-surface shadow-lg">
               <Avatar user={user} size="xl" />
             </div>
           </div>
 
           <div className="min-w-0 w-full">
-            <h4 className="text-xl font-bold text-gray-900 dark:text-white break-words">{name}</h4>
+            <h4 className="text-xl font-bold text-slate-900 dark:text-white break-words">{name}</h4>
             {user.username && (
-              <p className="mt-1 text-sm font-medium text-[#2D6A4F] dark:text-[#52b788] break-all">
+              <p className="mt-1 text-sm font-medium text-brand-600 dark:text-brand-400 break-all">
                 @{user.username}
               </p>
             )}
           </div>
 
-          <div className="mt-5 w-full rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950/50 p-4">
+          <div className="mt-5 w-full rounded-2xl border border-slate-100 dark:border-ink-line bg-slate-50 dark:bg-ink-page/50 p-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Role
               </span>
-              <span className="inline-flex self-start sm:self-auto items-center px-3 py-1 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-xs font-bold uppercase tracking-wider text-[#2D6A4F] dark:text-[#52b788]">
+              <span className="inline-flex self-start sm:self-auto items-center px-3 py-1 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">
                 {roleLabel(user)}
               </span>
             </div>
           </div>
 
           {!imageUrl && (
-            <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">
               Profile picture is not available for this member.
             </p>
           )}

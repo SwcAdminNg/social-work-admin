@@ -98,84 +98,84 @@ export default function UserProfilePage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <button onClick={() => router.back()} className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors">
+        <button onClick={() => router.back()} className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
           &larr; Back to Users
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
-        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+      <div className="flex flex-col gap-2 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
+        <h1 className="font-display text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.username : "User Profile"}
         </h1>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
           {user?.email && (
             <div className="flex flex-col">
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Email</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{user.email}</span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Email</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-300">{user.email}</span>
             </div>
           )}
           {user?.username && (
             <div className="flex flex-col">
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Username</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">@{user.username}</span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Username</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-300">@{user.username}</span>
             </div>
           )}
           {user?.phone_number && (
             <div className="flex flex-col">
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Phone</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{user.phone_number}</span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Phone</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-300">{user.phone_number}</span>
             </div>
           )}
           <div className="flex flex-col">
-            <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">User ID</span>
-            <span className="text-sm font-mono text-gray-500 dark:text-gray-400">{userId}</span>
+            <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">User ID</span>
+            <span className="text-sm font-mono text-slate-500 dark:text-slate-400">{userId}</span>
           </div>
           {user && (
             <div className="flex flex-col">
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Status</span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Status</span>
               <span className="mt-0.5">
                 {user.is_suspended ? (
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">Suspended</span>
                 ) : user.is_active ? (
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">Active</span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400">Inactive</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">Inactive</span>
                 )}
               </span>
             </div>
           )}
           {user?.user_type && (
             <div className="flex flex-col">
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">Role</span>
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-300">{user.user_type}</span>
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Role</span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-300">{user.user_type}</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start">
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-ink-surface p-1 self-start">
         <button
           onClick={() => handleTabChange("transactions")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "transactions" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "transactions" ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"}`}
         >
           Transactions
         </button>
         <button
           onClick={() => handleTabChange("courses")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "courses" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "courses" ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"}`}
         >
           Courses
         </button>
         <button
           onClick={() => handleTabChange("cards")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "cards" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "cards" ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"}`}
         >
           Cards
         </button>
         {isInstructor && (
           <button
             onClick={() => handleTabChange("documents")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "documents" ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm" : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${activeTab === "documents" ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"}`}
           >
             Documents
           </button>
@@ -189,7 +189,7 @@ export default function UserProfilePage() {
               { key: "date", header: "Date", render: (t) => <span className="text-sm">{formatDate(t.created_at)}</span> },
               { key: "reference", header: "Ref", render: (t) => <span className="text-sm font-mono">{t.reference}</span> },
               { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-semibold">₦{t.amount.toLocaleString()}</span> },
-              { key: "type", header: "Type", render: (t) => <span className="text-xs text-gray-500">{t.transaction_type}</span> },
+              { key: "type", header: "Type", render: (t) => <span className="text-xs text-slate-500">{t.transaction_type}</span> },
               { key: "status", header: "Status", render: (t) => <StatusBadge status={t.status} /> },
             ]}
             data={txData?.items ?? []}
@@ -206,8 +206,8 @@ export default function UserProfilePage() {
           <DataTable
             columns={[
               { key: "title", header: "Course Title", render: (c) => <span className="text-sm font-semibold">{c.title}</span> },
-              { key: "category", header: "Category", render: (c) => <span className="text-xs text-gray-500">{c.category}</span> },
-              { key: "level", header: "Level", render: (c) => <span className="text-xs text-gray-500">{c.level}</span> },
+              { key: "category", header: "Category", render: (c) => <span className="text-xs text-slate-500">{c.category}</span> },
+              { key: "level", header: "Level", render: (c) => <span className="text-xs text-slate-500">{c.level}</span> },
             ]}
             data={coursesData?.items ?? []}
             keyExtractor={(c) => c.id}
@@ -222,22 +222,22 @@ export default function UserProfilePage() {
         <div className="flex flex-col gap-4">
           {cardsLoading ? (
             <div className="animate-pulse flex gap-4">
-              <div className="h-20 w-48 bg-gray-200 dark:bg-gray-800 rounded-xl" />
+              <div className="h-20 w-48 bg-slate-200 dark:bg-slate-800 rounded-xl" />
             </div>
           ) : cardsData?.length === 0 ? (
             <EmptyState icon={IconLock} title="No saved cards" description="User has no saved payment methods." />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {cardsData?.map((card) => (
-                <div key={card.id} className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col gap-2">
+                <div key={card.id} className="p-4 rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface flex flex-col gap-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold uppercase text-gray-700 dark:text-gray-300">{card.card_type}</span>
-                    <span className="text-xs text-gray-500">{card.gateway}</span>
+                    <span className="text-sm font-bold uppercase text-slate-700 dark:text-slate-300">{card.card_type}</span>
+                    <span className="text-xs text-slate-500">{card.gateway}</span>
                   </div>
-                  <div className="text-lg font-mono font-medium tracking-widest text-gray-900 dark:text-white">
+                  <div className="text-lg font-mono font-medium tracking-widest text-slate-900 dark:text-white">
                     **** **** **** {card.last4}
                   </div>
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-slate-500">
                     <span>Expires {card.exp_month}/{card.exp_year}</span>
                     <span>{card.bank || "Unknown Bank"}</span>
                   </div>
@@ -250,10 +250,10 @@ export default function UserProfilePage() {
 
       {activeTab === "documents" && isInstructor && (
         <div className="flex flex-col gap-4">
-          <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Instructor CV</p>
-              <h2 className="text-base font-bold text-gray-900 dark:text-white truncate mt-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Instructor CV</p>
+              <h2 className="font-display text-base font-bold text-slate-900 dark:text-white truncate mt-1">
                 {user?.cv_file_name ?? "No CV uploaded"}
               </h2>
               {cvError && (
@@ -265,7 +265,7 @@ export default function UserProfilePage() {
                 href={cvDownload.download_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors shadow-sm"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors shadow-sm"
               >
                 Download CV
               </a>
@@ -273,7 +273,7 @@ export default function UserProfilePage() {
               <button
                 type="button"
                 disabled
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 dark:text-gray-500 rounded-xl cursor-not-allowed"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 rounded-xl cursor-not-allowed"
               >
                 {cvLoading ? "Preparing link…" : "No download"}
               </button>
@@ -294,8 +294,8 @@ export default function UserProfilePage() {
                   header: "Name",
                   render: (doc) => (
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{doc.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{doc.file_name}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{doc.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{doc.file_name}</p>
                     </div>
                   ),
                   hideInCard: true,
@@ -303,12 +303,12 @@ export default function UserProfilePage() {
                 {
                   key: "type",
                   header: "Type",
-                  render: (doc) => <span className="text-xs text-gray-500">{doc.mime_type ?? "Unknown"}</span>,
+                  render: (doc) => <span className="text-xs text-slate-500">{doc.mime_type ?? "Unknown"}</span>,
                 },
                 {
                   key: "size",
                   header: "Size",
-                  render: (doc) => <span className="text-xs text-gray-500">{formatFileSize(doc.file_size_bytes)}</span>,
+                  render: (doc) => <span className="text-xs text-slate-500">{formatFileSize(doc.file_size_bytes)}</span>,
                 },
                 {
                   key: "updated",
@@ -323,7 +323,7 @@ export default function UserProfilePage() {
                       href={doc.download_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/15 dark:hover:bg-[#52b788]/25 rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/15 dark:hover:bg-brand-400/25 rounded-lg transition-colors"
                     >
                       Download
                     </a>
@@ -336,12 +336,12 @@ export default function UserProfilePage() {
               skeletonRows={3}
               cardTitle={(doc) => (
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 shrink-0 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center">
+                  <div className="w-9 h-9 shrink-0 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center">
                     <IconDocument />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{doc.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{doc.file_name}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{doc.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{doc.file_name}</p>
                   </div>
                 </div>
               )}

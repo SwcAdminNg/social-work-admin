@@ -105,15 +105,15 @@ export function TwoFactorSettings() {
   };
 
   return (
-    <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
-      <div className="p-8 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/80">
+    <div className="max-w-3xl w-full bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-300">
+      <div className="p-8 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800/80">
         <div className="flex items-center gap-3 mb-2">
-          <span className="w-9 h-9 rounded-xl bg-[#2D6A4F]/10 dark:bg-[#52b788]/10 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center flex-shrink-0">
+          <span className="w-9 h-9 rounded-xl bg-brand-600/10 dark:bg-brand-400/10 text-brand-600 dark:text-brand-400 flex items-center justify-center flex-shrink-0">
             <IconShieldCheck className="w-5 h-5" />
           </span>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Two-Factor Authentication</h2>
+          <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">Two-Factor Authentication</h2>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Required on every account. Choose how you receive your sign-in codes.
         </p>
       </div>
@@ -132,7 +132,7 @@ export function TwoFactorSettings() {
 
         {isLoading && (
           <div className="flex justify-center items-center h-24">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D6A4F]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
           </div>
         )}
 
@@ -162,22 +162,22 @@ export function TwoFactorSettings() {
               switchDisabled={starting !== null}
               onSelect={() => setConfirmMethod("EMAIL")}
             />
-            <p className="text-xs text-gray-400 dark:text-gray-500 pt-1">
+            <p className="text-xs text-slate-400 dark:text-slate-500 pt-1">
               Two-factor authentication protects your account and cannot be turned off.
             </p>
           </div>
         )}
 
         {pending && (
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900 dark:text-white">
+              <h3 className="font-display font-bold text-slate-900 dark:text-white">
                 {pending.method === "TOTP" ? "Scan the QR code" : "Enter the code we emailed you"}
               </h3>
               <button
                 type="button"
                 onClick={resetPending}
-                className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788]"
+                className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400"
               >
                 Cancel
               </button>
@@ -186,21 +186,21 @@ export function TwoFactorSettings() {
             {pending.method === "TOTP" && (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-3">
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white p-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={pending.qrCodeDataUri} alt="Scan this QR code with your authenticator app" width={160} height={160} />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 text-center">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 text-center">
                   Can&apos;t scan? Enter this key manually:
                 </p>
-                <p className="text-center font-mono text-xs tracking-wide text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 rounded-xl px-3 py-2.5 mb-5 break-all">
+                <p className="text-center font-mono text-xs tracking-wide text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-ink-surface/50 rounded-xl px-3 py-2.5 mb-5 break-all">
                   {pending.secret}
                 </p>
               </>
             )}
 
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2.5">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2.5">
               Enter the 6-digit code
             </p>
             <CodeInput value={code} onChange={setCode} onComplete={submitCode} disabled={confirming} />
@@ -209,7 +209,7 @@ export function TwoFactorSettings() {
               type="button"
               onClick={() => code.length === 6 && submitCode(code)}
               disabled={confirming || code.length !== 6}
-              className="mt-5 w-full h-[48px] rounded-2xl font-bold text-sm text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] shadow-md hover:shadow-lg transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+              className="mt-5 w-full h-[48px] rounded-2xl font-bold text-sm text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 shadow-md hover:shadow-lg transition-all disabled:opacity-70 flex items-center justify-center gap-2"
             >
               {confirming ? <IconSpinner className="w-4 h-4" /> : <IconCheck />}
               {confirming ? "Confirming…" : "Confirm"}
@@ -220,7 +220,7 @@ export function TwoFactorSettings() {
                 type="button"
                 onClick={handleResendEmail}
                 disabled={resending}
-                className="mt-3 w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:text-[#1e4d38] dark:hover:text-white disabled:opacity-50"
+                className="mt-3 w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-white disabled:opacity-50"
               >
                 {resending ? <IconSpinner className="w-3.5 h-3.5" /> : <IconRefresh />}
                 Resend code
@@ -259,16 +259,16 @@ function ConfirmSwitchModal({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-switch-title"
-        className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center text-center"
+        className="relative w-full max-w-md bg-white dark:bg-ink-surface rounded-2xl shadow-2xl border border-slate-200 dark:border-ink-line p-6 flex flex-col items-center text-center"
       >
         <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-6">
           <IconAlertTriangle className="w-8 h-8" />
         </div>
 
-        <h2 id="confirm-switch-title" className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 id="confirm-switch-title" className="text-xl font-bold text-slate-900 dark:text-white mb-2">
           Switch to {methodLabel}?
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
           Your current two-factor method will stop working as soon as you finish setting up {methodLabel.toLowerCase()}.
           You&apos;ll need to verify with it the next time you sign in.
         </p>
@@ -277,14 +277,14 @@ function ConfirmSwitchModal({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-xl transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl shadow-lg shadow-green-900/20 transition-all hover:-translate-y-0.5"
+            className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl shadow-lg shadow-green-900/20 transition-all hover:-translate-y-0.5"
           >
             Yes, continue
           </button>
@@ -315,29 +315,29 @@ function MethodRow({
     <div
       className={`flex items-center gap-4 rounded-2xl border p-4 transition-colors ${
         active
-          ? "border-[#2D6A4F] dark:border-[#52b788] bg-[#2D6A4F]/5 dark:bg-[#52b788]/5"
-          : "border-gray-200 dark:border-gray-700"
+          ? "border-brand-600 dark:border-brand-400 bg-brand-600/5 dark:bg-brand-400/5"
+          : "border-slate-200 dark:border-slate-700"
       }`}
     >
       <span
         className={`w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center ${
           active
-            ? "bg-[#2D6A4F] text-white"
-            : "bg-gray-100 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400"
+            ? "bg-brand-600 text-white"
+            : "bg-slate-100 dark:bg-ink-surface/50 text-slate-500 dark:text-slate-400"
         }`}
       >
         {icon}
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="font-bold text-sm text-gray-900 dark:text-white">{title}</p>
+          <p className="font-bold text-sm text-slate-900 dark:text-white">{title}</p>
           {active && (
-            <span className="inline-flex items-center gap-1 text-[0.65rem] font-bold uppercase tracking-wide text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 rounded-full px-2 py-0.5">
+            <span className="inline-flex items-center gap-1 text-[0.65rem] font-bold uppercase tracking-wide text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 rounded-full px-2 py-0.5">
               <IconCheck /> Active
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{description}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
       </div>
 
       {active ? (
@@ -346,7 +346,7 @@ function MethodRow({
           disabled
           aria-disabled="true"
           title="This is your current sign-in method"
-          className="flex-shrink-0 px-4 py-2 text-xs font-bold text-gray-400 dark:text-gray-600 border border-gray-200 dark:border-gray-700 rounded-xl cursor-not-allowed opacity-70"
+          className="flex-shrink-0 px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-700 rounded-xl cursor-not-allowed opacity-70"
         >
           Currently in use
         </button>
@@ -355,7 +355,7 @@ function MethodRow({
           type="button"
           onClick={onSelect}
           disabled={switchDisabled}
-          className="flex-shrink-0 px-4 py-2 text-xs font-bold text-[#2D6A4F] dark:text-[#52b788] border border-[#2D6A4F] dark:border-[#52b788] rounded-xl hover:bg-[#2D6A4F] hover:text-white dark:hover:bg-[#52b788] dark:hover:text-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#2D6A4F] dark:disabled:hover:text-[#52b788] flex items-center gap-1.5"
+          className="flex-shrink-0 px-4 py-2 text-xs font-bold text-brand-600 dark:text-brand-400 border border-brand-600 dark:border-brand-400 rounded-xl hover:bg-brand-600 hover:text-white dark:hover:bg-brand-400 dark:hover:text-slate-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-brand-600 dark:disabled:hover:text-brand-400 flex items-center gap-1.5"
         >
           {loading && <IconSpinner className="w-3.5 h-3.5" />}
           Switch

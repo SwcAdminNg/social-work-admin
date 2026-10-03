@@ -12,6 +12,7 @@ import { IconLifeBuoy, IconAlertTriangle, IconStar, IconRefresh } from "@/compon
 import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTable";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
 
 const STATUS_OPTIONS: { value: TicketStatus | ""; label: string }[] = [
   { value: "", label: "All Statuses" },
@@ -28,7 +29,7 @@ export function StatusBadge({ status }: { status: TicketStatus }) {
     OPEN: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
     IN_PROGRESS: "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400",
     RESOLVED: "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400",
-    CLOSED: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400",
+    CLOSED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400",
   };
   const labels: Record<TicketStatus, string> = {
     OPEN: "Open",
@@ -158,6 +159,12 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
     fetchPage(1, { assignedAdminId: value });
   };
 
+  const handleDateRangeChange = ({ start, end }: DateRangeValue) => {
+    setStartDate(start);
+    setEndDate(end);
+    fetchPage(1, { startDate: start, endDate: end });
+  };
+
   const handleFilterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchPage(1);
@@ -179,10 +186,10 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
       hideInCard: true,
       render: (t) => (
         <div className="flex flex-col min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[220px]">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-[220px]">
             {ticketDisplayName(t)}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[220px]">
             {t.user?.email ?? t.user_id}
           </p>
         </div>
@@ -213,14 +220,14 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
         t.assigned_admin ? (
           <span className="text-sm">{adminDisplayName(t.assigned_admin)}</span>
         ) : (
-          <span className="text-xs text-gray-400 italic">Unassigned</span>
+          <span className="text-xs text-slate-400 italic">Unassigned</span>
         ),
     },
     {
       key: "activity",
       header: "Last Activity",
       render: (t) => (
-        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap" suppressHydrationWarning>
+        <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" suppressHydrationWarning>
           {formatRelativeTime(t.last_admin_reply_at ?? t.last_user_message_at ?? t.created_at)}
         </span>
       ),
@@ -235,7 +242,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
             {t.rating}/5
           </span>
         ) : (
-          <span className="text-xs text-gray-300 dark:text-gray-600">—</span>
+          <span className="text-xs text-slate-300 dark:text-slate-600">—</span>
         ),
     },
   ];
@@ -244,23 +251,23 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
     <div className="flex flex-col gap-6">
       <form
         onSubmit={handleFilterSubmit}
-        className="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col gap-4"
+        className="bg-white dark:bg-ink-surface p-4 border border-slate-200 dark:border-ink-line rounded-2xl flex flex-col gap-4"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_auto] gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Search</label>
+            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Search</label>
             <input
               type="search"
-              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Subject, name, email, phone"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</label>
+            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Status</label>
             <select
-              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
               value={status}
               onChange={(e) => handleStatusChange(e.target.value as TicketStatus | "")}
             >
@@ -271,30 +278,21 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Start Date</label>
-            <input
-              type="date"
-              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              max={endDate || undefined}
+          <div className="flex min-w-0 flex-col gap-1.5 xl:col-span-2">
+            <label htmlFor="ticket-date-range" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Date Created</label>
+            <DateRangePicker
+              id="ticket-date-range"
+              title="Tickets created between"
+              presets="past"
+              start={startDate}
+              end={endDate}
+              onChange={handleDateRangeChange}
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">End Date</label>
-            <input
-              type="date"
-              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={startDate || undefined}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Assigned To</label>
+            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Assigned To</label>
             <select
-              className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
               value={assignedFilter}
               onChange={(e) => handleAssignedChange(e.target.value)}
             >
@@ -312,7 +310,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
               type="button"
               onClick={() => fetchPage(data.meta.page)}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               <IconRefresh className={loading ? "animate-spin" : ""} />
               Refresh
@@ -320,7 +318,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
             >
               Apply
             </button>
@@ -328,7 +326,7 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
               type="button"
               onClick={handleResetFilters}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors cursor-pointer disabled:opacity-60"
             >
               Reset
             </button>
@@ -345,15 +343,15 @@ export function TicketQueueList({ initialData, currentUserId, isAdmin }: TicketQ
           skeletonRows={5}
           cardTitle={(t) => (
             <div className="flex flex-col min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{ticketDisplayName(t)}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{t.user?.email ?? t.user_id}</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{ticketDisplayName(t)}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.user?.email ?? t.user_id}</p>
             </div>
           )}
           actions={(t) => (
             <button
               type="button"
               onClick={() => router.push(`/dashboard/help-support/tickets/${t.id}`)}
-              className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors cursor-pointer"
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors cursor-pointer"
             >
               Open
             </button>

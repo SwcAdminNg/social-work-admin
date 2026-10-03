@@ -59,34 +59,34 @@ export function ResourcePicker({
   return (
     <div
       ref={containerRef}
-      className="absolute bottom-full mb-2 left-0 w-80 max-h-72 overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-20"
+      className="absolute bottom-full mb-2 left-0 w-80 max-h-72 overflow-y-auto bg-white dark:bg-ink-surface border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20"
     >
-      <div className="p-2 border-b border-gray-100 dark:border-gray-800">
+      <div className="p-2 border-b border-slate-100 dark:border-ink-line">
         <input
           autoFocus
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search resources to share…"
-          className="w-full px-2.5 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+          className="w-full px-2.5 py-1.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
         />
       </div>
       {loading ? (
         <div className="flex justify-center py-6">
-          <IconSpinner className="w-4 h-4 text-gray-400" />
+          <IconSpinner className="w-4 h-4 text-slate-400" />
         </div>
       ) : results.length === 0 ? (
-        <p className="px-3 py-4 text-sm text-gray-400 text-center">No resources found.</p>
+        <p className="px-3 py-4 text-sm text-slate-400 text-center">No resources found.</p>
       ) : (
         results.map((resource) => (
           <button
             key={resource.id}
             type="button"
             onClick={() => onPick(resource)}
-            className="w-full text-left px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2.5 cursor-pointer"
+            className="w-full text-left px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2.5 cursor-pointer"
           >
             <IconLibrary />
-            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{resource.name}</span>
+            <span className="text-sm font-medium text-slate-900 dark:text-white truncate">{resource.name}</span>
           </button>
         ))
       )}

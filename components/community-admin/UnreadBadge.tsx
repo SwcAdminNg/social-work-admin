@@ -6,8 +6,8 @@ import { getUnreadCommunityCount } from "@/lib/api/community-client";
 
 const POLL_INTERVAL_MS = 30_000;
 
-/** Aggregate unread-message badge for the Communities nav item (GET /community/unread-count). */
-export function UnreadBadge() {
+/** Aggregate unread community-message count (GET /community/unread-count). */
+export function useCommunityUnreadCount() {
   const { status } = useSession();
   const { data } = useQuery({
     queryKey: ["community_unread_count"],
@@ -16,12 +16,23 @@ export function UnreadBadge() {
     refetchInterval: POLL_INTERVAL_MS,
     staleTime: POLL_INTERVAL_MS,
   });
+  return data ?? 0;
+}
 
-  if (!data) return null;
+export function badgeLabel(count: number) {
+  return count > 99 ? "99+" : String(count);
+}
+
+/** Unread-message badge for the Communities nav item. */
+export function UnreadBadge({ className = "" }: { className?: string }) {
+  const count = useCommunityUnreadCount();
+  if (!count) return null;
 
   return (
-    <span className="ml-auto inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-[0.65rem] font-bold bg-red-500 text-white">
-      {data > 99 ? "99+" : data}
+    <span
+      className={`ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-extrabold leading-none text-white ${className}`}
+    >
+      {badgeLabel(count)}
     </span>
   );
 }

@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function GuestJoinPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-gray-950" />}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 dark:bg-ink-page" />}>
       <GuestJoin />
     </Suspense>
   );

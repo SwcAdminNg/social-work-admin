@@ -20,15 +20,15 @@ export default function HelpSupportLayout({ children }: { children: React.ReactN
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+        <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Help &amp; Support
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Manage the support ticket queue{isAdmin ? " and the public FAQ content" : ""}.
         </p>
       </div>
 
-      <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start">
+      <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-ink-surface p-1 self-start">
         {tabs.map((tab) => {
           const active = pathname.startsWith(tab.href);
           return (
@@ -37,8 +37,8 @@ export default function HelpSupportLayout({ children }: { children: React.ReactN
               href={tab.href}
               className={`px-4 py-2 rounded-lg text-sm font-semibold no-underline transition-colors ${
                 active
-                  ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm"
-                  : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+                  ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
               {tab.label}

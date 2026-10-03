@@ -62,38 +62,38 @@ function ApproveModal({
         }}
         className="flex flex-col gap-5"
       >
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           The applicant will be emailed a 7-day setup link to create their username, password, and 2FA. Their account
           stays inactive until they finish setup.
         </p>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="approve-platform" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="approve-platform" className="text-sm font-medium text-slate-700 dark:text-slate-300">
             Platform
           </label>
           <select
             id="approve-platform"
             value={platform}
             onChange={(e) => setPlatform(e.target.value as "NG" | "COM")}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           >
             <option value="NG">NG</option>
             <option value="COM">COM</option>
           </select>
-          <p className="text-xs text-gray-400">Determines which storefront&apos;s instructor account is created.</p>
+          <p className="text-xs text-slate-400">Determines which storefront&apos;s instructor account is created.</p>
         </div>
         <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors disabled:opacity-70"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors disabled:opacity-70"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
           >
             {isLoading && <IconSpinner className="w-4 h-4" />}
             {isLoading ? "Approving..." : "Approve"}
@@ -126,12 +126,12 @@ function RejectModal({
         }}
         className="flex flex-col gap-5"
       >
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           No account is created. The applicant is notified by email and may submit a new application at any time.
         </p>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="reject-reason" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Reason <span className="text-gray-400 font-normal">(optional, shown to the applicant)</span>
+          <label htmlFor="reject-reason" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            Reason <span className="text-slate-400 font-normal">(optional, shown to the applicant)</span>
           </label>
           <textarea
             id="reject-reason"
@@ -139,7 +139,7 @@ function RejectModal({
             onChange={(e) => setReason(e.target.value)}
             rows={4}
             placeholder="e.g. CV did not demonstrate relevant teaching experience"
-            className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full resize-none rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           />
         </div>
         <div className="flex justify-end gap-3">
@@ -147,7 +147,7 @@ function RejectModal({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors disabled:opacity-70"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors disabled:opacity-70"
           >
             Cancel
           </button>
@@ -227,7 +227,7 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
   if (applicationQuery.isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <IconSpinner className="w-6 h-6 text-gray-400" />
+        <IconSpinner className="w-6 h-6 text-slate-400" />
       </div>
     );
   }
@@ -248,24 +248,24 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
       <div>
         <button
           onClick={() => router.push("/dashboard/instructor-applications")}
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors cursor-pointer"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer"
         >
           &larr; Back to Instructor Applications
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+      <div className="flex flex-col gap-4 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">{applicantName(application)}</h1>
+              <h1 className="font-display text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">{applicantName(application)}</h1>
               <StatusBadge status={application.status} />
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {application.email}
               {application.phone_number ? ` · ${application.phone_number}` : ""}
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1" suppressHydrationWarning>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1" suppressHydrationWarning>
               Applied {formatTimestamp(application.created_at)}
             </p>
           </div>
@@ -282,7 +282,7 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
               <button
                 type="button"
                 onClick={() => setApproveOpen(true)}
-                className="px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-lg transition-colors cursor-pointer"
+                className="px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-lg transition-colors cursor-pointer"
               >
                 Approve
               </button>
@@ -290,20 +290,20 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
           )}
         </div>
 
-        <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-          <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 block mb-2">Curriculum Vitae</span>
+        <div className="pt-4 border-t border-slate-100 dark:border-ink-line">
+          <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400 block mb-2">Curriculum Vitae</span>
           {application.cv_download_url ? (
             <a
               href={application.cv_download_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 rounded-lg transition-colors"
             >
               <IconDocument />
               Download {application.cv_file_name}
             </a>
           ) : (
-            <span className="inline-flex items-center gap-2 text-sm text-gray-400">
+            <span className="inline-flex items-center gap-2 text-sm text-slate-400">
               <IconDocument />
               {application.cv_file_name}
             </span>
@@ -312,11 +312,11 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
       </div>
 
       {application.status === "APPROVED" && (
-        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+        <div className="flex flex-col gap-4 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Account Setup</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">Account Setup</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Reviewed {formatTimestamp(application.reviewed_at)}. An inactive instructor account has been created —
                 the applicant can&apos;t log in until they finish setup via their emailed link.
               </p>
@@ -328,7 +328,7 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
                 setResendConfirmOpen(true);
               }}
               disabled={resendMutation.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-60"
             >
               {resendMutation.isPending ? <IconSpinner className="w-4 h-4" /> : <IconMail />}
               Resend Setup Link
@@ -345,14 +345,14 @@ export function ApplicationDetail({ applicationId }: { applicationId: string }) 
       )}
 
       {application.status === "REJECTED" && (
-        <div className="flex flex-col gap-2 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
-          <h2 className="text-sm font-bold text-gray-900 dark:text-white">Rejection Reason</h2>
+        <div className="flex flex-col gap-2 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
+          <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">Rejection Reason</h2>
           {application.rejection_reason ? (
-            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{application.rejection_reason}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{application.rejection_reason}</p>
           ) : (
-            <p className="text-sm text-gray-400 italic">No reason was given.</p>
+            <p className="text-sm text-slate-400 italic">No reason was given.</p>
           )}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Reviewed {formatTimestamp(application.reviewed_at)}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">Reviewed {formatTimestamp(application.reviewed_at)}</p>
         </div>
       )}
 

@@ -20,7 +20,7 @@ export default async function NotAuthorizedPage() {
       />
       <Link
         href="/dashboard"
-        className="self-center text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] no-underline hover:text-[#1e4d38] dark:hover:text-white transition-colors duration-150"
+        className="self-center text-sm font-semibold text-brand-600 dark:text-brand-400 no-underline hover:text-brand-700 dark:hover:text-white transition-colors duration-150"
       >
         Back to dashboard
       </Link>

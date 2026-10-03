@@ -2,18 +2,58 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { IconLogoMark } from "@/components/auth/shared/icons";
+import { ChevronsLeft, LogOut, Moon, Sun, X } from "lucide-react";
+import { useTheme } from "@/components/generic/ThemeProvider";
 import { UnreadBadge } from "@/components/community-admin/UnreadBadge";
-import { dashboardNavItems } from "./nav-items";
+import { canShowNavItem, dashboardNavGroups, type NavItem } from "./nav-items";
 import { useSidebar } from "./SidebarContext";
-import { IconChevronsLeft, IconClose, IconLogout } from "./icons";
 import { LogoutModal } from "./LogoutModal";
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+const ROW =
+  "group relative flex h-9 w-full items-center gap-3 rounded-md px-3 text-sm font-medium no-underline transition-all duration-150";
+const ROW_IDLE =
+  "text-slate-700 hover:bg-brand-50 hover:text-brand-600 dark:text-slate-300 dark:hover:bg-brand-400/12 dark:hover:text-brand-200";
+
+function NavLink({
+  item,
+  active,
+  collapsed,
+}: {
+  item: NavItem;
+  active: boolean;
+  collapsed: boolean;
+}) {
+  const Icon = item.icon;
+  const compact = collapsed ? "lg:hidden" : "";
+
+  return (
+    <Link
+      href={item.href}
+      title={collapsed ? item.label : undefined}
+      aria-current={active ? "page" : undefined}
+      className={`${ROW} ${
+        active
+          ? "bg-brand-600 text-white shadow-[0_10px_24px_-16px_rgba(45,106,79,0.85)] dark:bg-brand-400 dark:text-[#06130d]"
+          : ROW_IDLE
+      } ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+    >
+      <span className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
+        <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
+      </span>
+      <span className={`min-w-0 truncate ${compact}`}>{item.label}</span>
+      {item.href === "/dashboard/communities" && (
+        <UnreadBadge className={collapsed ? "lg:absolute lg:-right-1 lg:-top-1 lg:h-4 lg:min-w-4 lg:px-1" : ""} />
+      )}
+    </Link>
+  );
 }
 
 export function Sidebar() {
@@ -22,11 +62,8 @@ export function Sidebar() {
   const { mobileOpen, setMobileOpen, collapsed, toggleCollapsed } =
     useSidebar();
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-  const isAdmin = session?.user?.userType === "ADMIN";
-  const isStaff = isAdmin || session?.user?.userType === "INSTRUCTOR";
-  const visibleNavItems = dashboardNavItems.filter(
-    (item) => (!item.adminOnly || isAdmin) && (!item.staffOnly || isStaff),
-  );
+  const userType = session?.user?.userType;
+  const compact = collapsed ? "lg:hidden" : "";
 
   return (
     <>
@@ -36,119 +73,170 @@ export function Sidebar() {
         aria-hidden="true"
         className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
           mobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
         }`}
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out
-          ${collapsed ? "lg:w-[84px]" : "lg:w-72"}
-          w-72
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#e5e3ee] bg-white shadow-[16px_0_40px_-38px_rgba(18,24,40,0.45)] transition-all duration-300 ease-in-out dark:border-ink-line dark:bg-ink-surface dark:shadow-none
+          ${collapsed ? "lg:w-[78px]" : "lg:w-[252px]"}
+          w-[252px]
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
         {/* Brand */}
-        <div className="flex items-center justify-between gap-2 h-[84px] px-5 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+        <div className="flex h-24 flex-shrink-0 items-center justify-between gap-2 px-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 no-underline overflow-hidden"
-            aria-label="Social Work Nigeria dashboard home"
+            className={`flex min-w-0 items-center overflow-hidden no-underline ${collapsed ? "lg:hidden" : ""}`}
+            aria-label="Social Work Nigeria admin home"
           >
-            <div className="w-9 h-9 rounded-xl bg-[#2D6A4F] flex items-center justify-center flex-shrink-0">
-              <IconLogoMark />
-            </div>
-            <div
-              className={`leading-tight transition-opacity duration-200 whitespace-nowrap ${collapsed ? "lg:opacity-0 lg:w-0" : "opacity-100"}`}
-            >
-              <p className="text-gray-900 dark:text-white font-bold text-[0.9rem]">
-                Social Work Nigeria
-              </p>
-              <p className="text-[#2D6A4F] dark:text-[#52b788] text-[0.6rem] uppercase tracking-widest font-semibold">
-                ADMIN PANEL
-              </p>
+            <div className="relative h-24 w-[180px] overflow-hidden">
+              <Image
+                src="/images/swc-dark-logo.png"
+                alt="SWC Logo"
+                width={220}
+                height={96}
+                priority
+                className="h-24 w-[220px] max-w-none origin-left scale-125 object-contain object-left"
+              />
             </div>
           </Link>
+
+          <button
+            onClick={toggleCollapsed}
+            aria-label="Collapse sidebar"
+            className={`hidden h-8 w-8 flex-shrink-0 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white lg:flex ${collapsed ? "lg:hidden" : ""}`}
+          >
+            <ChevronsLeft className="h-[18px] w-[18px]" />
+          </button>
+
+          {/* Collapsed: compact admin mark */}
+          <button
+            onClick={toggleCollapsed}
+            aria-label="Expand sidebar"
+            className={`mx-auto hidden h-10 w-10 items-center justify-center rounded-xl bg-brand-600 font-display text-sm font-extrabold text-white transition hover:bg-brand-700 dark:bg-brand-400 dark:text-[#06130d] ${collapsed ? "lg:flex" : ""}`}
+          >
+            SW
+          </button>
 
           {/* Mobile close */}
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="Close sidebar"
-            className="lg:hidden w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white lg:hidden"
           >
-            <IconClose />
+            <X className="h-5 w-5" />
           </button>
+        </div>
+
+        <div className={`-mt-3 mb-3 px-5 ${compact}`}>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-brand-700 ring-1 ring-inset ring-brand-200/70 dark:bg-brand-400/12 dark:text-brand-300 dark:ring-brand-400/20">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+            Admin console
+          </span>
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 overflow-y-auto px-3 py-5">
-          <ul className="flex flex-col gap-1 list-none m-0 p-0">
-            {visibleNavItems.map(({ label, href, icon: Icon }) => {
-              const active = isActive(pathname, href);
+        <nav className="swcl-sidebar-scroll flex-1 overflow-y-auto px-3 pb-4">
+          <div className="flex flex-col gap-4">
+            {dashboardNavGroups.map((group, index) => {
+              const items = group.items.filter((item) =>
+                canShowNavItem(item, userType),
+              );
+              if (!items.length) return null;
               return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    title={collapsed ? label : undefined}
-                    className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-colors duration-150
-                      ${
-                        active
-                          ? "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
-                          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/70 hover:text-gray-900 dark:hover:text-gray-200"
-                      }`}
-                  >
-                    {active && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-full bg-[#2D6A4F] dark:bg-[#52b788]" />
-                    )}
-                    <span className="flex-shrink-0">
-                      <Icon />
-                    </span>
-                    <span
-                      className={`whitespace-nowrap transition-opacity duration-200 flex-1 ${collapsed ? "lg:hidden" : ""}`}
+                <section key={group.label ?? `primary-${index}`}>
+                  {group.label && (
+                    <p
+                      className={`mb-2 px-2 text-[0.68rem] font-semibold uppercase tracking-[0.05em] text-slate-500 ${compact}`}
                     >
-                      {label}
-                    </span>
-                    {href === "/dashboard/communities" && !collapsed && <UnreadBadge />}
-                  </Link>
-                </li>
+                      {group.label}
+                    </p>
+                  )}
+                  {group.label && collapsed && (
+                    <div className="mx-3 mb-2 hidden h-px bg-slate-100 dark:bg-ink-line lg:block" />
+                  )}
+                  <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                    {items.map((item) => (
+                      <li key={item.href}>
+                        <NavLink
+                          item={item}
+                          active={isActive(pathname, item.href)}
+                          collapsed={collapsed}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
               );
             })}
-          </ul>
+          </div>
         </nav>
 
-        {/* Collapse toggle (desktop only) */}
+        {/* Collapse toggle (desktop, collapsed state only) */}
         <button
           onClick={toggleCollapsed}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="hidden lg:flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-xl text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/70 hover:text-gray-900 dark:hover:text-gray-200 transition-colors cursor-pointer"
+          aria-label="Expand sidebar"
+          className={`mx-3 mb-2 hidden h-9 items-center justify-center gap-2 rounded-md px-3 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white ${collapsed ? "lg:flex" : ""}`}
         >
-          <span
-            className={`flex-shrink-0 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
-          >
-            <IconChevronsLeft />
-          </span>
-          <span className={collapsed ? "hidden" : ""}>Collapse</span>
+          <ChevronsLeft className="h-[18px] w-[18px] rotate-180" />
         </button>
 
-        {/* Logout */}
-        <div className="px-3 pb-5 border-t border-gray-100 dark:border-gray-800 pt-3 flex-shrink-0">
+        {/* Logout & theme */}
+        <div className="flex-shrink-0 space-y-1 border-t border-[#eceaf4] px-3 pb-4 pt-3 dark:border-ink-line">
           <button
+            type="button"
             onClick={() => setLogoutModalOpen(true)}
             title={collapsed ? "Logout" : undefined}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 no-underline transition-colors duration-150 cursor-pointer"
+            className={`${ROW} cursor-pointer text-left text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:text-red-400 dark:hover:bg-red-500/10 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
           >
-            <span className="flex-shrink-0">
-              <IconLogout />
+            <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
+              <LogOut className="h-[18px] w-[18px]" strokeWidth={1.9} />
             </span>
-            <span
-              className={`whitespace-nowrap ${collapsed ? "lg:hidden" : ""}`}
-            >
-              Logout
-            </span>
+            <span className={`whitespace-nowrap ${compact}`}>Logout</span>
           </button>
+          <SidebarThemeToggle collapsed={collapsed} />
         </div>
       </aside>
 
-      <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
+      <LogoutModal
+        open={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+      />
     </>
+  );
+}
+
+function SidebarThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const { theme, toggle } = useTheme();
+  const isDark = theme === "dark";
+  const compact = collapsed ? "lg:hidden" : "";
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={collapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}
+      className={`mt-3 flex h-10 w-full cursor-pointer items-center gap-3 rounded-md border border-[#dceee4] bg-white px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:border-brand-200 hover:bg-[#f7fcf9] dark:border-[#27433a] dark:bg-[#13231d] dark:text-slate-100 dark:hover:border-brand-500 dark:hover:bg-[#183026] ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+    >
+      <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-brand-600 dark:text-brand-400">
+        {isDark ? (
+          <Sun className="h-[18px] w-[18px]" strokeWidth={1.9} />
+        ) : (
+          <Moon className="h-[18px] w-[18px]" strokeWidth={1.9} />
+        )}
+      </span>
+      <span className={`min-w-0 flex-1 text-left ${compact}`}>Dark mode</span>
+      <span
+        className={`flex h-5 w-9 flex-shrink-0 items-center rounded-full p-0.5 transition-colors ${compact} ${
+          isDark ? "justify-end bg-brand-400" : "justify-start bg-slate-200"
+        }`}
+        aria-hidden="true"
+      >
+        <span className="h-4 w-4 rounded-full bg-white shadow-sm transition-all" />
+      </span>
+    </button>
   );
 }

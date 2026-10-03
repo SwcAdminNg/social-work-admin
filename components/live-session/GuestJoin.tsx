@@ -54,19 +54,19 @@ export function GuestJoin() {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-ink-page px-4">
       <div className="max-w-sm w-full text-center">
         {state.status === "loading" ? (
           <>
-            <IconSpinner className="w-8 h-8 mx-auto text-[#2D6A4F] dark:text-[#52b788]" />
-            <p className="mt-4 text-sm font-medium text-gray-600 dark:text-gray-400">
+            <IconSpinner className="w-8 h-8 mx-auto text-brand-600 dark:text-brand-400" />
+            <p className="mt-4 text-sm font-medium text-slate-600 dark:text-slate-400">
               Joining the live session...
             </p>
           </>
         ) : (
           <>
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white">Can&apos;t join this session</h1>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{state.message}</p>
+            <h1 className="font-display text-lg font-bold text-slate-900 dark:text-white">Can&apos;t join this session</h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{state.message}</p>
           </>
         )}
       </div>

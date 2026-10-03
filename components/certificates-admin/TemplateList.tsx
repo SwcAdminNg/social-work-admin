@@ -60,16 +60,16 @@ export function TemplateList({ initialData, currentUserId, isAdmin }: TemplateLi
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Certificate Templates
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Design certificate templates and assign them to courses.
           </p>
         </div>
         <Link
           href="/dashboard/certificates/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start"
         >
           <IconPlus />
           New Template

@@ -28,11 +28,11 @@ function initials(user: any) {
 function ReviewerIdentity({ user, course }: { user: any; course: any }) {
   return (
     <div className="flex items-center gap-3 min-w-0 py-1">
-      <div className="w-9 h-9 shrink-0 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center text-xs font-bold">
+      <div className="w-9 h-9 shrink-0 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs font-bold">
         {initials(user)}
       </div>
       <div className="min-w-0 flex flex-col">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
           {user.first_name} {user.last_name}
         </p>
         {course && (
@@ -61,7 +61,7 @@ function RatingStars({ rating }: { rating: number }) {
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round" 
-          className={star <= rating ? "text-amber-500" : "text-gray-300 dark:text-gray-600"}
+          className={star <= rating ? "text-amber-500" : "text-slate-300 dark:text-slate-600"}
         >
           <path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 16.9l-5.9 3.3 1.3-6.5L2.5 9.2l6.6-.7L12 2.5z" />
         </svg>
@@ -82,18 +82,18 @@ function ReviewActions({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 focus:outline-none">
+        <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           align="end"
-          className="w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+          className="w-40 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-xl shadow-xl z-50 py-1 overflow-hidden"
         >
           <DropdownMenu.Item asChild>
             <button
-              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+              className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
               onClick={() => onReply(review)}
             >
               Reply
@@ -102,7 +102,7 @@ function ReviewActions({
           {review.is_hidden ? (
             <DropdownMenu.Item asChild>
               <button
-                className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
                 onClick={() => onConfirmAction("unhide", review)}
               >
                 Unhide
@@ -111,17 +111,17 @@ function ReviewActions({
           ) : (
             <DropdownMenu.Item asChild>
               <button
-                className="w-full text-left px-4 py-2.5 text-sm text-orange-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                className="w-full text-left px-4 py-2.5 text-sm text-orange-600 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
                 onClick={() => onConfirmAction("hide", review)}
               >
                 Hide
               </button>
             </DropdownMenu.Item>
           )}
-          <DropdownMenu.Separator className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+          <DropdownMenu.Separator className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
           <DropdownMenu.Item asChild>
             <button
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
               onClick={() => onConfirmAction("delete", review)}
             >
               Delete
@@ -200,13 +200,13 @@ export function ReviewList() {
       header: "Review",
       render: (r) => (
         <div className="max-w-md py-1">
-          <p className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
-            {r.review_text || <span className="text-gray-400 italic">No comment provided</span>}
+          <p className="text-sm text-slate-900 dark:text-slate-100 line-clamp-2">
+            {r.review_text || <span className="text-slate-400 italic">No comment provided</span>}
           </p>
           {r.reply_text && (
-            <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-100 dark:border-gray-800">
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-1">Reply:</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{r.reply_text}</p>
+            <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded border border-slate-100 dark:border-ink-line">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">Reply:</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{r.reply_text}</p>
             </div>
           )}
         </div>
@@ -232,7 +232,7 @@ export function ReviewList() {
       key: "date",
       header: "Date",
       render: (r) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+        <span className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">
           {new Date(r.created_at).toLocaleDateString()}
         </span>
       ),
@@ -252,16 +252,16 @@ export function ReviewList() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
             Review Management
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Moderate and respond to user reviews across all courses.
           </p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div className="bg-white dark:bg-ink-surface rounded-2xl shadow-sm border border-slate-200 dark:border-ink-line overflow-hidden">
         <DataTable
           data={data?.items || []}
           columns={columns}
@@ -284,7 +284,7 @@ export function ReviewList() {
         />
         
         {data?.meta && data.meta.total_pages > 1 && (
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/50 dark:bg-gray-900/50">
+          <div className="border-t border-slate-200 dark:border-ink-line p-4 bg-slate-50/50 dark:bg-ink-surface/50">
             <Pagination
               currentPage={page}
               totalPages={data.meta.total_pages}

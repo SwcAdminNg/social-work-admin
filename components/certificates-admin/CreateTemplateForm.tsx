@@ -76,13 +76,13 @@ export function CreateTemplateForm() {
       </div>
 
       <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 flex flex-col gap-4">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Preview</h3>
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-5 flex flex-col gap-4">
+          <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Preview</h3>
           <CertificatePreview state={state} />
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             {submitting && <IconSpinner className="text-white/80" />}
             {submitting ? "Creating…" : "Create template"}

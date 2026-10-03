@@ -50,13 +50,13 @@ export function CourseResourcesTab({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Reference material tied to this course — policies, templates, recordings, and links. Lives
           in the general Resources library, separate from the curriculum above.
         </p>
         <Link
           href={newResourceHref}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start flex-shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 no-underline self-start flex-shrink-0"
         >
           <IconPlus />
           New Resource
@@ -64,7 +64,7 @@ export function CourseResourcesTab({
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-16 text-gray-400">
+        <div className="flex items-center justify-center py-16 text-slate-400">
           <IconSpinner />
         </div>
       ) : resources && resources.length === 0 ? (

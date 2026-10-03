@@ -8,6 +8,7 @@ import type { CourseItem, CourseLiveSession } from "@/lib/api/courses.types";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { LiveSessionGuestInvites } from "./LiveSessionGuestInvites";
 import { VideoStatusBadge } from "./StatusBadge";
+import { DatePicker } from "@/components/ui/date-picker";
 
 function toLocalInputValue(iso: string): string {
   const d = new Date(iso);
@@ -132,19 +133,22 @@ export function LiveSessionEditor({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
             Date &amp; time
           </label>
-          <input
-            type="datetime-local"
+          <DatePicker
+            mode="datetime"
+            title="Live session date & time"
+            presets="future"
+            aria-label="Live session date and time"
             value={scheduledStartAt}
             disabled={!editable}
-            onChange={(e) => setScheduledStartAt(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] disabled:opacity-60 disabled:cursor-not-allowed"
+            clearable={false}
+            onChange={setScheduledStartAt}
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
             Duration (minutes)
           </label>
           <input
@@ -154,14 +158,14 @@ export function LiveSessionEditor({
             value={durationMinutes}
             disabled={!editable}
             onChange={(e) => setDurationMinutes(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
             Guest name (optional)
           </label>
           <input
@@ -171,11 +175,11 @@ export function LiveSessionEditor({
             disabled={!editable}
             onChange={(e) => setGuestName(e.target.value)}
             placeholder="e.g. Dr. Amara Okafor"
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
             Guest title (optional)
           </label>
           <input
@@ -185,7 +189,7 @@ export function LiveSessionEditor({
             disabled={!editable}
             onChange={(e) => setGuestTitle(e.target.value)}
             placeholder="e.g. Clinical Director, Crisis Response Network"
-            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
       </div>
@@ -202,7 +206,7 @@ export function LiveSessionEditor({
             type="button"
             onClick={handleSaveClick}
             disabled={!dirty || saving}
-            className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>
@@ -210,19 +214,19 @@ export function LiveSessionEditor({
       )}
 
       {(liveSession.recording_status || liveSession.status === "ENDED") && (
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-800">
-          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Recording:</span>
+        <div className="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-ink-line">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Recording:</span>
           {liveSession.recording_status ? (
             <VideoStatusBadge status={liveSession.recording_status} />
           ) : (
-            <span className="text-xs text-gray-400 dark:text-gray-600">Not available yet</span>
+            <span className="text-xs text-slate-400 dark:text-slate-600">Not available yet</span>
           )}
           {liveSession.recording_status === "READY" && (
             <button
               type="button"
               onClick={handleViewRecording}
               disabled={fetchingRecording}
-              className="text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {fetchingRecording ? "Fetching link..." : "View recording"}
             </button>

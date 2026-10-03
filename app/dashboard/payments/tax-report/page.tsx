@@ -10,6 +10,9 @@ import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTab
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { IconReceipt } from "@/components/dashboard/icons";
 import Link from "next/link";
+import { DateRangePicker, formatValue, type DateRangeValue } from "@/components/ui/date-picker";
+
+const todayValue = () => formatValue(new Date(), "date");
 
 const PAGE_SIZE = 20;
 
@@ -50,29 +53,23 @@ export default function TaxReportPage() {
   const transactions = data?.items ?? [];
   const summary = data?.summary;
 
-  function handleApplyFilters(e: React.FormEvent) {
-    e.preventDefault();
+  function handleRangeChange(range: DateRangeValue) {
+    setStartDate(range.start);
+    setEndDate(range.end);
     setPage(1);
-    setAppliedRange({ startDate: startDate || undefined, endDate: endDate || undefined });
-  }
-
-  function handleClearFilters() {
-    setStartDate("");
-    setEndDate("");
-    setPage(1);
-    setAppliedRange({});
+    setAppliedRange({ startDate: range.start || undefined, endDate: range.end || undefined });
   }
 
   const columns: DataTableColumn<TaxReportTransaction>[] = [
     {
       key: "date",
       header: "Date",
-      render: (txn) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(txn.created_at)}</span>,
+      render: (txn) => <span className="text-sm text-slate-700 dark:text-slate-300">{formatDate(txn.created_at)}</span>,
     },
     {
       key: "reference",
       header: "Reference",
-      render: (txn) => <span className="text-sm font-mono text-gray-900 dark:text-white">{txn.reference}</span>,
+      render: (txn) => <span className="text-sm font-mono text-slate-900 dark:text-white">{txn.reference}</span>,
     },
     {
       key: "user",
@@ -80,7 +77,7 @@ export default function TaxReportPage() {
       render: (txn) => (
         <Link
           href={`/dashboard/user-management/${txn.user_id}`}
-          className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline"
+          className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline"
         >
           {txn.user_id}
         </Link>
@@ -89,114 +86,92 @@ export default function TaxReportPage() {
     {
       key: "type",
       header: "Type",
-      render: (txn) => <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{txn.transaction_type}</span>,
+      render: (txn) => <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{txn.transaction_type}</span>,
     },
     {
       key: "subtotal",
       header: "Subtotal",
-      render: (txn) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatMoney(txn.subtotal_amount)}</span>,
+      render: (txn) => <span className="text-sm text-slate-700 dark:text-slate-300">{formatMoney(txn.subtotal_amount)}</span>,
     },
     {
       key: "discount",
       header: "Discount",
-      render: (txn) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatMoney(txn.discount_amount)}</span>,
+      render: (txn) => <span className="text-sm text-slate-700 dark:text-slate-300">{formatMoney(txn.discount_amount)}</span>,
     },
     {
       key: "tax_rate",
       header: "Tax Rate",
       render: (txn) => (
-        <span className="text-sm text-gray-700 dark:text-gray-300">{(txn.tax_rate * 100).toFixed(1)}%</span>
+        <span className="text-sm text-slate-700 dark:text-slate-300">{(txn.tax_rate * 100).toFixed(1)}%</span>
       ),
     },
     {
       key: "tax_amount",
       header: "VAT",
       render: (txn) => (
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatMoney(txn.tax_amount)}</span>
+        <span className="text-sm font-semibold text-slate-900 dark:text-white">{formatMoney(txn.tax_amount)}</span>
       ),
     },
     {
       key: "amount",
       header: "Total Charged",
       render: (txn) => (
-        <span className="text-sm font-bold text-gray-900 dark:text-white">{formatMoney(txn.amount)}</span>
+        <span className="text-sm font-bold text-slate-900 dark:text-white">{formatMoney(txn.amount)}</span>
       ),
     },
   ];
 
   return (
     <div className="flex flex-col gap-6">
-      <form
-        onSubmit={handleApplyFilters}
-        className="flex flex-wrap items-end gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4"
-      >
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Start Date
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface p-4 sm:flex-row sm:items-end">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:max-w-sm">
+          <label htmlFor="tax-report-range" className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            Date range
           </label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D6A4F] outline-none"
+          <DateRangePicker
+            id="tax-report-range"
+            title="Tax report period"
+            presets="past"
+            max={todayValue()}
+            start={startDate}
+            end={endDate}
+            onChange={handleRangeChange}
+            placeholder="All time"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            End Date
-          </label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D6A4F] outline-none"
-          />
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-xl transition-colors shadow-sm"
-        >
-          Apply
-        </button>
-        {(appliedRange.startDate || appliedRange.endDate) && (
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
-          >
-            Clear
-          </button>
+        {isFetching && (appliedRange.startDate || appliedRange.endDate) && (
+          <p className="text-xs font-medium text-slate-400 sm:pb-3">Updating…</p>
         )}
-      </form>
+      </div>
 
       {summary && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <div className="rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface p-5">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               Total VAT Collected
             </div>
-            <div className="mt-2 text-2xl font-extrabold text-gray-900 dark:text-white">
+            <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
               {formatMoney(summary.total_tax_amount)}
             </div>
             {(summary.start_date || summary.end_date) && (
-              <div className="mt-1 text-xs text-gray-400">
+              <div className="mt-1 text-xs text-slate-400">
                 {summary.start_date ?? "beginning"} → {summary.end_date ?? "now"}
               </div>
             )}
           </div>
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <div className="rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface p-5">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               Taxable Transactions
             </div>
-            <div className="mt-2 text-2xl font-extrabold text-gray-900 dark:text-white">
+            <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
               {summary.total_taxable_transactions.toLocaleString()}
             </div>
           </div>
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <div className="rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface p-5">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               VAT Rate
             </div>
-            <div className="mt-2 text-2xl font-extrabold text-gray-900 dark:text-white">
+            <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
               {(summary.tax_rate * 100).toFixed(1)}%
             </div>
           </div>

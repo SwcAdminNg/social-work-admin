@@ -82,21 +82,21 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">FAQ Management</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">FAQ Management</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Organize the public help center into categories and questions.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="text-sm font-bold text-gray-900 dark:text-white">Categories</h2>
+        <div className="bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-ink-line">
+            <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">Categories</h2>
             <button
               type="button"
               onClick={() => setCategoryModal({ open: true, category: null })}
-              className="p-1.5 rounded-lg text-[#2D6A4F] dark:text-[#52b788] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-brand-600 dark:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label="Add category"
             >
               <IconPlus />
@@ -109,19 +109,19 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                 onClick={() => setSelectedCategoryId("all")}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-left transition-colors cursor-pointer ${
                   selectedCategoryId === "all"
-                    ? "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
               >
                 All Questions
-                <span className="text-xs text-gray-400">{items.length}</span>
+                <span className="text-xs text-slate-400">{items.length}</span>
               </button>
             </li>
             {categories.map((cat) => (
               <li key={cat.id} className="group">
                 <div
                   className={`flex items-center gap-1 px-1 rounded-lg ${
-                    selectedCategoryId === cat.id ? "bg-[#2D6A4F]/10 dark:bg-[#52b788]/15" : "hover:bg-gray-50 dark:hover:bg-gray-800"
+                    selectedCategoryId === cat.id ? "bg-brand-600/10 dark:bg-brand-400/15" : "hover:bg-slate-50 dark:hover:bg-slate-800"
                   }`}
                 >
                   <button
@@ -129,19 +129,19 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                     onClick={() => setSelectedCategoryId(cat.id)}
                     className={`flex-1 min-w-0 flex items-center justify-between py-2 px-2 text-sm font-medium text-left cursor-pointer ${
                       selectedCategoryId === cat.id
-                        ? "text-[#2D6A4F] dark:text-[#52b788]"
-                        : "text-gray-600 dark:text-gray-400"
+                        ? "text-brand-600 dark:text-brand-400"
+                        : "text-slate-600 dark:text-slate-400"
                     }`}
                   >
                     <span className="truncate">{cat.name}</span>
-                    <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                    <span className="text-xs text-slate-400 flex-shrink-0 ml-2">
                       {items.filter((i) => i.category_id === cat.id).length}
                     </span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setCategoryModal({ open: true, category: cat })}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-opacity cursor-pointer flex-shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-opacity cursor-pointer flex-shrink-0"
                     aria-label={`Edit ${cat.name}`}
                   >
                     <IconChevronDown className="rotate-[-90deg]" />
@@ -149,7 +149,7 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                   <button
                     type="button"
                     onClick={() => setDeleteState({ open: true, type: "category", id: cat.id, label: cat.name })}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-opacity cursor-pointer flex-shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-opacity cursor-pointer flex-shrink-0"
                     aria-label={`Delete ${cat.name}`}
                   >
                     <IconTrash />
@@ -158,7 +158,7 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
               </li>
             ))}
             {categories.length === 0 && (
-              <li className="px-3 py-6 text-center text-xs text-gray-400">No categories yet.</li>
+              <li className="px-3 py-6 text-center text-xs text-slate-400">No categories yet.</li>
             )}
           </ul>
         </div>
@@ -167,13 +167,13 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Audience
                 </span>
                 <select
                   value={selectedAudience}
                   onChange={(e) => setSelectedAudience(e.target.value as FaqAudience | "all")}
-                  className="px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] text-gray-900 dark:text-white"
+                  className="px-3 py-2 text-sm bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-900 dark:text-white"
                 >
                   <option value="all">All Audiences</option>
                   {AUDIENCE_OPTIONS.map((opt) => (
@@ -184,13 +184,13 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
                 </select>
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   Visibility
                 </span>
                 <select
                   value={selectedVisibility}
                   onChange={(e) => setSelectedVisibility(e.target.value as FaqVisibility | "all")}
-                  className="px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] text-gray-900 dark:text-white"
+                  className="px-3 py-2 text-sm bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-900 dark:text-white"
                 >
                   <option value="all">All Visibility</option>
                   {VISIBILITY_OPTIONS.map((opt) => (
@@ -206,7 +206,7 @@ export function FaqManager({ initialCategories, initialItems }: FaqManagerProps)
               onClick={() => setItemModal({ open: true, item: null })}
               disabled={categories.length === 0}
               title={categories.length === 0 ? "Create a category first" : undefined}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <IconPlus />
               Add Question
@@ -310,7 +310,7 @@ function FaqItemCard({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4">
+    <div className="bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl p-4">
       <div className="flex items-start justify-between gap-4">
         <button
           type="button"
@@ -319,17 +319,17 @@ function FaqItemCard({
         >
           <IconChevronDown className={`flex-shrink-0 mt-0.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.question}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.question}</p>
             <div className="flex items-center gap-2 mt-1">
               {categoryLabel && (
-                <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+                <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">
                   {categoryLabel}
                 </span>
               )}
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">
                 {item.audience === "BOTH" ? "Student & Instructor" : item.audience === "INSTRUCTOR" ? "Instructor" : "Student"}
               </span>
-              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">
+              <span className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">
                 {item.visibility === "ACCOUNT" ? "Account-only" : "Public"}
               </span>
             </div>
@@ -343,7 +343,7 @@ function FaqItemCard({
             className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider cursor-pointer transition-colors ${
               item.is_published
                 ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
             }`}
           >
             {item.is_published ? "Published" : "Draft"}
@@ -351,14 +351,14 @@ function FaqItemCard({
           <button
             type="button"
             onClick={onEdit}
-            className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={onDelete}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
             aria-label="Delete question"
           >
             <IconTrash />
@@ -368,21 +368,21 @@ function FaqItemCard({
 
       {expanded && (
         <div className="mt-3 pl-6 flex flex-col gap-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+          <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed">
             {item.answer}
           </p>
           {item.keywords.length > 0 && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               <span className="font-semibold">Keywords:</span> {item.keywords.join(", ")}
             </p>
           )}
           {item.escalation_route && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               <span className="font-semibold">Escalation route:</span> {item.escalation_route}
             </p>
           )}
           {item.related_article_ids.length > 0 && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-400">
               <span className="font-semibold">Related articles:</span> {item.related_article_ids.length}
             </p>
           )}
@@ -433,38 +433,38 @@ function CategoryModal({
     <Modal isOpen={state.open} onClose={onClose} title={state.category ? "Edit Category" : "New Category"} maxWidth="sm">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Billing & Payments"
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Display Order
           </label>
           <input
             type="number"
             value={order}
             onChange={(e) => setOrder(Number(e.target.value))}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
         <div className="flex justify-end gap-3 mt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
           >
             {saving ? <IconSpinner className="w-4 h-4" /> : null}
             {state.category ? "Save Changes" : "Create Category"}
@@ -570,8 +570,8 @@ function ItemModal({
   };
 
   const inputClass =
-    "w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]";
-  const labelClass = "block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1";
+    "w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400";
+  const labelClass = "block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1";
 
   return (
     <Modal isOpen={state.open} onClose={onClose} title={state.item ? "Edit Question" : "New Question"} maxWidth="lg">
@@ -656,12 +656,12 @@ function ItemModal({
                 className={inputClass}
               />
             </div>
-            <label className="col-span-2 sm:col-span-1 flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer h-[38px]">
+            <label className="col-span-2 sm:col-span-1 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer h-[38px]">
               <input
                 type="checkbox"
                 checked={isPublished}
                 onChange={(e) => setIsPublished(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-600"
               />
               Published
             </label>
@@ -669,7 +669,7 @@ function ItemModal({
 
           <div>
             <label className={labelClass}>
-              Keywords <span className="text-gray-400 font-normal">(comma-separated)</span>
+              Keywords <span className="text-slate-400 font-normal">(comma-separated)</span>
             </label>
             <input
               value={keywordsText}
@@ -684,28 +684,28 @@ function ItemModal({
               <button
                 type="button"
                 onClick={() => setShowRelated((v) => !v)}
-                className="w-full flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer py-1"
+                className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer py-1"
               >
                 <span>
                   Related Articles{" "}
                   {relatedArticleIds.length > 0 && (
-                    <span className="ml-1 text-[#2D6A4F] dark:text-[#52b788]">({relatedArticleIds.length} selected)</span>
+                    <span className="ml-1 text-brand-600 dark:text-brand-400">({relatedArticleIds.length} selected)</span>
                   )}
                 </span>
                 <IconChevronDown className={`transition-transform ${showRelated ? "rotate-180" : ""}`} />
               </button>
               {showRelated && (
-                <div className="mt-2 max-h-36 overflow-y-auto rounded-xl border border-gray-300 dark:border-gray-700 p-2 flex flex-col gap-0.5">
+                <div className="mt-2 max-h-36 overflow-y-auto rounded-xl border border-slate-300 dark:border-slate-700 p-2 flex flex-col gap-0.5">
                   {relatedOptions.map((opt) => (
                     <label
                       key={opt.id}
-                      className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                      className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 px-2 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                     >
                       <input
                         type="checkbox"
                         checked={relatedArticleIds.includes(opt.id)}
                         onChange={() => toggleRelatedArticle(opt.id)}
-                        className="w-4 h-4 flex-shrink-0 rounded border-gray-300 dark:border-gray-700 text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                        className="w-4 h-4 flex-shrink-0 rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-600"
                       />
                       <span className="truncate">{opt.question}</span>
                     </label>
@@ -716,18 +716,18 @@ function ItemModal({
           )}
         </div>
 
-        <div className="sticky bottom-0 flex justify-end gap-3 px-4 sm:px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="sticky bottom-0 flex justify-end gap-3 px-4 sm:px-6 py-3 border-t border-slate-100 dark:border-ink-line bg-white dark:bg-ink-surface">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !question.trim() || !answer.trim() || !categoryId}
-            className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer"
           >
             {saving ? <IconSpinner className="w-4 h-4" /> : null}
             {state.item ? "Save Changes" : "Create Question"}

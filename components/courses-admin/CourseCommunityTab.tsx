@@ -29,7 +29,7 @@ export function CourseCommunityTab({ courseId }: { courseId: string }) {
   if (communitiesQuery.isLoading) {
     return (
       <div className="flex justify-center py-16">
-        <IconSpinner className="w-5 h-5 text-gray-400" />
+        <IconSpinner className="w-5 h-5 text-slate-400" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function CourseCommunityTab({ courseId }: { courseId: string }) {
   }
 
   return (
-    <div className="h-[36rem] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div className="h-[36rem] rounded-2xl border border-slate-200 dark:border-ink-line overflow-hidden">
       <CommunityChatPanel
         communityId={community.id}
         communityName={community.name}

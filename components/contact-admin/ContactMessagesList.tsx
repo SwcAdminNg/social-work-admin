@@ -15,6 +15,7 @@ import {
 import { DataTable, type DataTableColumn } from "@/components/generic/ui/DataTable";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
 
 interface ContactMessagesListProps {
   initialData: PaginatedResult<ContactMessage>;
@@ -46,6 +47,13 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
 
   const handleFilterChange = (key: keyof ContactMessagesFilters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // The picker has its own Apply, so a new range is fetched straight away.
+  const handleDateRangeChange = ({ start, end }: DateRangeValue) => {
+    const next = { ...filters, start_date: start, end_date: end };
+    setFilters(next);
+    fetchPage(1, next);
   };
 
   const applyFilters = (e?: React.FormEvent) => {
@@ -85,14 +93,14 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
       hideInCard: true,
       render: (msg) => (
         <div>
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">
             {msg.full_name}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {msg.email}
           </p>
           {msg.company_name && (
-            <p className="text-[10px] uppercase font-bold text-gray-400 mt-0.5">
+            <p className="text-[10px] uppercase font-bold text-slate-400 mt-0.5">
               {msg.company_name}
             </p>
           )}
@@ -122,31 +130,31 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Contact Messages
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             View and manage all incoming messages from the "Contact Us" form.
           </p>
         </div>
 
         {/* Filters */}
-        <form onSubmit={applyFilters} className="bg-white dark:bg-gray-900 p-4 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col gap-4">
+        <form onSubmit={applyFilters} className="bg-white dark:bg-ink-surface p-4 border border-slate-200 dark:border-ink-line rounded-2xl flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Search</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Search</label>
               <input
                 type="text"
                 placeholder="Name, email..."
-                className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 value={filters.search}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Platform</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Platform</label>
               <select
-                className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 value={filters.platform}
                 onChange={(e) => handleFilterChange("platform", e.target.value)}
               >
@@ -156,9 +164,9 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Category</label>
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Category</label>
               <select
-                className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 value={filters.category}
                 onChange={(e) => handleFilterChange("category", e.target.value)}
               >
@@ -169,22 +177,15 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 <option value="courses">Courses</option>
               </select>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Start Date</label>
-              <input
-                type="date"
-                className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-                value={filters.start_date}
-                onChange={(e) => handleFilterChange("start_date", e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">End Date</label>
-              <input
-                type="date"
-                className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-                value={filters.end_date}
-                onChange={(e) => handleFilterChange("end_date", e.target.value)}
+            <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
+              <label htmlFor="contact-date-range" className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Date Received</label>
+              <DateRangePicker
+                id="contact-date-range"
+                title="Messages received between"
+                presets="past"
+                start={filters.start_date ?? ""}
+                end={filters.end_date ?? ""}
+                onChange={handleDateRangeChange}
               />
             </div>
           </div>
@@ -192,7 +193,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             <button
               type="button"
               onClick={clearFilters}
-              className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Clear
             </button>
@@ -217,11 +218,11 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             skeletonRows={5}
             cardTitle={(msg) => (
               <div className="flex flex-col min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                   {msg.full_name}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{msg.email}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{msg.email}</p>
                 </div>
               </div>
             )}
@@ -229,7 +230,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
               <button
                 type="button"
                 onClick={() => setSelectedMessage(msg)}
-                className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-xs font-semibold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors cursor-pointer"
               >
                 View
               </button>
@@ -261,20 +262,20 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             onClick={() => setSelectedMessage(null)}
             aria-hidden="true"
           />
-          <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-ink-surface rounded-2xl shadow-2xl border border-slate-200 dark:border-ink-line flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-ink-line flex-shrink-0">
               <div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white">
                   Message Details
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Sent on {formatDate(selectedMessage.created_at)}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedMessage(null)}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <IconX size={20} />
               </button>
@@ -283,19 +284,19 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             <div className="p-6 overflow-y-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                     Sender Info
                   </p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
                     {selectedMessage.full_name}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
                     <a href={`mailto:${selectedMessage.email}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                       {selectedMessage.email}
                     </a>
                   </p>
                   {selectedMessage.phone_number && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       <a href={`tel:${selectedMessage.phone_number}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         {selectedMessage.phone_number}
                       </a>
@@ -304,18 +305,18 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 </div>
 
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                     Additional Info
                   </p>
                   {selectedMessage.company_name && (
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <p className="text-sm text-slate-700 dark:text-slate-300">
                       <span className="font-semibold">Company:</span> {selectedMessage.company_name}
                     </p>
                   )}
-                  <p className="text-sm text-gray-700 dark:text-gray-300 capitalize">
+                  <p className="text-sm text-slate-700 dark:text-slate-300 capitalize">
                     <span className="font-semibold">Category:</span> {selectedMessage.category || "General"}
                   </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <p className="text-sm text-slate-700 dark:text-slate-300">
                     <span className="font-semibold">Platform:</span> {selectedMessage.platform}
                   </p>
                 </div>
@@ -323,32 +324,32 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
 
               {selectedMessage.subject && (
                 <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                     Subject
                   </p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">
                     {selectedMessage.subject}
                   </p>
                 </div>
               )}
 
               <div>
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
                   Message Content
                 </p>
-                <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-ink-line">
+                  <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
                     {selectedMessage.message}
                   </p>
                 </div>
               </div>
             </div>
             
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 flex justify-end flex-shrink-0">
+            <div className="px-6 py-4 border-t border-slate-100 dark:border-ink-line bg-slate-50 dark:bg-slate-800/30 flex justify-end flex-shrink-0">
                <button
                   type="button"
                   onClick={() => setSelectedMessage(null)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Close
                 </button>

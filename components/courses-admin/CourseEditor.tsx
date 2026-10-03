@@ -125,14 +125,14 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       <div>
         <Link
           href="/dashboard/course-management"
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] no-underline transition-colors duration-150"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 no-underline transition-colors duration-150"
         >
           ← Back to Course Management
         </Link>
       </div>
 
       {/* Hero banner — thumbnail, title, and at-a-glance course meta */}
-      <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#2D6A4F] to-[#1e4d38] text-white shadow-lg shadow-green-900/20">
+      <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-lg shadow-green-900/20">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-6 sm:p-8">
           <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-2xl bg-white/10 border border-white/20 overflow-hidden flex items-center justify-center text-white/70">
             {course.thumbnail_url ? (
@@ -153,7 +153,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
               {categoryLabel(course.category)} · {levelLabel(course.level)}
             </p>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight truncate">
+              <h1 className="font-display text-xl sm:text-2xl font-extrabold tracking-tight truncate">
                 {course.title}
               </h1>
               <PublishedBadge isPublished={course.is_published} tone="banner" />
@@ -185,7 +185,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-1 rounded-xl bg-gray-100 dark:bg-gray-900 p-1 self-start overflow-x-auto">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-ink-surface p-1 self-start overflow-x-auto">
           {(
             [
               { key: "details", label: "Details", icon: IconBookOpen, count: undefined },
@@ -203,8 +203,8 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
               onClick={() => setTab(key)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-150 cursor-pointer whitespace-nowrap ${
                 tab === key
-                  ? "bg-white dark:bg-gray-800 text-[#2D6A4F] dark:text-[#52b788] shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                  ? "bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
               <Icon />
@@ -213,8 +213,8 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
                 <span
                   className={`inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[0.65rem] font-bold ${
                     tab === key
-                      ? "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
-                      : "bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                      ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400"
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                   }`}
                 >
                   {count}
@@ -233,7 +233,7 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
           <button
             type="button"
             onClick={() => setDeleteOpen(true)}
-            className="p-2.5 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
+            className="p-2.5 rounded-xl text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
             aria-label="Delete course"
           >
             <IconTrash />
@@ -250,8 +250,8 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
       {tab === "curriculum" && (
         <div className="flex flex-col gap-4">
           {course.governance?.governance_enabled && (
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-              <span className="text-xs font-bold uppercase text-gray-500">Layer</span>
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 dark:border-ink-line dark:bg-ink-surface">
+              <span className="text-xs font-bold uppercase text-slate-500">Layer</span>
               {(["auto", "draft", "live"] as const).map((option) => (
                 <button
                   key={option}
@@ -259,14 +259,14 @@ export function CourseEditor({ initialCourse }: { initialCourse: CourseDetail })
                   onClick={() => handleLayerChange(option)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-bold ${
                     layer === option
-                      ? "bg-[#2D6A4F] text-white"
-                      : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
                   }`}
                 >
                   {option.toUpperCase()}
                 </button>
               ))}
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Current response: {course.governance.layer ?? layer}
               </span>
             </div>

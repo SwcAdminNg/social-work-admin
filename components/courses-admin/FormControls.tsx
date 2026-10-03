@@ -15,18 +15,18 @@ function FieldWrapper({
 }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      <label htmlFor={htmlFor} className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-600">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-600">{hint}</p>}
     </div>
   );
 }
 
 const inputClass =
-  "w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 disabled:opacity-60 disabled:cursor-not-allowed";
 
 interface BaseFieldProps {
   label: string;
@@ -154,7 +154,7 @@ export function ToggleField({
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={`relative mt-0.5 w-10 h-6 flex-shrink-0 rounded-full transition-colors duration-200 ${
-          checked ? "bg-[#2D6A4F] dark:bg-[#52b788]" : "bg-gray-300 dark:bg-gray-700"
+          checked ? "bg-brand-600 dark:bg-brand-400" : "bg-slate-300 dark:bg-slate-700"
         }`}
       >
         <span
@@ -164,8 +164,8 @@ export function ToggleField({
         />
       </button>
       <span>
-        <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
-        {hint && <span className="block text-xs text-gray-400 dark:text-gray-600 mt-0.5">{hint}</span>}
+        <span className="block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
+        {hint && <span className="block text-xs text-slate-400 dark:text-slate-600 mt-0.5">{hint}</span>}
       </span>
     </label>
   );

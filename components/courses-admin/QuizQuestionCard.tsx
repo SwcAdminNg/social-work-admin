@@ -139,20 +139,20 @@ export function QuizQuestionCard({
   const hasCorrectOption = question.options.some((o) => o.is_correct);
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-ink-line p-4">
       <div className="flex items-start gap-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onBlur={saveText}
-          className="flex-1 bg-transparent text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800 rounded px-1.5 py-1"
+          className="flex-1 bg-transparent text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800 rounded px-1.5 py-1"
         />
         {onDuplicate && (
           <button
             type="button"
             onClick={onDuplicate}
             disabled={duplicating}
-            className="p-1.5 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Duplicate question as a variant"
             title="Duplicate as a variant (so retakes can draw a different version instead of repeating this one)"
           >
@@ -162,7 +162,7 @@ export function QuizQuestionCard({
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
+          className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
           aria-label="Delete question"
         >
           <IconTrash />
@@ -170,12 +170,12 @@ export function QuizQuestionCard({
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none text-xs font-medium text-gray-500 dark:text-gray-400">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none text-xs font-medium text-slate-500 dark:text-slate-400">
           <input
             type="checkbox"
             checked={question.allow_multiple_answers}
             onChange={toggleAllowMultiple}
-            className="accent-[#2D6A4F]"
+            className="accent-brand-600"
           />
           Allow multiple correct answers
         </label>
@@ -183,7 +183,7 @@ export function QuizQuestionCard({
           <select
             value={question.multi_answer_mode || "OR"}
             onChange={(e) => updateMultiAnswerMode(e.target.value as "AND" | "OR")}
-            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-600 dark:focus:ring-brand-400"
           >
             <option value="OR">Partial Credit (OR)</option>
             <option value="AND">All-or-Nothing (AND)</option>
@@ -223,12 +223,12 @@ export function QuizQuestionCard({
             }
           }}
           placeholder="New option text"
-          className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+          className="flex-1 rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
         />
         <button
           type="button"
           onClick={handleAddOption}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 cursor-pointer"
         >
           <IconPlus />
           Add
@@ -271,18 +271,18 @@ function OptionRow({
         type={allowMultiple ? "checkbox" : "radio"}
         checked={isCorrect}
         onChange={(e) => onToggleCorrect(e.target.checked)}
-        className="accent-[#2D6A4F]"
+        className="accent-brand-600"
       />
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
         onBlur={() => onSaveText(text)}
-        className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+        className="flex-1 rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
       />
       <button
         type="button"
         onClick={onRemove}
-        className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
+        className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
         aria-label="Remove option"
       >
         <IconTrash />

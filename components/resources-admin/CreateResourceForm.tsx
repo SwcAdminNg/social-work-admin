@@ -57,7 +57,7 @@ export function CreateResourceForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6"
+      className="flex flex-col gap-5 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6"
     >
       <TextField
         label="Name"
@@ -95,7 +95,7 @@ export function CreateResourceForm({
       />
 
       {!!presetCourseId && (
-        <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+        <p className="text-xs text-slate-500 dark:text-slate-400 -mt-2">
           Pre-filled to tie this resource to the course you came from. Change visibility above to detach it.
         </p>
       )}
@@ -103,7 +103,7 @@ export function CreateResourceForm({
       <button
         type="submit"
         disabled={submitting}
-        className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+        className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
       >
         {submitting && <IconSpinner className="text-white/80" />}
         {submitting ? "Creating…" : "Create draft resource"}

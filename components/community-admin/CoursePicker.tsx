@@ -108,7 +108,7 @@ export function CoursePicker({
 
       {(multiple || value.length === 0) && (
         <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={query}
@@ -118,25 +118,25 @@ export function CoursePicker({
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
-            className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
           />
-          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />}
+          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />}
         </div>
       )}
 
       {open && query.trim() && (
-        <div className="absolute top-full mt-1 left-0 right-0 z-10 max-h-56 overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
+        <div className="absolute top-full mt-1 left-0 right-0 z-10 max-h-56 overflow-y-auto bg-white dark:bg-ink-surface border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg">
           {!loading && filteredResults.length === 0 ? (
-            <p className="px-3 py-2.5 text-sm text-gray-400">No matching courses.</p>
+            <p className="px-3 py-2.5 text-sm text-slate-400">No matching courses.</p>
           ) : (
             filteredResults.map((course) => (
               <button
                 key={course.id}
                 type="button"
                 onClick={() => addCourse(course)}
-                className="w-full text-left px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col cursor-pointer"
+                className="w-full text-left px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex flex-col cursor-pointer"
               >
-                <span className="text-sm font-medium text-gray-900 dark:text-white">{course.title}</span>
+                <span className="text-sm font-medium text-slate-900 dark:text-white">{course.title}</span>
               </button>
             ))
           )}

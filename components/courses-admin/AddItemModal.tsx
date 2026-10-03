@@ -16,6 +16,7 @@ import {
   IconUpload,
   IconX,
 } from "@/components/dashboard/icons";
+import { DatePicker, formatValue } from "@/components/ui/date-picker";
 
 type UIItemType = "VIDEO" | "DOCUMENT" | "QUIZ" | "ESSAY" | "QUIZ_GROUP" | "LINKS" | "LIVE_SESSION";
 
@@ -296,9 +297,9 @@ export function AddItemModal({
       />
       <form
         onSubmit={handleSubmit}
-        className="relative w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 shadow-xl flex flex-col gap-4"
+        className="relative w-full max-w-md rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6 shadow-xl flex flex-col gap-4"
       >
-        <h2 className="text-base font-bold text-gray-900 dark:text-white">
+        <h2 className="font-display text-base font-bold text-slate-900 dark:text-white">
           Add curriculum item
         </h2>
 
@@ -311,8 +312,8 @@ export function AddItemModal({
                 onClick={() => setItemType(value)}
                 className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border text-xs font-semibold transition-colors duration-150 cursor-pointer ${
                   itemType === value
-                    ? "border-[#2D6A4F] dark:border-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788]"
-                    : "border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700"
+                    ? "border-brand-600 dark:border-brand-400 bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400"
+                    : "border-slate-200 dark:border-ink-line text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
               >
                 <Icon />
@@ -325,7 +326,7 @@ export function AddItemModal({
             <div>
               <label
                 htmlFor="item-title"
-                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Title
               </label>
@@ -346,13 +347,13 @@ export function AddItemModal({
                           ? "e.g. Module 1 final"
                           : "e.g. Midterm essay"
                 }
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </div>
             <div>
               <label
                 htmlFor="item-estimated-minutes"
-                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Estimated Time (minutes)
               </label>
@@ -363,7 +364,7 @@ export function AddItemModal({
                 value={estimatedMinutes}
                 onChange={(e) => setEstimatedMinutes(e.target.value)}
                 placeholder="Optional"
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </div>
           </div>
@@ -380,20 +381,20 @@ export function AddItemModal({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-150"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-150"
                 >
                   <IconUpload />
                   Select Document
                 </button>
               ) : (
-                <div className="flex items-center justify-between gap-3 text-sm px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800">
-                  <div className="font-medium text-gray-800 dark:text-gray-200 truncate flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-3 text-sm px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800">
+                  <div className="font-medium text-slate-800 dark:text-slate-200 truncate flex-1 min-w-0">
                     {file.name}
                   </div>
                   <button
                     type="button"
                     onClick={clearFile}
-                    className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    className="p-1 rounded-full text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700"
                     aria-label="Remove file"
                   >
                     <IconX size={16} />
@@ -405,9 +406,9 @@ export function AddItemModal({
                   type="checkbox"
                   checked={downloadable}
                   onChange={(e) => setDownloadable(e.target.checked)}
-                  className="accent-[#2D6A4F]"
+                  className="accent-brand-600"
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-slate-600 dark:text-slate-400">
                   Allow students to download this document
                 </span>
               </label>
@@ -419,7 +420,7 @@ export function AddItemModal({
               <div>
                 <label
                   htmlFor="item-link-url"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                 >
                   URL
                 </label>
@@ -430,13 +431,13 @@ export function AddItemModal({
                   onChange={(e) => setLinkUrl(e.target.value)}
                   required
                   placeholder="https://example.org/article"
-                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                 />
               </div>
               <div>
                 <label
                   htmlFor="item-link-label"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Display label (optional)
                 </label>
@@ -446,13 +447,13 @@ export function AddItemModal({
                   value={linkLabel}
                   onChange={(e) => setLinkLabel(e.target.value)}
                   placeholder="e.g. Trauma-Informed Practice: A Primer"
-                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                 />
               </div>
               <div>
                 <label
                   htmlFor="item-link-description"
-                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Description (optional)
                 </label>
@@ -462,7 +463,7 @@ export function AddItemModal({
                   onChange={(e) => setLinkDescription(e.target.value)}
                   rows={2}
                   placeholder="A short blurb about this resource."
-                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                  className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                 />
               </div>
             </div>
@@ -474,23 +475,25 @@ export function AddItemModal({
                 <div>
                   <label
                     htmlFor="item-live-session-start"
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Date &amp; time
                   </label>
-                  <input
+                  <DatePicker
                     id="item-live-session-start"
-                    type="datetime-local"
+                    mode="datetime"
+                    title="Live session date & time"
+                    presets="future"
+                    min={formatValue(new Date(), "datetime")}
                     value={scheduledStartAt}
-                    onChange={(e) => setScheduledStartAt(e.target.value)}
+                    onChange={setScheduledStartAt}
                     required
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="item-live-session-duration"
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Duration (minutes)
                   </label>
@@ -502,7 +505,7 @@ export function AddItemModal({
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(e.target.value)}
                     placeholder="60"
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                    className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                   />
                 </div>
               </div>
@@ -510,7 +513,7 @@ export function AddItemModal({
                 <div>
                   <label
                     htmlFor="item-live-session-guest-name"
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Guest name (optional)
                   </label>
@@ -521,13 +524,13 @@ export function AddItemModal({
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="e.g. Dr. Amara Okafor"
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                    className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="item-live-session-guest-title"
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Guest title (optional)
                   </label>
@@ -538,7 +541,7 @@ export function AddItemModal({
                     value={guestTitle}
                     onChange={(e) => setGuestTitle(e.target.value)}
                     placeholder="e.g. Clinical Director, Crisis Response Network"
-                    className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                    className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                   />
                 </div>
               </div>
@@ -553,9 +556,9 @@ export function AddItemModal({
               type="checkbox"
               checked={isPreview}
               onChange={(e) => setIsPreview(e.target.checked)}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-slate-600 dark:text-slate-400">
               Allow non-enrolled users to preview this item
             </span>
           </label>
@@ -566,11 +569,11 @@ export function AddItemModal({
                 type="checkbox"
                 checked={isFinalAssessment}
                 onChange={(e) => setIsFinalAssessment(e.target.checked)}
-                className="accent-[#2D6A4F] mt-0.5"
+                className="accent-brand-600 mt-0.5"
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-slate-600 dark:text-slate-400">
                 Final assessment for this section
-                <span className="block text-xs text-gray-400 dark:text-gray-600 mt-0.5">
+                <span className="block text-xs text-slate-400 dark:text-slate-600 mt-0.5">
                   Students must pass this before the next section unlocks. Can be changed later in settings.
                 </span>
               </span>
@@ -580,12 +583,12 @@ export function AddItemModal({
 
         {isUploading && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-center text-gray-700 dark:text-gray-300">
+            <p className="text-sm font-medium text-center text-slate-700 dark:text-slate-300">
               Uploading: {Math.round(uploadProgress)}%
             </p>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
               <div
-                className="bg-[#2D6A4F] h-2.5 rounded-full transition-all duration-150"
+                className="bg-brand-600 h-2.5 rounded-full transition-all duration-150"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
@@ -597,14 +600,14 @@ export function AddItemModal({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
+            className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             {submitting && !isUploading && (
               <IconSpinner className="text-white/80" />

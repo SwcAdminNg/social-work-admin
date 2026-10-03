@@ -66,7 +66,7 @@ export function CertificatePreview({
   return (
     <div className="flex flex-col gap-2">
       <div
-        className="relative w-full aspect-[3/2] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 shadow-inner"
+        className="relative w-full aspect-[3/2] overflow-hidden rounded-lg border border-slate-200 dark:border-ink-line shadow-inner"
         style={{ backgroundColor: state.backgroundColor || "#FFFFFF", fontFamily: fontStack(state.fontFamily) }}
       >
         {state.borderStyle !== "NONE" && (
@@ -99,7 +99,7 @@ export function CertificatePreview({
           >
             {state.organizationName || "Social Workers Academy"}
           </p>
-          <h2 className="text-lg sm:text-2xl font-extrabold tracking-tight mt-1" style={{ color: state.accentColor }}>
+          <h2 className="font-display text-lg sm:text-2xl font-extrabold tracking-tight mt-1" style={{ color: state.accentColor }}>
             {state.titleText || "Certificate of Completion"}
           </h2>
           {state.subtitleText && (
@@ -144,7 +144,7 @@ export function CertificatePreview({
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 dark:text-gray-600">
+      <p className="text-xs text-slate-400 dark:text-slate-600">
         Preview only — uses sample data. Actual rendering happens server-side on first view.
       </p>
 

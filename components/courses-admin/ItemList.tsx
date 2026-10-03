@@ -60,7 +60,7 @@ export function ItemList({
 
   if (section.items.length === 0) {
     return (
-      <p className="text-sm text-gray-400 dark:text-gray-600 px-1 py-3">
+      <p className="text-sm text-slate-400 dark:text-slate-600 px-1 py-3">
         No items yet — add a video, document, or quiz to this section.
       </p>
     );

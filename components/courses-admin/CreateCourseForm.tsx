@@ -13,6 +13,7 @@ import { DynamicStringListInput } from "./DynamicStringListInput";
 import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
 import { InstructorsInput } from "./InstructorsInput";
 import type { CourseInstructorInputDTO, AccessMode } from "@/lib/api/courses.types";
+import { DateRangePicker } from "@/components/ui/date-picker";
 
 export function CreateCourseForm() {
   const router = useRouter();
@@ -86,7 +87,7 @@ export function CreateCourseForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
       <TextField label="Title" id="title" value={title} onChange={setTitle} required placeholder="e.g. Ethics in Social Work" />
       <TextAreaField label="Description" id="description" value={description} onChange={setDescription} required placeholder="What will learners get from this course?" />
       <TextField
@@ -105,7 +106,7 @@ export function CreateCourseForm() {
 
       <InstructorsInput value={instructors} onChange={setInstructors} />
 
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-ink-line p-4">
         <ToggleField
           label="Scheduled Access"
           hint="Limit access to this course to a specific date window."
@@ -113,34 +114,30 @@ export function CreateCourseForm() {
           onChange={(checked) => setAccessMode(checked ? "SCHEDULED" : "SELF_PACED")}
         />
         {accessMode === "SCHEDULED" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="accessStartDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                Access Start Date
-              </label>
-              <input
-                type="datetime-local"
-                id="accessStartDate"
-                value={accessStartDate}
-                onChange={(e) => setAccessStartDate(e.target.value)}
-                required
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="accessEndDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                Access End Date
-              </label>
-              <input
-                type="datetime-local"
-                id="accessEndDate"
-                value={accessEndDate}
-                onChange={(e) => setAccessEndDate(e.target.value)}
-                required
-                min={accessStartDate}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-              />
-            </div>
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label htmlFor="accessWindow" className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              Access Window
+            </label>
+            <DateRangePicker
+              id="accessWindow"
+              mode="datetime"
+              title="Course access window"
+              presets="future"
+              requireEnd
+              required
+              startTimeLabel="Opens at"
+              endTimeLabel="Closes at"
+              defaultStartTime={{ hours: 9, minutes: 0 }}
+              defaultEndTime={{ hours: 23, minutes: 55 }}
+              start={accessStartDate}
+              end={accessEndDate}
+              onChange={({ start, end }) => {
+                setAccessStartDate(start);
+                setAccessEndDate(end);
+              }}
+              placeholder="Choose when learners can access this course"
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400">Learners can only open the course between these two times.</p>
           </div>
         )}
       </div>
@@ -164,7 +161,7 @@ export function CreateCourseForm() {
         onChange={setRequirements}
       />
 
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-ink-line p-4">
         <ToggleField
           label="This course is free"
           hint="Turn off to set a price."
@@ -182,7 +179,7 @@ export function CreateCourseForm() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-ink-line p-4">
         <ToggleField
           label="Exclusive Course"
           hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
@@ -191,7 +188,7 @@ export function CreateCourseForm() {
         />
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-ink-line p-4">
         <ToggleField
           label="Certificates enabled"
           hint="Allow students to earn a certificate on completion. Keep off for courses that get continuous content updates."
@@ -203,7 +200,7 @@ export function CreateCourseForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+        className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
       >
         {submitting && <IconSpinner className="text-white/80" />}
         {submitting ? "Creating…" : "Create draft course"}

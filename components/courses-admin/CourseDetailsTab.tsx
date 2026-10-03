@@ -14,6 +14,7 @@ import { CATEGORY_OPTIONS, LEVEL_OPTIONS } from "./constants";
 import { ThumbnailUploader } from "./ThumbnailUploader";
 import { InstructorsInput } from "./InstructorsInput";
 import type { CourseInstructorInputDTO, AccessMode } from "@/lib/api/courses.types";
+import { DateRangePicker } from "@/components/ui/date-picker";
 
 function FormSection({
   title,
@@ -25,11 +26,11 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
+        <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
         {description && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>
         )}
       </div>
       {children}
@@ -177,34 +178,30 @@ export function CourseDetailsTab({
             onChange={(checked) => setAccessMode(checked ? "SCHEDULED" : "SELF_PACED")}
           />
           {accessMode === "SCHEDULED" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="accessStartDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Access Start Date
-                </label>
-                <input
-                  type="datetime-local"
-                  id="accessStartDate"
-                  value={accessStartDate}
-                  onChange={(e) => setAccessStartDate(e.target.value)}
-                  required
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="accessEndDate" className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Access End Date
-                </label>
-                <input
-                  type="datetime-local"
-                  id="accessEndDate"
-                  value={accessEndDate}
-                  onChange={(e) => setAccessEndDate(e.target.value)}
-                  required
-                  min={accessStartDate}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
-                />
-              </div>
+            <div className="flex flex-col gap-1.5 mt-1">
+              <label htmlFor="accessWindow" className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                Access Window
+              </label>
+              <DateRangePicker
+                id="accessWindow"
+                mode="datetime"
+                title="Course access window"
+                presets="future"
+                requireEnd
+                required
+                startTimeLabel="Opens at"
+                endTimeLabel="Closes at"
+                defaultStartTime={{ hours: 9, minutes: 0 }}
+                defaultEndTime={{ hours: 23, minutes: 55 }}
+                start={accessStartDate}
+                end={accessEndDate}
+                onChange={({ start, end }) => {
+                  setAccessStartDate(start);
+                  setAccessEndDate(end);
+                }}
+                placeholder="Choose when learners can access this course"
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400">Learners can only open the course between these two times.</p>
             </div>
           )}
         </FormSection>
@@ -219,14 +216,14 @@ export function CourseDetailsTab({
               onChange={(v) => setPrice(v.replace(/[^0-9.]/g, ""))}
             />
           )}
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-slate-100 dark:bg-slate-800" />
           <ToggleField
             label="Exclusive Course"
             hint="Hide this course from standard subscriptions. Users will need to purchase it directly."
             checked={isExclusive}
             onChange={setIsExclusive}
           />
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-slate-100 dark:bg-slate-800" />
           <ToggleField
             label="Certificates enabled"
             hint="Allow students to earn a certificate on completion. Keep off for courses that get continuous content updates."
@@ -238,8 +235,8 @@ export function CourseDetailsTab({
 
       {/* Sticky summary + save */}
       <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 flex flex-col gap-4">
-          <div className="w-full aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center text-gray-300 dark:text-gray-600">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-5 flex flex-col gap-4">
+          <div className="w-full aspect-video rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center text-slate-300 dark:text-slate-600">
             {thumbnailUrl ? (
               <Image src={thumbnailUrl} alt="" width={320} height={180} className="object-cover w-full h-full" />
             ) : (
@@ -247,8 +244,8 @@ export function CourseDetailsTab({
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{title || "Untitled course"}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{title || "Untitled course"}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {isFree ? "Free" : price ? `₦${Number(price).toLocaleString()}` : "No price set"}
               {isExclusive ? " · Exclusive" : ""}
             </p>
@@ -256,7 +253,7 @@ export function CourseDetailsTab({
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             {saving && <IconSpinner className="text-white/80" />}
             {saving ? "Saving…" : "Save changes"}

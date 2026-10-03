@@ -73,11 +73,11 @@ export function PublishControl({
       title={!course.is_published && !canPublish ? "Add at least one curriculum item before publishing" : undefined}
       className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
         course.is_published
-          ? "text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800"
-          : "text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20"
+          ? "text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-ink-line hover:bg-slate-100 dark:hover:bg-slate-800"
+          : "text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20"
       }`}
     >
-      {loading && <IconSpinner className={course.is_published ? "text-gray-500" : "text-white/80"} />}
+      {loading && <IconSpinner className={course.is_published ? "text-slate-500" : "text-white/80"} />}
       {label}
     </button>
   );

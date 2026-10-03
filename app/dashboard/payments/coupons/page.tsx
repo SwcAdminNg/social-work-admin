@@ -17,10 +17,11 @@ import { IconPlus, IconTrash, IconSpinner, IconHash, IconX } from "@/components/
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import * as Dialog from "@radix-ui/react-dialog";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const inputClass =
-  "rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D6A4F] outline-none disabled:opacity-50";
-const labelClass = "text-sm font-bold text-gray-700 dark:text-gray-300";
+  "rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-page px-3 py-2 text-sm focus:ring-2 focus:ring-brand-600 outline-none disabled:opacity-50";
+const labelClass = "text-sm font-bold text-slate-700 dark:text-slate-300";
 
 function toDatetimeLocal(iso: string | null): string {
   if (!iso) return "";
@@ -143,7 +144,7 @@ function CourseScopePicker({
         className={inputClass}
       />
       {search && (
-        <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
+        <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 dark:border-ink-line divide-y divide-slate-100 dark:divide-ink-line">
           {data?.items.length ? (
             data.items.map((course) => (
               <button
@@ -153,13 +154,13 @@ function CourseScopePicker({
                   if (!selectedIds.includes(course.id)) onChange([...selectedIds, course.id]);
                   setSearch("");
                 }}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
               >
                 {course.title}
               </button>
             ))
           ) : (
-            <div className="px-3 py-2 text-sm text-gray-400">No courses found</div>
+            <div className="px-3 py-2 text-sm text-slate-400">No courses found</div>
           )}
         </div>
       )}
@@ -168,7 +169,7 @@ function CourseScopePicker({
           {selectedIds.map((id) => (
             <span
               key={id}
-              className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 rounded-full text-xs font-semibold bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
+              className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400"
             >
               {titleFor(id)}
               <button
@@ -285,10 +286,10 @@ export default function CouponsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">All Coupons</h2>
+        <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white">All Coupons</h2>
         <button
           onClick={() => openModal()}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-xl transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors shadow-sm"
         >
           <IconPlus /> Create Coupon
         </button>
@@ -296,7 +297,7 @@ export default function CouponsPage() {
 
       {isLoading ? (
         <div className="flex justify-center p-8">
-          <IconSpinner className="text-[#2D6A4F]" />
+          <IconSpinner className="text-brand-600" />
         </div>
       ) : data?.items.length === 0 ? (
         <EmptyState
@@ -305,10 +306,10 @@ export default function CouponsPage() {
           description="Create your first discount code to run a promo."
         />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              <tr className="border-b border-slate-100 dark:border-ink-line text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 <th className="px-4 py-3">Code</th>
                 <th className="px-4 py-3">Discount</th>
                 <th className="px-4 py-3">Redemptions</th>
@@ -317,27 +318,27 @@ export default function CouponsPage() {
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-ink-line">
               {data?.items.map((coupon) => (
                 <tr key={coupon.id}>
                   <td className="px-4 py-3">
-                    <div className="font-bold text-gray-900 dark:text-white">{coupon.code}</div>
+                    <div className="font-bold text-slate-900 dark:text-white">{coupon.code}</div>
                     {coupon.description && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate">
                         {coupon.description}
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
                     {coupon.discount_type === "PERCENTAGE"
                       ? `${coupon.discount_value}%${coupon.max_discount_amount ? ` (up to ${formatMoney(coupon.max_discount_amount)})` : ""}`
                       : formatMoney(coupon.discount_value)}
                   </td>
-                  <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
                     {coupon.times_redeemed}
                     {coupon.max_redemptions != null ? ` / ${coupon.max_redemptions}` : ""}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">
+                  <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs">
                     {coupon.valid_from ? new Date(coupon.valid_from).toLocaleDateString() : "—"}
                     {" → "}
                     {coupon.valid_until ? new Date(coupon.valid_until).toLocaleDateString() : "—"}
@@ -350,7 +351,7 @@ export default function CouponsPage() {
                       className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider transition-colors ${
                         coupon.is_active
                           ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                          : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
                       }`}
                     >
                       {coupon.is_active ? "Active" : "Inactive"}
@@ -359,7 +360,7 @@ export default function CouponsPage() {
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => openModal(coupon)}
-                      className="px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                       Edit
                     </button>
@@ -383,17 +384,17 @@ export default function CouponsPage() {
           <button
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg disabled:opacity-40"
+            className="px-3 py-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             Page {data.page} of {data.total_pages}
           </span>
           <button
             disabled={page >= data.total_pages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg disabled:opacity-40"
+            className="px-3 py-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg disabled:opacity-40"
           >
             Next
           </button>
@@ -403,8 +404,8 @@ export default function CouponsPage() {
       <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl z-50 p-6 border border-gray-200 dark:border-gray-800">
-            <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-ink-surface rounded-2xl shadow-xl z-50 p-6 border border-slate-200 dark:border-ink-line">
+            <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-white mb-4">
               {editingCoupon ? "Edit Coupon" : "Create Coupon"}
             </Dialog.Title>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -489,23 +490,33 @@ export default function CouponsPage() {
                 />
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <label className={labelClass}>Valid From (optional)</label>
-                  <input
-                    type="datetime-local"
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <label htmlFor="coupon-valid-from" className={labelClass}>Valid From (optional)</label>
+                  <DatePicker
+                    id="coupon-valid-from"
+                    mode="datetime"
+                    title="Coupon valid from"
+                    presets="future"
+                    defaultTime={{ hours: 0, minutes: 0 }}
+                    max={form.valid_until || undefined}
                     value={form.valid_from}
-                    onChange={(e) => setForm((f) => ({ ...f, valid_from: e.target.value }))}
-                    className={inputClass}
+                    onChange={(v) => setForm((f) => ({ ...f, valid_from: v }))}
+                    placeholder="Immediately"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <label className={labelClass}>Valid Until (optional)</label>
-                  <input
-                    type="datetime-local"
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <label htmlFor="coupon-valid-until" className={labelClass}>Valid Until (optional)</label>
+                  <DatePicker
+                    id="coupon-valid-until"
+                    mode="datetime"
+                    title="Coupon valid until"
+                    presets="future"
+                    defaultTime={{ hours: 23, minutes: 55 }}
+                    min={form.valid_from || undefined}
                     value={form.valid_until}
-                    onChange={(e) => setForm((f) => ({ ...f, valid_until: e.target.value }))}
-                    className={inputClass}
+                    onChange={(v) => setForm((f) => ({ ...f, valid_until: v }))}
+                    placeholder="No expiry"
                   />
                 </div>
               </div>
@@ -557,7 +568,7 @@ export default function CouponsPage() {
                   selectedIds={form.applicable_course_ids}
                   onChange={(ids) => setForm((f) => ({ ...f, applicable_course_ids: ids }))}
                 />
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-slate-400">
                   Leave both category and courses empty to apply the coupon to everything.
                 </p>
               </div>
@@ -567,9 +578,9 @@ export default function CouponsPage() {
                   type="checkbox"
                   checked={form.new_users_only}
                   onChange={(e) => setForm((f) => ({ ...f, new_users_only: e.target.checked }))}
-                  className="rounded text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                  className="rounded text-brand-600 focus:ring-brand-600"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   First-time buyers only
                 </span>
               </label>
@@ -579,23 +590,23 @@ export default function CouponsPage() {
                   type="checkbox"
                   checked={form.is_active}
                   onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-                  className="rounded text-[#2D6A4F] focus:ring-[#2D6A4F]"
+                  className="rounded text-brand-600 focus:ring-brand-600"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Is Active</span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Is Active</span>
               </label>
 
-              <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-ink-line">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                  className="px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] rounded-xl transition-colors disabled:opacity-70"
+                  className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors disabled:opacity-70"
                 >
                   {isSaving ? "Saving..." : "Save Coupon"}
                 </button>

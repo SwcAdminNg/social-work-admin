@@ -95,19 +95,19 @@ export function SectionCard({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+    <div ref={setNodeRef} style={style} className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line">
       <div className="flex items-center gap-2 p-4">
         <button
           type="button"
           {...attributes}
           {...listeners}
-          className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing touch-none"
+          className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-grab active:cursor-grabbing touch-none"
           aria-label="Drag to reorder section"
         >
           <IconDragHandle />
         </button>
 
-        <span className="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-lg bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] text-xs font-extrabold">
+        <span className="flex-shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-lg bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 text-xs font-extrabold">
           {index + 1}
         </span>
 
@@ -115,10 +115,10 @@ export function SectionCard({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={saveTitle}
-          className="flex-1 min-w-0 bg-transparent text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800 rounded px-1.5 py-0.5"
+          className="flex-1 min-w-0 bg-transparent text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800 rounded px-1.5 py-0.5"
         />
 
-        <span className="text-xs font-medium text-gray-400 dark:text-gray-600 flex-shrink-0">
+        <span className="text-xs font-medium text-slate-400 dark:text-slate-600 flex-shrink-0">
           {section.items.length} item{section.items.length === 1 ? "" : "s"}
         </span>
 
@@ -135,7 +135,7 @@ export function SectionCard({
         <button
           type="button"
           onClick={() => setAddItemOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 cursor-pointer flex-shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 cursor-pointer flex-shrink-0"
         >
           <IconPlus />
           Add item
@@ -144,7 +144,7 @@ export function SectionCard({
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
+          className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
           aria-label="Delete section"
         >
           <IconTrash />
@@ -153,7 +153,7 @@ export function SectionCard({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-transform duration-150 cursor-pointer"
+          className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-transform duration-150 cursor-pointer"
           style={{ transform: expanded ? "rotate(180deg)" : undefined }}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
@@ -163,14 +163,14 @@ export function SectionCard({
 
       {expanded && (
         <div className="px-4 pb-4 flex flex-col gap-4">
-          <div className="rounded-xl border border-gray-100 dark:border-gray-800 p-3">
+          <div className="rounded-xl border border-slate-100 dark:border-ink-line p-3">
             <DynamicStringListInput
               label="Guest lecturers"
               placeholder="e.g. Dr. Amara Okafor"
               values={guestNames}
               onChange={saveGuestInstructors}
             />
-            {savingGuests && <p className="text-xs text-gray-400 mt-1">Saving…</p>}
+            {savingGuests && <p className="text-xs text-slate-400 mt-1">Saving…</p>}
           </div>
           <ItemList
             courseId={course.id}

@@ -29,7 +29,7 @@ const EXPIRING_SOON_DAYS = 14;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const chipTone = {
-  Authoring: "bg-gray-100 text-gray-700 ring-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700",
+  Authoring: "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700",
   Review: "bg-sky-50 text-sky-700 ring-sky-100 dark:bg-sky-500/10 dark:text-sky-300 dark:ring-sky-500/20",
   Approval: "bg-emerald-50 text-emerald-700 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20",
 } as const;
@@ -97,15 +97,15 @@ export function StaffRolesManager() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Staff Roles</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="font-display text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Staff Roles</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Who can author, review, approve and publish — platform-wide or per course.
           </p>
         </div>
         <button
           type="button"
           onClick={() => openGrant()}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-[#2D6A4F] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#1e4d38] sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-700 sm:self-auto"
         >
           <IconPlus />
           Grant role
@@ -113,10 +113,10 @@ export function StaffRolesManager() {
       </div>
 
       <DashboardCard className="overflow-hidden">
-        <div className="flex flex-col gap-3 border-b border-gray-200 p-4 dark:border-gray-800">
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-4 dark:border-ink-line">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             <div className="relative lg:w-64 lg:shrink-0">
-              <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -154,18 +154,18 @@ export function StaffRolesManager() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
             {data && (
               <span>
                 {total} {total === 1 ? "person" : "people"}
               </span>
             )}
             {hasFilters && (
-              <button type="button" onClick={clearFilters} className="font-semibold hover:text-gray-800 dark:hover:text-gray-200">
+              <button type="button" onClick={clearFilters} className="font-semibold hover:text-slate-800 dark:hover:text-slate-200">
                 Clear filters
               </button>
             )}
-            {isFetching && !isLoading && <IconSpinner className="text-gray-400" />}
+            {isFetching && !isLoading && <IconSpinner className="text-slate-400" />}
           </div>
         </div>
 
@@ -173,25 +173,25 @@ export function StaffRolesManager() {
           <SkeletonRows />
         ) : members.length === 0 ? (
           <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400">
               <IconUsers />
             </div>
-            <p className="font-bold text-gray-900 dark:text-white">{hasFilters ? "No matches" : "No staff roles yet"}</p>
-            <p className="max-w-sm text-sm text-gray-500 dark:text-gray-400">
+            <p className="font-bold text-slate-900 dark:text-white">{hasFilters ? "No matches" : "No staff roles yet"}</p>
+            <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
               {hasFilters ? "Try a different search or clear the filters." : "Grant your first reviewer or approver to start the approval workflow."}
             </p>
             {hasFilters ? (
-              <button type="button" onClick={clearFilters} className="mt-1 text-sm font-bold text-[#2D6A4F] dark:text-[#52b788]">
+              <button type="button" onClick={clearFilters} className="mt-1 text-sm font-bold text-brand-600 dark:text-brand-400">
                 Clear filters
               </button>
             ) : (
-              <button type="button" onClick={() => openGrant()} className="mt-1 inline-flex items-center gap-2 rounded-xl bg-[#2D6A4F] px-4 py-2 text-sm font-bold text-white">
+              <button type="button" onClick={() => openGrant()} className="mt-1 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white">
                 <IconPlus /> Grant role
               </button>
             )}
           </div>
         ) : (
-          <ul className={`divide-y divide-gray-100 transition-opacity dark:divide-gray-800 ${isFetching ? "opacity-70" : ""}`}>
+          <ul className={`divide-y divide-slate-100 transition-opacity dark:divide-ink-line ${isFetching ? "opacity-70" : ""}`}>
             {members.map((member) => (
               <MemberRow
                 key={member.user.id}
@@ -209,7 +209,7 @@ export function StaffRolesManager() {
         )}
 
         {data && data.meta.total_pages > 1 && (
-          <div className="border-t border-gray-200 dark:border-gray-800">
+          <div className="border-t border-slate-200 dark:border-ink-line">
             <Pagination currentPage={page} totalPages={data.meta.total_pages} onPageChange={setPage} />
           </div>
         )}
@@ -273,9 +273,9 @@ function MemberRow({
       <div className="flex min-w-0 items-center gap-3">
         <Avatar name={user.name} src={user.profile_picture_url} />
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">{user.name}</p>
-          <p className="truncate text-xs text-gray-500 dark:text-gray-400" title={user.email}>{user.email}</p>
-          <p className="mt-0.5 text-[0.7rem] text-gray-400 dark:text-gray-500">{summary}</p>
+          <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{user.name}</p>
+          <p className="truncate text-xs text-slate-500 dark:text-slate-400" title={user.email}>{user.email}</p>
+          <p className="mt-0.5 text-[0.7rem] text-slate-400 dark:text-slate-500">{summary}</p>
         </div>
       </div>
 
@@ -283,7 +283,7 @@ function MemberRow({
         {scopes.map((scope) => (
           <div key={scope.key} className="group/scope flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-3">
             <span
-              className={`shrink-0 pt-1 text-xs font-semibold sm:w-44 sm:truncate ${scope.course ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}
+              className={`shrink-0 pt-1 text-xs font-semibold sm:w-44 sm:truncate ${scope.course ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-500"}`}
               title={scope.course?.title}
             >
               {scope.course ? scope.course.title : "Platform-wide"}
@@ -295,7 +295,7 @@ function MemberRow({
               <button
                 type="button"
                 onClick={() => onGrant(scope.course)}
-                className="rounded-full px-2 py-1 text-xs font-semibold text-gray-400 transition-opacity hover:bg-gray-100 hover:text-[#2D6A4F] focus:opacity-100 md:opacity-0 md:group-hover/scope:opacity-100 dark:hover:bg-gray-800 dark:hover:text-[#52b788]"
+                className="rounded-full px-2 py-1 text-xs font-semibold text-slate-400 transition-opacity hover:bg-slate-100 hover:text-brand-600 focus:opacity-100 md:opacity-0 md:group-hover/scope:opacity-100 dark:hover:bg-slate-800 dark:hover:text-brand-400"
                 aria-label={`Add a role for ${user.name} ${scope.course ? `on ${scope.course.title}` : "platform-wide"}`}
               >
                 + Role
@@ -309,7 +309,7 @@ function MemberRow({
         <button
           type="button"
           onClick={() => onGrant()}
-          className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:border-[#2D6A4F] hover:text-[#2D6A4F] dark:border-gray-700 dark:text-gray-200 dark:hover:border-[#52b788] dark:hover:text-[#52b788]"
+          className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 transition-colors hover:border-brand-600 hover:text-brand-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-brand-400 dark:hover:text-brand-400"
         >
           <IconPlus /> Add role
         </button>
@@ -381,14 +381,14 @@ function RevokeModal({ item, onClose, onDone }: { item: StaffRoleAssignment | nu
             revoke.mutate();
           }}
         >
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong className="text-gray-900 dark:text-white">{item.user?.name ?? "This person"}</strong> will immediately lose{" "}
-            <strong className="text-gray-900 dark:text-white">{humanize(item.role)}</strong>{" "}
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            <strong className="text-slate-900 dark:text-white">{item.user?.name ?? "This person"}</strong> will immediately lose{" "}
+            <strong className="text-slate-900 dark:text-white">{humanize(item.role)}</strong>{" "}
             {item.course?.title ? <>on {item.course.title}</> : "platform-wide"}.
           </p>
           <div>
-            <label htmlFor="revoke-reason" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Reason <span className="font-normal text-gray-400">(optional)</span>
+            <label htmlFor="revoke-reason" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Reason <span className="font-normal text-slate-400">(optional)</span>
             </label>
             <input
               id="revoke-reason"
@@ -400,7 +400,7 @@ function RevokeModal({ item, onClose, onDone }: { item: StaffRoleAssignment | nu
             />
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+            <button type="button" onClick={onClose} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
               Cancel
             </button>
             <button

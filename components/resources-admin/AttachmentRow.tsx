@@ -105,14 +105,14 @@ export function AttachmentRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/40"
+      className="rounded-xl border border-slate-200 dark:border-ink-line bg-slate-50/60 dark:bg-ink-surface/40"
     >
       <div className="flex items-center gap-2 p-2.5">
         <button
           type="button"
           {...attributes}
           {...listeners}
-          className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing touch-none"
+          className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-grab active:cursor-grabbing touch-none"
           aria-label="Drag to reorder"
         >
           <IconDragHandle />
@@ -128,7 +128,7 @@ export function AttachmentRow({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={saveTitle}
-          className="flex-1 min-w-0 bg-transparent text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1.5 py-0.5"
+          className="flex-1 min-w-0 bg-transparent text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-ink-surface rounded px-1.5 py-0.5"
         />
 
         {attachment.video && <VideoStatusBadge status={attachment.video.status} />}
@@ -136,7 +136,7 @@ export function AttachmentRow({
           <span
             className={`text-[0.7rem] font-bold uppercase tracking-wide px-2 py-1 rounded-full ${
               attachment.document.is_uploaded
-                ? "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
+                ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400"
                 : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
             }`}
           >
@@ -145,12 +145,12 @@ export function AttachmentRow({
         )}
 
         {attachment.document && (
-          <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none flex-shrink-0 ml-2">
+          <label className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 cursor-pointer select-none flex-shrink-0 ml-2">
             <input
               type="checkbox"
               checked={!!attachment.document.downloadable}
               onChange={toggleDownloadable}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
             Downloadable
           </label>
@@ -159,7 +159,7 @@ export function AttachmentRow({
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
+          className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer"
           aria-label="Delete attachment"
         >
           <IconTrash />
@@ -168,7 +168,7 @@ export function AttachmentRow({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-transform duration-150 cursor-pointer"
+          className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-transform duration-150 cursor-pointer"
           style={{ transform: expanded ? "rotate(180deg)" : undefined }}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
@@ -177,7 +177,7 @@ export function AttachmentRow({
       </div>
 
       {expanded && (
-        <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+        <div className="border-t border-slate-200 dark:border-ink-line p-4">
           {attachment.attachment_type === "VIDEO" && (
             <VideoUploader
               attachment={attachment}

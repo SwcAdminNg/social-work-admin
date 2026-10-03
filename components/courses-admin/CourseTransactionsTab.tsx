@@ -34,7 +34,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function PaymentIcon({ cardType }: { cardType: string | null }) {
-  if (!cardType) return <span className="text-xs text-gray-400 dark:text-gray-500">Other</span>;
+  if (!cardType) return <span className="text-xs text-slate-400 dark:text-slate-500">Other</span>;
   const type = cardType.toLowerCase();
   if (type.includes("visa")) {
     return (
@@ -45,13 +45,13 @@ function PaymentIcon({ cardType }: { cardType: string | null }) {
   }
   if (type.includes("mastercard")) {
     return (
-      <span className="inline-flex items-center justify-center w-8 h-5 bg-transparent border border-gray-200 dark:border-gray-700 rounded-sm relative overflow-hidden">
+      <span className="inline-flex items-center justify-center w-8 h-5 bg-transparent border border-slate-200 dark:border-slate-700 rounded-sm relative overflow-hidden">
         <span className="w-3 h-3 rounded-full bg-red-500 absolute left-1 mix-blend-multiply opacity-80"></span>
         <span className="w-3 h-3 rounded-full bg-yellow-500 absolute right-1 mix-blend-multiply opacity-80"></span>
       </span>
     );
   }
-  return <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">{type}</span>;
+  return <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">{type}</span>;
 }
 
 export function CourseTransactionsTab({ courseId }: { courseId: string }) {
@@ -68,28 +68,28 @@ export function CourseTransactionsTab({ courseId }: { courseId: string }) {
         <StatTile icon={IconReceipt} label="Total transactions" value={data?.total_items ?? (isLoading ? "…" : 0)} />
       </div>
 
-      <div className="flex flex-col gap-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Sales & Transactions</h2>
+      <div className="flex flex-col gap-4 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl p-6">
+        <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white mb-2">Sales & Transactions</h2>
 
         <DataTable
           columns={[
-            { key: "date", header: "Date", render: (t) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(t.created_at)}</span> },
+            { key: "date", header: "Date", render: (t) => <span className="text-sm text-slate-700 dark:text-slate-300">{formatDate(t.created_at)}</span> },
             {
               key: "user",
               header: "User",
               render: (t) => (
                 <Link
                   href={`/dashboard/user-management/${t.user.id}`}
-                  className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
+                  className="flex flex-col hover:bg-slate-50 dark:hover:bg-slate-800 p-1 -ml-1 rounded transition-colors"
                 >
-                  <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
+                  <span className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                     {t.user.full_name || `${t.user.first_name || ""} ${t.user.last_name || ""}`.trim() || "User"}
                   </span>
-                  <span className="text-xs text-gray-500">{t.user.email}</span>
+                  <span className="text-xs text-slate-500">{t.user.email}</span>
                 </Link>
               )
             },
-            { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-bold text-gray-900 dark:text-white">₦{t.amount.toLocaleString()}</span> },
+            { key: "amount", header: "Amount", render: (t) => <span className="text-sm font-bold text-slate-900 dark:text-white">₦{t.amount.toLocaleString()}</span> },
             { key: "status", header: "Status", render: (t) => <StatusBadge status={t.status} /> },
             {
               key: "method",

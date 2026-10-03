@@ -86,8 +86,8 @@ export function CourseGovernanceTab({
                   <Badge tone="gray">v{course.current_version_label ?? governance?.current_version_label}</Badge>
                 )}
               </div>
-              <h3 className="mt-3 text-sm font-bold text-gray-900 dark:text-white">Course lifecycle</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <h3 className="font-display mt-3 text-sm font-bold text-slate-900 dark:text-white">Course lifecycle</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Draft edits on published courses are held in a working copy until review and publish.
               </p>
             </div>
@@ -95,7 +95,7 @@ export function CourseGovernanceTab({
               type="button"
               disabled={!!acting}
               onClick={() => run("refresh", () => getCourseGovernance(course.id), "Governance refreshed.")}
-              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold text-gray-700 dark:border-gray-800 dark:text-gray-200"
+              className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 dark:border-ink-line dark:text-slate-200"
             >
               Refresh
             </button>
@@ -103,7 +103,7 @@ export function CourseGovernanceTab({
         </DashboardCard>
 
         <DashboardCard className="p-5">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Open revision</h3>
+          <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Open revision</h3>
           {openRevision ? (
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -116,7 +116,7 @@ export function CourseGovernanceTab({
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                <Link href={`/dashboard/approval-centre/revisions/${openRevision.id}`} className="rounded-xl bg-[#2D6A4F] px-4 py-2 text-sm font-bold text-white no-underline">
+                <Link href={`/dashboard/approval-centre/revisions/${openRevision.id}`} className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white no-underline">
                   Open review
                 </Link>
                 {openRevision.status === "DRAFT" && (
@@ -129,7 +129,7 @@ export function CourseGovernanceTab({
                       const reason = window.prompt("Reason") ?? undefined;
                       run("submit", () => submitRevision(openRevision.id, { change_summary, reason }), "Revision submitted.");
                     }}
-                    className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold dark:border-gray-800"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-ink-line"
                   >
                     Submit for review
                   </button>
@@ -139,7 +139,7 @@ export function CourseGovernanceTab({
                     type="button"
                     disabled={!!acting}
                     onClick={() => run("withdraw", () => withdrawRevision(openRevision.id), "Revision withdrawn.")}
-                    className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold dark:border-gray-800"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-ink-line"
                   >
                     Withdraw
                   </button>
@@ -148,12 +148,12 @@ export function CourseGovernanceTab({
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">No open revision for this course.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">No open revision for this course.</p>
               <button
                 type="button"
                 disabled={!!acting}
                 onClick={() => run("open", () => openCourseRevision(course.id), "Working copy opened.")}
-                className="mt-3 rounded-xl border border-gray-200 px-4 py-2 text-sm font-bold dark:border-gray-800"
+                className="mt-3 rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-ink-line"
               >
                 Open working copy
               </button>
@@ -163,15 +163,15 @@ export function CourseGovernanceTab({
       </div>
 
       <DashboardCard>
-        <div className="border-b border-gray-200 p-4 dark:border-gray-800">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Version history</h3>
+        <div className="border-b border-slate-200 p-4 dark:border-ink-line">
+          <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Version history</h3>
         </div>
         {loading ? (
-          <p className="p-4 text-sm text-gray-500">Loading versions...</p>
+          <p className="p-4 text-sm text-slate-500">Loading versions...</p>
         ) : versions.length === 0 ? (
-          <p className="p-4 text-sm text-gray-500">No versions recorded yet.</p>
+          <p className="p-4 text-sm text-slate-500">No versions recorded yet.</p>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-800">
+          <div className="divide-y divide-slate-200 dark:divide-ink-line">
             {versions.map((version) => {
               const label = version.version_label ?? version.label ?? version.id;
               return (
@@ -179,11 +179,11 @@ export function CourseGovernanceTab({
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-bold text-gray-900 dark:text-white">v{label}</span>
+                        <span className="font-bold text-slate-900 dark:text-white">v{label}</span>
                         {version.is_current && <Badge tone="green">Current</Badge>}
                         {version.risk_level && <Badge tone={riskTone(version.risk_level)}>{humanize(version.risk_level)}</Badge>}
                       </div>
-                      <p className="mt-1 text-xs text-gray-500">{formatDate(version.published_at ?? version.approved_at)}</p>
+                      <p className="mt-1 text-xs text-slate-500">{formatDate(version.published_at ?? version.approved_at)}</p>
                     </div>
                     {!version.is_current && version.has_snapshot && (
                       <button
@@ -193,14 +193,14 @@ export function CourseGovernanceTab({
                           const reason = window.prompt(`Rollback to version ${label}? Reason`);
                           if (reason !== null) run(`rollback-${version.id}`, () => rollbackCourseVersion(course.id, version.id, reason), "Rollback revision created.");
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-bold dark:border-gray-800"
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold dark:border-ink-line"
                       >
                         {acting === `rollback-${version.id}` && <IconSpinner />}
                         Rollback
                       </button>
                     )}
                   </div>
-                  {version.reason && <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{version.reason}</p>}
+                  {version.reason && <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{version.reason}</p>}
                 </div>
               );
             })}

@@ -45,15 +45,15 @@ function CommunityRow({
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors cursor-pointer ${
         active
-          ? "bg-[#2D6A4F]/10 dark:bg-[#52b788]/15"
-          : "hover:bg-gray-50 dark:hover:bg-gray-800/60"
+          ? "bg-brand-600/10 dark:bg-brand-400/15"
+          : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
       }`}
     >
       <div
         className={`w-9 h-9 shrink-0 rounded-full flex items-center justify-center ${
           active
-            ? "bg-[#2D6A4F] text-white"
-            : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+            ? "bg-brand-600 text-white"
+            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
         }`}
       >
         <Icon />
@@ -61,13 +61,13 @@ function CommunityRow({
       <div className="min-w-0 flex-1">
         <p
           className={`text-sm font-semibold truncate ${
-            active ? "text-[#2D6A4F] dark:text-[#52b788]" : "text-gray-900 dark:text-white"
+            active ? "text-brand-600 dark:text-brand-400" : "text-slate-900 dark:text-white"
           }`}
         >
           {community.name}
         </p>
         {community.member_count !== undefined && (
-          <p className="text-xs text-gray-400 dark:text-gray-500">{community.member_count} members</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">{community.member_count} members</p>
         )}
       </div>
     </button>
@@ -127,48 +127,48 @@ export function CommunityHub({
         h-[calc(100dvh-4.5rem)] max-h-[calc(100dvh-4.5rem)]
         sm:h-[calc(100dvh-7.5rem)] sm:max-h-[calc(100dvh-7.5rem)]
         lg:h-[calc(100dvh-8.5rem)] lg:max-h-[calc(100dvh-8.5rem)]
-        rounded-none sm:rounded-2xl border-0 sm:border border-gray-200 dark:border-gray-800
-        bg-white dark:bg-gray-900 overflow-hidden"
+        rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 dark:border-ink-line
+        bg-white dark:bg-ink-surface overflow-hidden"
     >
       {/* Sidebar */}
       <div
-        className={`w-full sm:w-80 shrink-0 border-r border-gray-100 dark:border-gray-800 flex flex-col ${
+        className={`w-full sm:w-80 shrink-0 border-r border-slate-100 dark:border-ink-line flex flex-col ${
           mobileShowChat ? "hidden sm:flex" : "flex"
         }`}
       >
-        <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-col gap-3">
+        <div className="p-4 border-b border-slate-100 dark:border-ink-line flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-gray-900 dark:text-white">Communities</h2>
+            <h2 className="font-display text-base font-extrabold text-slate-900 dark:text-white">Communities</h2>
             {isAdmin && !browsingAllCustom && (
               <button
                 type="button"
                 onClick={() => setCreateOpen(true)}
                 title="New custom community"
-                className="p-1.5 rounded-lg text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 cursor-pointer"
+                className="p-1.5 rounded-lg text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 cursor-pointer"
               >
                 <IconPlus />
               </button>
             )}
           </div>
           <div className="relative">
-            <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search communities…"
-              className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
             />
           </div>
           {isAdmin && (
-            <div className="flex gap-1 p-1 rounded-xl bg-gray-100 dark:bg-gray-800">
+            <div className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
               <button
                 type="button"
                 onClick={() => setBrowsingAllCustom(false)}
                 className={`flex-1 px-2 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                   !browsingAllCustom
-                    ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "bg-white dark:bg-ink-surface text-slate-900 dark:text-white shadow-sm"
+                    : "text-slate-500 dark:text-slate-400"
                 }`}
               >
                 My communities
@@ -178,8 +178,8 @@ export function CommunityHub({
                 onClick={() => setBrowsingAllCustom(true)}
                 className={`flex-1 px-2 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                   browsingAllCustom
-                    ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "bg-white dark:bg-ink-surface text-slate-900 dark:text-white shadow-sm"
+                    : "text-slate-500 dark:text-slate-400"
                 }`}
               >
                 Manage all custom
@@ -192,7 +192,7 @@ export function CommunityHub({
           {browsingAllCustom ? (
             allCustomQuery.isLoading ? (
               <div className="flex justify-center py-10">
-                <IconSpinner className="w-5 h-5 text-gray-400" />
+                <IconSpinner className="w-5 h-5 text-slate-400" />
               </div>
             ) : (
               <>
@@ -206,7 +206,7 @@ export function CommunityHub({
                     />
                   ))}
                   {(allCustomQuery.data?.items ?? []).length === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-6">No custom communities yet.</p>
+                    <p className="text-sm text-slate-400 text-center py-6">No custom communities yet.</p>
                   )}
                 </div>
                 {allCustomQuery.data && allCustomQuery.data.meta.total_pages > 1 && (
@@ -234,7 +234,7 @@ export function CommunityHub({
               )}
               {courseCommunities.length > 0 && (
                 <div className="flex flex-col gap-1">
-                  <p className="px-3 text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-600">
+                  <p className="px-3 text-[0.65rem] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-600">
                     Courses
                   </p>
                   {courseCommunities.map((community) => (
@@ -249,7 +249,7 @@ export function CommunityHub({
               )}
               {customCommunities.length > 0 && (
                 <div className="flex flex-col gap-1">
-                  <p className="px-3 text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-600">
+                  <p className="px-3 text-[0.65rem] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-600">
                     Custom
                   </p>
                   {customCommunities.map((community) => (
@@ -263,7 +263,7 @@ export function CommunityHub({
                 </div>
               )}
               {filtered.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-10">No communities match &quot;{search}&quot;.</p>
+                <p className="text-sm text-slate-400 text-center py-10">No communities match &quot;{search}&quot;.</p>
               )}
             </>
           )}

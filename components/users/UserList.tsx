@@ -50,9 +50,9 @@ const userTypeOptions = [
 ];
 
 const ROLE_STYLES: Record<User["user_type"], string> = {
-  ADMIN: "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]",
+  ADMIN: "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400",
   INSTRUCTOR: "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
-  USER: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+  USER: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
 };
 
 function RoleBadge({ userType }: { userType: User["user_type"] }) {
@@ -67,7 +67,7 @@ function RoleBadge({ userType }: { userType: User["user_type"] }) {
 
 function PlatformBadge({ platform }: { platform: User["platform"] }) {
   return (
-    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
       {platform}
     </span>
   );
@@ -86,11 +86,11 @@ function ActiveBadge({ isActive, isSuspended }: { isActive: boolean; isSuspended
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide ${
         isActive
-          ? "bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]"
+          ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400"
           : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
       }`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-[#2D6A4F] dark:bg-[#52b788]" : "bg-red-500"}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-brand-600 dark:bg-brand-400" : "bg-red-500"}`} />
       {isActive ? "Active" : "Inactive"}
     </span>
   );
@@ -103,16 +103,16 @@ function initials(user: User) {
 function UserIdentity({ user }: { user: User }) {
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <div className="w-9 h-9 shrink-0 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center text-xs font-bold">
+      <div className="w-9 h-9 shrink-0 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs font-bold">
         {initials(user)}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
           {user.first_name} {user.last_name}
         </p>
         <div className="flex items-center gap-2">
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
-          <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 hidden sm:inline-block">• Last active: {formatTimeAgo(user.last_login_at)}</span>
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+          <span className="text-[0.65rem] text-slate-400 dark:text-slate-500 hidden sm:inline-block">• Last active: {formatTimeAgo(user.last_login_at)}</span>
         </div>
       </div>
     </div>
@@ -132,19 +132,19 @@ function UserActions({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 focus:outline-none">
+        <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           align="end"
-          className="w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+          className="w-40 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-xl shadow-xl z-50 py-1 overflow-hidden"
         >
           {user.is_suspended ? (
             <DropdownMenu.Item asChild>
               <button
-                className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
                 onClick={() => onConfirmAction("unsuspend", user)}
               >
                 Unsuspend
@@ -153,25 +153,25 @@ function UserActions({
           ) : (
             <DropdownMenu.Item asChild>
               <button
-                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
                 onClick={() => onConfirmAction("suspend", user)}
               >
                 Suspend
               </button>
             </DropdownMenu.Item>
           )}
-          <DropdownMenu.Separator className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+          <DropdownMenu.Separator className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
           <DropdownMenu.Item asChild>
             <Link
               href={`/dashboard/user-management/${user.id}`}
-              className="w-full flex text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+              className="w-full flex text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
             >
               View Profile
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <button
-              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-800"
+              className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-800"
               onClick={() => onOpenRoleModal(user)}
             >
               Change Role
@@ -284,16 +284,16 @@ export function UserList() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             User Management
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             A list of all the users in your account including their name, title, email and role.
           </p>
         </div>
         <button
           onClick={() => setIsInviteModalOpen(true)}
-          className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors shadow-sm shrink-0"
+          className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors shadow-sm shrink-0"
         >
           Invite Admin
         </button>
@@ -301,7 +301,7 @@ export function UserList() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <form onSubmit={handleSearchSubmit} className="relative flex-1">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
             <IconSearch />
           </span>
           <input
@@ -311,7 +311,7 @@ export function UserList() {
             autoComplete="off"
 
             placeholder="Search by name, email…"
-            className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 pl-10 pr-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </form>
 

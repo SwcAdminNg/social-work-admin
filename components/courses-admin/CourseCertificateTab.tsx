@@ -41,10 +41,10 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
-        {description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</p>}
+        <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+        {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
       </div>
       {children}
     </div>
@@ -176,14 +176,14 @@ export function CourseCertificateTab({
           description="Pick which design this course uses. Leave unassigned to fall back to the oldest active global template."
         >
           {loadingTemplates ? (
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <IconSpinner />
               Loading templates…
             </div>
           ) : templates.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               No active templates yet.{" "}
-              <Link href="/dashboard/certificates/new" className="text-[#2D6A4F] dark:text-[#52b788] font-semibold no-underline hover:underline">
+              <Link href="/dashboard/certificates/new" className="text-brand-600 dark:text-brand-400 font-semibold no-underline hover:underline">
                 Create one
               </Link>{" "}
               to assign it here.
@@ -192,7 +192,7 @@ export function CourseCertificateTab({
             <select
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             >
               <option value="">Use global default</option>
               {templates.map((t) => (
@@ -207,13 +207,13 @@ export function CourseCertificateTab({
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer self-start"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer self-start"
           >
             {saving && <IconSpinner className="text-white/80" />}
             {saving ? "Saving…" : "Save template"}
           </button>
 
-          <p className="text-xs text-gray-400 dark:text-gray-600">
+          <p className="text-xs text-slate-400 dark:text-slate-600">
             The API doesn&apos;t return which template is currently assigned, so this remembers your last
             save in this browser only — it won&apos;t reflect changes made elsewhere or on another device.
           </p>

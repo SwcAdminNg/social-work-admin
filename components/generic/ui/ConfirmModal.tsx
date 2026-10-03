@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Modal } from "./Modal";
+import { Button } from "@/components/ui/primitives";
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -27,33 +28,23 @@ export function ConfirmModal({
   isDestructive = false,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="sm">
+    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={title} maxWidth="sm">
       <div className="flex flex-col gap-5">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm leading-6 text-slate-600 dark:text-slate-400">
           {description}
         </div>
-        
-        <div className="flex justify-end gap-3 mt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors disabled:opacity-70"
-          >
+
+        <div className="mt-1 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
             {cancelText}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={isDestructive ? "danger" : "primary"}
             onClick={onConfirm}
-            disabled={isLoading}
-            className={`px-4 py-2 text-sm font-bold text-white rounded-xl transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 ${
-              isDestructive 
-                ? "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700" 
-                : "bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68]"
-            }`}
+            loading={isLoading}
           >
-            {isLoading ? "Loading..." : confirmText}
-          </button>
+            {confirmText}
+          </Button>
         </div>
       </div>
     </Modal>

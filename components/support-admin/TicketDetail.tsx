@@ -200,7 +200,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
   if (ticketQuery.isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <IconSpinner className="w-6 h-6 text-gray-400" />
+        <IconSpinner className="w-6 h-6 text-slate-400" />
       </div>
     );
   }
@@ -243,17 +243,17 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
       <div>
         <button
           onClick={() => router.push("/dashboard/help-support/tickets")}
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] transition-colors cursor-pointer"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer"
         >
           &larr; Back to Tickets
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
+      <div className="flex flex-col gap-4 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="font-display text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {ticket.subject || `Ticket #${ticket.id.slice(0, 8)}`}
               </h1>
               <StatusBadge status={ticket.status} />
@@ -264,7 +264,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {personName(ticket.user) || ticket.user_id}
               {ticket.user?.email ? ` · ${ticket.user.email}` : ""}
             </p>
@@ -279,13 +279,13 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
 
           <div className="flex items-center gap-2">
             <div className="flex flex-col gap-1">
-              <label className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">Assign</label>
+              <label className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Assign</label>
               {isAdmin ? (
                 <select
                   value={ticket.assigned_admin_id ?? ""}
                   onChange={(e) => e.target.value && assignMutation.mutate(e.target.value)}
                   disabled={assignMutation.isPending}
-                  className="px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                  className="px-3 py-1.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 >
                   <option value="" disabled>
                     Unassigned
@@ -297,25 +297,25 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                   ))}
                 </select>
               ) : ticket.assigned_admin_id === currentUserId ? (
-                <span className="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400">Assigned to you</span>
+                <span className="px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400">Assigned to you</span>
               ) : (
                 <button
                   type="button"
                   onClick={() => currentUserId && assignMutation.mutate(currentUserId)}
                   disabled={assignMutation.isPending}
-                  className="px-3 py-1.5 text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+                  className="px-3 py-1.5 text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
                 >
                   Assign to me
                 </button>
               )}
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400">Status</label>
+              <label className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-400">Status</label>
               <select
                 value={ticket.status}
                 onChange={(e) => statusMutation.mutate(e.target.value as TicketStatus)}
                 disabled={statusMutation.isPending}
-                className="px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                className="px-3 py-1.5 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
@@ -328,12 +328,12 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
         </div>
       </div>
 
-      <div className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden">
+      <div className="flex flex-col bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 pt-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-400">Conversation</h2>
+          <h2 className="font-display text-xs font-bold uppercase tracking-wider text-slate-400">Conversation</h2>
           <span
             className={`inline-flex items-center gap-1.5 text-[0.65rem] font-semibold uppercase tracking-wider ${
-              connected ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"
+              connected ? "text-green-600 dark:text-green-400" : "text-slate-400 dark:text-slate-500"
             }`}
           >
             <IconWifi />
@@ -343,10 +343,10 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
         <div className="flex flex-col gap-3 p-6 max-h-[55vh] overflow-y-auto">
           {messagesQuery.isLoading ? (
             <div className="flex justify-center py-10">
-              <IconSpinner className="w-5 h-5 text-gray-400" />
+              <IconSpinner className="w-5 h-5 text-slate-400" />
             </div>
           ) : messages.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-10">No messages yet.</p>
+            <p className="text-sm text-slate-400 text-center py-10">No messages yet.</p>
           ) : (
             messages.map((msg: TicketMessage) => {
               const isAdminSender = msg.sender_type === "ADMIN";
@@ -355,8 +355,8 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words flex flex-col gap-2 ${
                       isAdminSender
-                        ? "bg-[#2D6A4F] text-white rounded-br-sm"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
+                        ? "bg-brand-600 text-white rounded-br-sm"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm"
                     }`}
                   >
                     {msg.attachment_url && msg.attachment_kind === "IMAGE" && (
@@ -373,7 +373,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold underline underline-offset-2 ${
-                          isAdminSender ? "bg-white/10" : "bg-white dark:bg-gray-900"
+                          isAdminSender ? "bg-white/10" : "bg-white dark:bg-ink-surface"
                         }`}
                       >
                         <IconDocument />
@@ -382,7 +382,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                     )}
                     {msg.body && <span>{msg.body}</span>}
                   </div>
-                  <span className="text-[0.65rem] text-gray-400 dark:text-gray-500 mt-1 px-1">
+                  <span className="text-[0.65rem] text-slate-400 dark:text-slate-500 mt-1 px-1">
                     {isAdminSender ? personName(msg.sender) || "Staff" : personName(msg.sender) || personName(ticket.user) || "User"} ·{" "}
                     {formatTimestamp(msg.created_at)}
                   </span>
@@ -393,15 +393,15 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
           <div ref={bottomRef} />
         </div>
 
-        <form onSubmit={handleSend} className="border-t border-gray-100 dark:border-gray-800 p-4 flex flex-col gap-2">
+        <form onSubmit={handleSend} className="border-t border-slate-100 dark:border-ink-line p-4 flex flex-col gap-2">
           {attachment && (
-            <div className="flex items-center gap-2 self-start px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-2 self-start px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-300">
               <IconDocument />
               <span className="truncate max-w-[220px]">{attachment.name}</span>
               <button
                 type="button"
                 onClick={() => setAttachment(null)}
-                className="text-gray-400 hover:text-red-500 cursor-pointer"
+                className="text-slate-400 hover:text-red-500 cursor-pointer"
                 aria-label="Remove attachment"
               >
                 <IconX size={14} />
@@ -415,7 +415,7 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
               onClick={() => fileInputRef.current?.click()}
               disabled={closed || uploading}
               title="Attach a file"
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               <IconUpload />
             </button>
@@ -431,12 +431,12 @@ export function TicketDetail({ ticketId }: { ticketId: string }) {
                   handleSend(e as unknown as React.FormEvent);
                 }
               }}
-              className="flex-1 resize-none px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white disabled:opacity-60"
+              className="flex-1 resize-none px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white disabled:opacity-60"
             />
             <button
               type="submit"
               disabled={!canSend || sendMutation.isPending || uploading}
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             >
               {sendMutation.isPending || uploading ? <IconSpinner className="w-4 h-4" /> : <IconSend />}
               Send

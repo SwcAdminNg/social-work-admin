@@ -59,7 +59,7 @@ export function Avatar({ name, src, size = "md" }: { name?: string | null; src?:
   const sizes = size === "sm" ? "h-6 w-6 text-[0.6rem]" : "h-9 w-9 text-xs";
   return (
     <span
-      className={`${sizes} inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2D6A4F]/10 font-bold text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]`}
+      className={`${sizes} inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600/10 font-bold text-brand-600 dark:bg-brand-400/15 dark:text-brand-400`}
       aria-hidden="true"
     >
       {src ? (
@@ -74,15 +74,15 @@ export function Avatar({ name, src, size = "md" }: { name?: string | null; src?:
 
 export function SkeletonRows({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="divide-y divide-gray-100 dark:divide-gray-800" aria-busy="true" aria-label="Loading">
+    <div className="divide-y divide-slate-100 dark:divide-ink-line" aria-busy="true" aria-label="Loading">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-5 py-4 animate-pulse">
-          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800" />
+          <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 w-1/3 rounded bg-gray-100 dark:bg-gray-800" />
-            <div className="h-3 w-1/5 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-3 w-1/3 rounded bg-slate-100 dark:bg-slate-800" />
+            <div className="h-3 w-1/5 rounded bg-slate-100 dark:bg-slate-800" />
           </div>
-          <div className="hidden h-6 w-24 rounded-full bg-gray-100 sm:block dark:bg-gray-800" />
+          <div className="hidden h-6 w-24 rounded-full bg-slate-100 sm:block dark:bg-slate-800" />
         </div>
       ))}
     </div>
@@ -119,7 +119,7 @@ export function Badge({
   tone?: "gray" | "green" | "amber" | "red" | "blue";
 }) {
   const classes = {
-    gray: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+    gray: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
     green: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
     amber: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
     red: "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300",
@@ -148,7 +148,7 @@ export function DashboardCard({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 ${className}`}>
+    <div className={`rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line ${className}`}>
       {children}
     </div>
   );
@@ -160,7 +160,7 @@ export function ItemLink({ kind, id, children }: { kind: string; id: string; chi
       ? `/dashboard/approval-centre/marks/${id}`
       : `/dashboard/approval-centre/revisions/${id}`;
   return (
-    <Link href={href} className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline no-underline">
+    <Link href={href} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline no-underline">
       {children}
     </Link>
   );
@@ -176,7 +176,7 @@ export function Segmented<T extends string>({
   options: { value: T; label: React.ReactNode }[];
 }) {
   return (
-    <div className="inline-flex rounded-xl bg-gray-100 p-1 dark:bg-gray-800/70" role="tablist">
+    <div className="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800/70" role="tablist">
       {options.map((option) => (
         <button
           key={option.value}
@@ -186,8 +186,8 @@ export function Segmented<T extends string>({
           onClick={() => onChange(option.value)}
           className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-all ${
             value === option.value
-              ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white"
-              : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
           {option.label}

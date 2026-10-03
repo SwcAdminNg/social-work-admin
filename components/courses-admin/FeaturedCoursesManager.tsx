@@ -32,7 +32,7 @@ function reorder<T>(list: T[], from: number, to: number): T[] {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 function CourseThumbnail({ url, title }: { url: string | null; title: string }) {
   return (
-    <div className="w-14 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 text-gray-300 dark:text-gray-600">
+    <div className="w-14 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 text-slate-300 dark:text-slate-600">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={title} className="w-full h-full object-cover" />
@@ -72,27 +72,27 @@ function FeaturedRow({
       onDragEnd={onDragEnd}
       className={`group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 select-none
         ${dragging
-          ? "border-[#2D6A4F]/40 dark:border-[#52b788]/40 bg-[#2D6A4F]/5 dark:bg-[#52b788]/5 shadow-lg"
-          : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700"
+          ? "border-brand-600/40 dark:border-brand-400/40 bg-brand-600/5 dark:bg-brand-400/5 shadow-lg"
+          : "border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface hover:border-slate-300 dark:hover:border-slate-700"
         }`}
     >
       {/* Drag handle */}
-      <span className="cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500 flex-shrink-0 transition-colors">
+      <span className="cursor-grab active:cursor-grabbing text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-500 flex-shrink-0 transition-colors">
         <IconGripVertical />
       </span>
 
       {/* Order badge */}
-      <span className="w-6 h-6 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] text-xs font-bold flex items-center justify-center flex-shrink-0">
+      <span className="w-6 h-6 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 text-xs font-bold flex items-center justify-center flex-shrink-0">
         {index + 1}
       </span>
 
       <CourseThumbnail url={course.thumbnail_url} title={course.title} />
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
           {course.title}
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
           {categoryLabel(course.category)} · {levelLabel(course.level)}
         </p>
       </div>
@@ -102,7 +102,7 @@ function FeaturedRow({
           className={`inline-flex items-center px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider ${
             course.is_published
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
-              : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500"
+              : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-500"
           }`}
         >
           {course.is_published ? "Published" : "Draft"}
@@ -111,7 +111,7 @@ function FeaturedRow({
           type="button"
           onClick={() => onRemove(course.id)}
           aria-label={`Remove ${course.title} from featured`}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors duration-150 cursor-pointer"
         >
           <IconTrash />
         </button>
@@ -168,23 +168,23 @@ function CoursePicker({ open, featuredIds, onAdd, onClose }: CoursePickerProps) 
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 flex flex-col max-h-[80vh]">
+      <div className="relative w-full max-w-lg bg-white dark:bg-ink-surface rounded-2xl shadow-2xl border border-slate-200 dark:border-ink-line flex flex-col max-h-[80vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-ink-line">
+          <h2 className="font-display text-base font-bold text-slate-900 dark:text-white">
             Add Course to Featured
           </h2>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <IconX size={18} />
           </button>
         </div>
 
         {/* Search */}
-        <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-800">
+        <div className="px-5 py-3 border-b border-slate-100 dark:border-ink-line">
           <input
             id="course-picker-search"
             type="text"
@@ -193,19 +193,19 @@ function CoursePicker({ open, featuredIds, onAdd, onClose }: CoursePickerProps) 
             placeholder="Search published courses…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]/40 dark:focus:ring-[#52b788]/40 transition"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-600/40 dark:focus:ring-brand-400/40 transition"
           />
         </div>
 
         {/* List */}
         <div className="overflow-y-auto flex-1 p-3">
           {loading && (
-            <div className="flex items-center justify-center py-10 text-gray-400">
+            <div className="flex items-center justify-center py-10 text-slate-400">
               <IconSpinner className="w-6 h-6" />
             </div>
           )}
           {!loading && filtered.length === 0 && (
-            <p className="text-center text-sm text-gray-400 py-10">
+            <p className="text-center text-sm text-slate-400 py-10">
               {courses.length === 0 ? "No published courses found." : "No courses match your search."}
             </p>
           )}
@@ -215,18 +215,18 @@ function CoursePicker({ open, featuredIds, onAdd, onClose }: CoursePickerProps) 
                 <button
                   type="button"
                   onClick={() => { onAdd(course); onClose(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-[#2D6A4F]/5 dark:hover:bg-[#52b788]/10 transition-colors cursor-pointer group"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-brand-600/5 dark:hover:bg-brand-400/10 transition-colors cursor-pointer group"
                 >
                   <CourseThumbnail url={course.thumbnail_url} title={course.title} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#2D6A4F] dark:group-hover:text-[#52b788] transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                       {course.title}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {categoryLabel(course.category)} · {levelLabel(course.level)}
                     </p>
                   </div>
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <IconPlus />
                   </span>
                 </button>
@@ -323,10 +323,10 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Featured Courses
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Choose which courses are highlighted on the homepage and control their display order.
             </p>
           </div>
@@ -335,7 +335,7 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
               type="button"
               id="add-featured-course-btn"
               onClick={() => setPickerOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-all duration-200 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-all duration-200 cursor-pointer"
             >
               <IconPlus />
               Add Course
@@ -347,8 +347,8 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
               disabled={!isDirty || saving}
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-green-900/20 transition-all duration-200 cursor-pointer
                 ${!isDirty || saving
-                  ? "bg-[#2D6A4F]/40 dark:bg-[#52b788]/30 cursor-not-allowed"
-                  : "bg-[#2D6A4F] hover:bg-[#1e4d38]"
+                  ? "bg-brand-600/40 dark:bg-brand-400/30 cursor-not-allowed"
+                  : "bg-brand-600 hover:bg-brand-700"
                 }`}
             >
               {saving ? <IconSpinner className="w-4 h-4" /> : null}
@@ -369,26 +369,26 @@ export function FeaturedCoursesManager({ initialData }: FeaturedCoursesManagerPr
         </div>
 
         {/* Featured list */}
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-gray-900 dark:text-white">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-ink-line flex items-center justify-between">
+            <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">
               Currently Featured
             </h2>
-            <span className="text-xs font-semibold text-gray-400 dark:text-gray-600">
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-600">
               {featured.length} course{featured.length !== 1 ? "s" : ""}
             </span>
           </div>
 
           {featured.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-center px-4">
-              <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-300 dark:text-gray-600">
+              <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-600">
                 <IconSparkles />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   No featured courses yet
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                   Click "Add Course" to select courses to feature on the homepage.
                 </p>
               </div>

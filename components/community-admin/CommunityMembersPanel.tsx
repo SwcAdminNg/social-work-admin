@@ -18,7 +18,7 @@ const PAGE_SIZE = 20;
 function AddedViaBadge({ member }: { member: CommunityMember }) {
   if (!member.added_via) return null;
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
       {member.added_via === "COURSE_SNAPSHOT" ? "Course snapshot" : "Added manually"}
     </span>
   );
@@ -66,16 +66,16 @@ export function CommunityMembersPanel({
   return (
     <>
       <div className="fixed inset-0 z-40 flex justify-end">
-        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 h-full shadow-xl flex flex-col">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+        <div className="relative w-full max-w-sm bg-white dark:bg-ink-surface h-full shadow-xl flex flex-col">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-ink-line">
             <div>
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Members</h3>
-              <p className="text-xs text-gray-400">{meta?.total_items ?? community.member_count ?? "—"} total</p>
+              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Members</h3>
+              <p className="text-xs text-slate-400">{meta?.total_items ?? community.member_count ?? "—"} total</p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               aria-label="Close"
             >
               <IconClose />
@@ -83,14 +83,14 @@ export function CommunityMembersPanel({
           </div>
 
           {canManage && (
-            <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-800">
+            <div className="px-5 py-3 border-b border-slate-100 dark:border-ink-line">
               <button
                 type="button"
                 onClick={() => {
                   setResyncCourse(null);
                   setAddOpen(true);
                 }}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 rounded-xl transition-colors cursor-pointer w-full justify-center"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 rounded-xl transition-colors cursor-pointer w-full justify-center"
               >
                 <IconUserPlus />
                 Add members
@@ -101,21 +101,21 @@ export function CommunityMembersPanel({
           <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-3 flex flex-col gap-3">
             {membersQuery.isLoading ? (
               <div className="flex justify-center py-10">
-                <IconSpinner className="w-5 h-5 text-gray-400" />
+                <IconSpinner className="w-5 h-5 text-slate-400" />
               </div>
             ) : members.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-10">No members yet.</p>
+              <p className="text-sm text-slate-400 text-center py-10">No members yet.</p>
             ) : (
               members.map((member) => (
                 <div key={member.user.id} className="flex items-center gap-3">
                   <Avatar user={member.user} isOnline={member.is_online} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                       {displayName(member.user)}
                     </p>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {member.user.email && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.user.email}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{member.user.email}</p>
                       )}
                       <AddedViaBadge member={member} />
                     </div>
@@ -128,7 +128,7 @@ export function CommunityMembersPanel({
                         setResyncCourse({ id: member.added_from_course_id as string, title: "this course" });
                         setAddOpen(true);
                       }}
-                      className="text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] cursor-pointer shrink-0"
+                      className="text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 cursor-pointer shrink-0"
                     >
                       <IconRefresh className="w-4 h-4" />
                     </button>
@@ -137,7 +137,7 @@ export function CommunityMembersPanel({
                     <button
                       type="button"
                       onClick={() => setRemoveTarget(member)}
-                      className="text-gray-400 hover:text-red-500 cursor-pointer shrink-0"
+                      className="text-slate-400 hover:text-red-500 cursor-pointer shrink-0"
                       aria-label={`Remove ${displayName(member.user)}`}
                     >
                       <IconTrash />

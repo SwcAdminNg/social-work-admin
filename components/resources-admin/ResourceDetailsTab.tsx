@@ -22,10 +22,10 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
-        {description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</p>}
+        <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+        {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
       </div>
       {children}
     </div>
@@ -124,8 +124,8 @@ export function ResourceDetailsTab({
 
       {/* Sticky summary + save */}
       <div className="lg:sticky lg:top-[88px] flex flex-col gap-4">
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 flex flex-col gap-4">
-          <div className="w-full aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center text-gray-300 dark:text-gray-600">
+        <div className="rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-5 flex flex-col gap-4">
+          <div className="w-full aspect-video rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center text-slate-300 dark:text-slate-600">
             {thumbnailUrl ? (
               <Image src={thumbnailUrl} alt="" width={320} height={180} className="object-cover w-full h-full" />
             ) : (
@@ -133,15 +133,15 @@ export function ResourceDetailsTab({
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{name || "Untitled resource"}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{name || "Untitled resource"}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {CATEGORY_OPTIONS.find((o) => o.value === category)?.label}
             </p>
           </div>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             {saving && <IconSpinner className="text-white/80" />}
             {saving ? "Saving…" : "Save changes"}

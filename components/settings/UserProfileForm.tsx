@@ -64,7 +64,7 @@ export function UserProfileForm() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D6A4F]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
       </div>
     );
   }
@@ -93,12 +93,12 @@ export function UserProfileForm() {
   };
 
   return (
-    <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
-      <div className="p-8 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-800/80">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="max-w-3xl w-full bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-300">
+      <div className="p-8 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800/80">
+        <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-2">
           Personal Information
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Update your profile details and settings here.
         </p>
       </div>
@@ -120,7 +120,7 @@ export function UserProfileForm() {
           <div className="space-y-2">
             <label
               htmlFor="first_name"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               First Name
             </label>
@@ -132,14 +132,14 @@ export function UserProfileForm() {
               maxLength={100}
               value={formData.first_name}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="last_name"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               Last Name
             </label>
@@ -151,14 +151,14 @@ export function UserProfileForm() {
               maxLength={100}
               value={formData.last_name}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="username"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               Username
             </label>
@@ -171,14 +171,14 @@ export function UserProfileForm() {
               maxLength={50}
               value={formData.username}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="phone_number"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               Phone Number
             </label>
@@ -189,14 +189,14 @@ export function UserProfileForm() {
               maxLength={20}
               value={formData.phone_number}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="gender"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               Gender
             </label>
@@ -205,7 +205,7 @@ export function UserProfileForm() {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] appearance-none"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 appearance-none"
             >
               <option value="MALE">Male</option>
               <option value="FEMALE">Female</option>
@@ -216,10 +216,10 @@ export function UserProfileForm() {
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
               Email Address{" "}
-              <span className="text-xs font-normal text-gray-400">
+              <span className="text-xs font-normal text-slate-400">
                 (Read-only)
               </span>
             </label>
@@ -228,7 +228,7 @@ export function UserProfileForm() {
               type="email"
               readOnly
               value={user?.email || ""}
-              className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 px-4 py-3 text-sm text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 px-4 py-3 text-sm text-slate-500 dark:text-slate-400 cursor-not-allowed"
             />
           </div>
         </div>
@@ -236,7 +236,7 @@ export function UserProfileForm() {
         <div className="space-y-2">
           <label
             htmlFor="address"
-            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+            className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
           >
             Address
           </label>
@@ -247,7 +247,7 @@ export function UserProfileForm() {
             maxLength={500}
             value={formData.address}
             onChange={handleChange}
-            className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 text-sm text-gray-900 dark:text-white transition-all focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788] resize-none"
+            className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-ink-surface/50 px-4 py-3 text-sm text-slate-900 dark:text-white transition-all focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400 resize-none"
           />
         </div>
 
@@ -255,7 +255,7 @@ export function UserProfileForm() {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="px-8 py-3 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:hover:shadow-md flex items-center justify-center gap-2 transform active:scale-[0.98]"
+            className="px-8 py-3 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:hover:shadow-md flex items-center justify-center gap-2 transform active:scale-[0.98]"
           >
             {mutation.isPending ? (
               <>

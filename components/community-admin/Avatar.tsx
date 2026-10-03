@@ -46,7 +46,7 @@ export function Avatar({
   return (
     <div className="relative shrink-0">
       <div
-        className={`${SIZE_CLASSES[size]} rounded-full bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 text-[#2D6A4F] dark:text-[#52b788] flex items-center justify-center font-bold overflow-hidden`}
+        className={`${SIZE_CLASSES[size]} rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold overflow-hidden`}
       >
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -57,8 +57,8 @@ export function Avatar({
       </div>
       {isOnline !== undefined && (
         <span
-          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${
-            isOnline ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 ${
+            isOnline ? "bg-green-500" : "bg-slate-300 dark:bg-slate-600"
           }`}
           aria-label={isOnline ? "Online" : "Offline"}
         />

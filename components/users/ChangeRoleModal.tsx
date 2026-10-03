@@ -57,14 +57,14 @@ export function ChangeRoleModal({ isOpen, onClose, user }: ChangeRoleModalProps)
     <Modal isOpen={isOpen} onClose={onClose} title="Change User Role" maxWidth="sm">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label htmlFor="role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Role for {user.first_name} {user.last_name}
           </label>
           <select
             id="role"
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as User["user_type"])}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           >
             {ROLES.map((role) => (
               <option key={role} value={role}>
@@ -78,14 +78,14 @@ export function ChangeRoleModal({ isOpen, onClose, user }: ChangeRoleModalProps)
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={mutation.isPending || selectedRole === user.user_type}
-            className="px-4 py-2 text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] dark:hover:bg-[#3d8c68] rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
           >
             {mutation.isPending ? "Saving..." : "Save Changes"}
           </button>

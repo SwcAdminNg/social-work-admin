@@ -59,7 +59,7 @@ export function ResourceAttachmentsTab({
       <button
         type="button"
         onClick={() => setAddOpen(true)}
-        className="self-start inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-[#2D6A4F] dark:text-[#52b788] border-2 border-dashed border-[#2D6A4F]/30 dark:border-[#52b788]/30 hover:bg-[#2D6A4F]/5 dark:hover:bg-[#52b788]/10 transition-colors duration-150 cursor-pointer"
+        className="self-start inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-brand-600 dark:text-brand-400 border-2 border-dashed border-brand-600/30 dark:border-brand-400/30 hover:bg-brand-600/5 dark:hover:bg-brand-400/10 transition-colors duration-150 cursor-pointer"
       >
         <IconPlus />
         Add attachment

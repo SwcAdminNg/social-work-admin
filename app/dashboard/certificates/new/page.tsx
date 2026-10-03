@@ -15,14 +15,14 @@ export default async function NewCertificateTemplatePage() {
       <div>
         <Link
           href="/dashboard/certificates"
-          className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#52b788] no-underline transition-colors duration-150"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 no-underline transition-colors duration-150"
         >
           ← Back to Certificates
         </Link>
-        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight mt-2">
+        <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-2">
           Create a certificate template
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Design the copy and colors — you can upload a logo and signature image next.
         </p>
       </div>

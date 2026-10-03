@@ -15,10 +15,10 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line p-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-900 dark:text-white">{title}</h3>
-        {description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</p>}
+        <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+        {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
       </div>
       {children}
     </div>

@@ -26,8 +26,8 @@ function formatDate(dateString: string) {
 function StatusBadge({ status }: { status: TransactionReadDTO["status"] }) {
   if (status === "SUCCESS") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-[#2D6A4F]/10 text-[#2D6A4F] dark:bg-[#52b788]/15 dark:text-[#52b788]">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] dark:bg-[#52b788]" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wide bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-brand-600 dark:bg-brand-400" />
         Success
       </span>
     );
@@ -66,7 +66,7 @@ export default function PaymentsPage() {
     {
       key: "date",
       header: "Date",
-      render: (txn) => <span className="text-sm text-gray-700 dark:text-gray-300">{formatDate(txn.created_at)}</span>,
+      render: (txn) => <span className="text-sm text-slate-700 dark:text-slate-300">{formatDate(txn.created_at)}</span>,
     },
     {
       key: "user",
@@ -74,29 +74,29 @@ export default function PaymentsPage() {
       render: (txn) => (
         <Link 
           href={`/dashboard/user-management/${txn.user.id}`}
-          className="flex flex-col hover:bg-gray-50 dark:hover:bg-gray-800 p-1 -ml-1 rounded transition-colors"
+          className="flex flex-col hover:bg-slate-50 dark:hover:bg-slate-800 p-1 -ml-1 rounded transition-colors"
         >
-          <span className="text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788]">
+          <span className="text-sm font-semibold text-brand-600 dark:text-brand-400">
             {txn.user.full_name || `${txn.user.first_name || ""} ${txn.user.last_name || ""}`.trim() || "User"}
           </span>
-          <span className="text-xs text-gray-500">{txn.user.email}</span>
+          <span className="text-xs text-slate-500">{txn.user.email}</span>
         </Link>
       ),
     },
     {
       key: "reference",
       header: "Reference",
-      render: (txn) => <span className="text-sm font-mono text-gray-900 dark:text-white">{txn.reference}</span>,
+      render: (txn) => <span className="text-sm font-mono text-slate-900 dark:text-white">{txn.reference}</span>,
     },
     {
       key: "amount",
       header: "Amount",
-      render: (txn) => <span className="text-sm font-semibold text-gray-900 dark:text-white">₦{txn.amount.toLocaleString()}</span>,
+      render: (txn) => <span className="text-sm font-semibold text-slate-900 dark:text-white">₦{txn.amount.toLocaleString()}</span>,
     },
     {
       key: "type",
       header: "Type",
-      render: (txn) => <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{txn.transaction_type}</span>,
+      render: (txn) => <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{txn.transaction_type}</span>,
     },
     {
       key: "status",

@@ -22,6 +22,7 @@ import { QuizQuestionCard } from "./QuizQuestionCard";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
+import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
 
 function newDraftOption(): CreateQuizOptionPayload & { key: string } {
   return { key: Math.random().toString(36).slice(2), text: "", is_correct: false, order_index: 0 };
@@ -39,7 +40,7 @@ export function QuizGroupBuilder({
   const quizGroup = item.assessment?.quiz_group;
 
   const [editingSettings, setEditingSettings] = useState(false);
-  const [dueDate, setDueDate] = useState<string>(item.assessment?.due_date ? item.assessment.due_date.slice(0, 16) : "");
+  const [dueDate, setDueDate] = useState<string>(isoToLocalInput(item.assessment?.due_date));
   const [passMark, setPassMark] = useState(String(quizGroup?.pass_mark_percentage ?? 70));
   const [maxAttempts, setMaxAttempts] = useState(quizGroup?.max_attempts ? String(quizGroup.max_attempts) : "");
   const [showResult, setShowResult] = useState(quizGroup?.show_result_to_student ?? true);
@@ -119,41 +120,51 @@ export function QuizGroupBuilder({
   return (
     <div className="flex flex-col gap-4">
       {editingSettings ? (
-        <form onSubmit={handleSaveSettings} className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4 bg-gray-50/50 dark:bg-gray-800/20">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Quiz Group Settings</h4>
+        <form onSubmit={handleSaveSettings} className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-ink-line p-4 bg-slate-50/50 dark:bg-slate-800/20">
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Quiz Group Settings</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Due Date (Optional)</label>
-              <input type="datetime-local" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]" />
+              <label htmlFor={`quiz-due-${item.id}`} className="text-xs font-medium text-slate-700 dark:text-slate-300">Due Date (Optional)</label>
+              <DatePicker
+                id={`quiz-due-${item.id}`}
+                mode="datetime"
+                size="sm"
+                title="Quiz group due date"
+                presets="future"
+                defaultTime={{ hours: 23, minutes: 55 }}
+                value={dueDate}
+                onChange={setDueDate}
+                placeholder="No due date"
+              />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Pass Mark (%)</label>
-              <input type="number" min="0" max="100" value={passMark} onChange={(e) => setPassMark(e.target.value)} required className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]" />
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Pass Mark (%)</label>
+              <input type="number" min="0" max="100" value={passMark} onChange={(e) => setPassMark(e.target.value)} required className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Max Attempts (Optional)</label>
-              <input type="number" min="1" value={maxAttempts} onChange={(e) => setMaxAttempts(e.target.value)} placeholder="Unlimited" className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]" />
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Max Attempts (Optional)</label>
+              <input type="number" min="1" value={maxAttempts} onChange={(e) => setMaxAttempts(e.target.value)} placeholder="Unlimited" className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Time Limit, Minutes (Optional)</label>
-              <input type="number" min="1" value={timeLimitMinutes} onChange={(e) => setTimeLimitMinutes(e.target.value)} placeholder="Untimed" className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]" />
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Time Limit, Minutes (Optional)</label>
+              <input type="number" min="1" value={timeLimitMinutes} onChange={(e) => setTimeLimitMinutes(e.target.value)} placeholder="Untimed" className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400" />
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <input type="checkbox" checked={showResult} onChange={(e) => setShowResult(e.target.checked)} className="accent-[#2D6A4F]" />
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Show result to student</label>
+              <input type="checkbox" checked={showResult} onChange={(e) => setShowResult(e.target.checked)} className="accent-brand-600" />
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Show result to student</label>
             </div>
-            <div className="h-px bg-gray-100 dark:bg-gray-800 sm:col-span-2" />
+            <div className="h-px bg-slate-100 dark:bg-slate-800 sm:col-span-2" />
             <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
           </div>
           <div className="flex items-center justify-end gap-2 mt-2">
-            <button type="button" onClick={() => setEditingSettings(false)} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-            <button type="submit" disabled={savingSettings} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors disabled:opacity-70">
+            <button type="button" onClick={() => setEditingSettings(false)} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+            <button type="submit" disabled={savingSettings} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors disabled:opacity-70">
               {savingSettings && <IconSpinner className="text-white/80" />} Save Settings
             </button>
           </div>
         </form>
       ) : (
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-4 flex-wrap">
             <span>Pass mark: {quizGroup.pass_mark_percentage}%</span>
             <span>Attempts: {quizGroup.max_attempts ? quizGroup.max_attempts : "Unlimited"}</span>
@@ -161,7 +172,7 @@ export function QuizGroupBuilder({
             {item.assessment?.due_date && <span>Due: {new Date(item.assessment.due_date).toLocaleDateString()}</span>}
             {item.assessment?.is_final_assessment && <FinalAssessmentBadge />}
           </div>
-          <button type="button" onClick={() => setEditingSettings(true)} className="font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer">Edit settings</button>
+          <button type="button" onClick={() => setEditingSettings(true)} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer">Edit settings</button>
         </div>
       )}
 
@@ -177,14 +188,14 @@ export function QuizGroupBuilder({
       ))}
 
       {addingSection ? (
-        <form onSubmit={handleAddSection} className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+        <form onSubmit={handleAddSection} className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-ink-line p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               value={sectionTitle}
               onChange={(e) => setSectionTitle(e.target.value)}
               required
               placeholder="Section title, e.g. Safety Principles"
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
             <input
               type="number"
@@ -192,7 +203,7 @@ export function QuizGroupBuilder({
               value={sectionQuestionsToAsk}
               onChange={(e) => setSectionQuestionsToAsk(e.target.value)}
               placeholder="Questions to ask (blank = all)"
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             />
           </div>
           <div className="flex items-center justify-end gap-3 mt-1">
@@ -204,14 +215,14 @@ export function QuizGroupBuilder({
                 setSectionQuestionsToAsk("");
               }}
               disabled={addingSectionSubmitting}
-              className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addingSectionSubmitting}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               {addingSectionSubmitting && <IconSpinner className="text-white/80" />}
               Add section
@@ -222,7 +233,7 @@ export function QuizGroupBuilder({
         <button
           type="button"
           onClick={() => setAddingSection(true)}
-          className="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 cursor-pointer"
+          className="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 cursor-pointer"
         >
           <IconPlus />
           Add section
@@ -455,18 +466,18 @@ function QuizGroupSectionPanel({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-900/30">
+    <div className="rounded-xl border border-slate-200 dark:border-ink-line bg-slate-50/40 dark:bg-ink-surface/30">
       <div className="flex items-center gap-2 p-3">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={saveTitle}
-          className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:bg-white dark:focus:bg-gray-900 rounded px-1.5 py-0.5"
+          className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:bg-white dark:focus:bg-ink-surface rounded px-1.5 py-0.5"
         />
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer flex-shrink-0"
+          className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-150 cursor-pointer flex-shrink-0"
           aria-label="Delete section"
         >
           <IconTrash />
@@ -474,7 +485,7 @@ function QuizGroupSectionPanel({
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-transform duration-150 cursor-pointer flex-shrink-0"
+          className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-transform duration-150 cursor-pointer flex-shrink-0"
           style={{ transform: expanded ? "rotate(180deg)" : undefined }}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
@@ -482,21 +493,21 @@ function QuizGroupSectionPanel({
         </button>
       </div>
 
-      <div className="px-3 pb-3 flex flex-col gap-2 border-t border-gray-100 dark:border-gray-800/60 pt-3">
+      <div className="px-3 pb-3 flex flex-col gap-2 border-t border-slate-100 dark:border-ink-line/60 pt-3">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-slate-600 dark:text-slate-400">
             <input
               type="checkbox"
               checked={askAll}
               onChange={(e) => handleToggleAskAll(e.target.checked)}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
             Ask every question every time
           </label>
 
           {!askAll && (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Questions per attempt</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Questions per attempt</span>
               <input
                 type="number"
                 min="1"
@@ -507,10 +518,10 @@ function QuizGroupSectionPanel({
                 }}
                 onBlur={saveQuestionsToAsk}
                 placeholder="e.g. 5"
-                className={`w-16 rounded-lg border bg-white dark:bg-gray-900 px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 ${
+                className={`w-16 rounded-lg border bg-white dark:bg-ink-surface px-2 py-1 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 ${
                   askError
                     ? "border-red-400 dark:border-red-500 focus:ring-red-400"
-                    : "border-gray-200 dark:border-gray-700 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                    : "border-slate-200 dark:border-slate-700 focus:ring-brand-600 dark:focus:ring-brand-400"
                 }`}
               />
             </div>
@@ -525,8 +536,8 @@ function QuizGroupSectionPanel({
               coverage.tone === "warning"
                 ? "text-amber-700 dark:text-amber-400"
                 : coverage.tone === "muted"
-                  ? "text-gray-400 dark:text-gray-600"
-                  : "text-gray-500 dark:text-gray-400"
+                  ? "text-slate-400 dark:text-slate-600"
+                  : "text-slate-500 dark:text-slate-400"
             }`}
           >
             {coverage.tone === "warning" && <IconAlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />}
@@ -536,7 +547,7 @@ function QuizGroupSectionPanel({
       </div>
 
       {expanded && (
-        <div className="border-t border-gray-200 dark:border-gray-800 p-3 flex flex-col gap-3">
+        <div className="border-t border-slate-200 dark:border-ink-line p-3 flex flex-col gap-3">
           <QuizAiAutocomplete itemId={itemId} sectionId={section.id} currentQuestionCount={section.questions.length} dispatch={dispatch} />
 
           {section.questions.map((question) => (
@@ -552,23 +563,23 @@ function QuizGroupSectionPanel({
           {adding ? (
             <form
               onSubmit={handleAddQuestion}
-              className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4"
+              className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-ink-line p-4"
             >
               <input
                 value={draftText}
                 onChange={(e) => setDraftText(e.target.value)}
                 required
                 placeholder="Question text"
-                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <label className="flex items-center gap-2.5 cursor-pointer select-none text-sm text-gray-600 dark:text-gray-400">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none text-sm text-slate-600 dark:text-slate-400">
                   <input
                     type="checkbox"
                     checked={allowMultiple}
                     onChange={(e) => setAllowMultiple(e.target.checked)}
-                    className="accent-[#2D6A4F]"
+                    className="accent-brand-600"
                   />
                   Allow multiple correct answers
                 </label>
@@ -576,7 +587,7 @@ function QuizGroupSectionPanel({
                   <select
                     value={multiAnswerMode}
                     onChange={(e) => setMultiAnswerMode(e.target.value as "AND" | "OR")}
-                    className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none"
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1 text-sm text-slate-900 dark:text-white focus:outline-none"
                   >
                     <option value="OR">Partial Credit (OR)</option>
                     <option value="AND">All-or-Nothing (AND)</option>
@@ -592,19 +603,19 @@ function QuizGroupSectionPanel({
                       name={`draft-correct-${section.id}`}
                       checked={option.is_correct}
                       onChange={(e) => updateDraftOption(option.key, { is_correct: e.target.checked })}
-                      className="accent-[#2D6A4F]"
+                      className="accent-brand-600"
                     />
                     <input
                       value={option.text}
                       onChange={(e) => updateDraftOption(option.key, { text: e.target.value })}
                       placeholder="Option text"
-                      className="flex-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                      className="flex-1 rounded-lg border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
                     />
                     <button
                       type="button"
                       onClick={() => setDraftOptions((prev) => prev.filter((o) => o.key !== option.key))}
                       disabled={draftOptions.length <= 2}
-                      className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150 cursor-pointer"
+                      className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150 cursor-pointer"
                       aria-label="Remove option"
                     >
                       <IconTrash />
@@ -614,7 +625,7 @@ function QuizGroupSectionPanel({
                 <button
                   type="button"
                   onClick={() => setDraftOptions((prev) => [...prev, newDraftOption()])}
-                  className="self-start inline-flex items-center gap-1.5 text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer"
+                  className="self-start inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer"
                 >
                   <IconPlus />
                   Add option
@@ -626,14 +637,14 @@ function QuizGroupSectionPanel({
                   type="button"
                   onClick={resetDraft}
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-150 cursor-pointer disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {submitting && <IconSpinner className="text-white/80" />}
                   Add question
@@ -644,7 +655,7 @@ function QuizGroupSectionPanel({
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] bg-[#2D6A4F]/10 dark:bg-[#52b788]/15 hover:bg-[#2D6A4F]/20 dark:hover:bg-[#52b788]/25 transition-colors duration-150 cursor-pointer"
+              className="self-start inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-brand-600 dark:text-brand-400 bg-brand-600/10 dark:bg-brand-400/15 hover:bg-brand-600/20 dark:hover:bg-brand-400/25 transition-colors duration-150 cursor-pointer"
             >
               <IconPlus />
               Add question

@@ -114,7 +114,7 @@ export function UserSearchSelect({
         />
       ) : (
         <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             value={query}
             onChange={(e) => {
@@ -125,7 +125,7 @@ export function UserSearchSelect({
             placeholder={placeholder}
             className="input input-with-icon"
           />
-          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />}
         </div>
       )}
 
@@ -143,10 +143,10 @@ export function UserSearchSelect({
                   setQuery("");
                   setOpen(false);
                 }}
-                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
               >
-                <span className="block text-sm font-semibold text-gray-900 dark:text-white">{userLabel(user)}</span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                <span className="block text-sm font-semibold text-slate-900 dark:text-white">{userLabel(user)}</span>
+                <span className="block text-xs text-slate-500 dark:text-slate-400">
                   {user.email} · {user.username} · {user.user_type}
                 </span>
               </button>
@@ -223,7 +223,7 @@ export function CourseSearchSelect({
         />
       ) : (
         <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             value={query}
             onChange={(e) => {
@@ -234,7 +234,7 @@ export function CourseSearchSelect({
             placeholder={placeholder}
             className="input input-with-icon"
           />
-          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+          {loading && <IconSpinner className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />}
         </div>
       )}
 
@@ -252,10 +252,10 @@ export function CourseSearchSelect({
                   setQuery("");
                   setOpen(false);
                 }}
-                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="w-full rounded-lg px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
               >
-                <span className="block text-sm font-semibold text-gray-900 dark:text-white">{course.title}</span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                <span className="block text-sm font-semibold text-slate-900 dark:text-white">{course.title}</span>
+                <span className="block text-xs text-slate-500 dark:text-slate-400">
                   {course.governance_status ?? (course.is_published ? "Published" : "Draft")}
                   {course.current_version_label ? ` · v${course.current_version_label}` : ""}
                 </span>
@@ -270,12 +270,12 @@ export function CourseSearchSelect({
 
 function SelectedPill({ title, subtitle, onClear }: { title: string; subtitle?: string; onClear: () => void }) {
   return (
-    <div className="flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#2D6A4F]/20 bg-[#2D6A4F]/5 px-3 py-2 dark:border-[#52b788]/20 dark:bg-[#52b788]/10">
+    <div className="flex min-h-10 items-center justify-between gap-3 rounded-xl border border-brand-600/20 bg-brand-600/5 px-3 py-2 dark:border-brand-400/20 dark:bg-brand-400/10">
       <span className="min-w-0">
-        <span className="block truncate text-sm font-bold text-gray-900 dark:text-white">{title}</span>
-        {subtitle && <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{subtitle}</span>}
+        <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{title}</span>
+        {subtitle && <span className="block truncate text-xs text-slate-500 dark:text-slate-400">{subtitle}</span>}
       </span>
-      <button type="button" onClick={onClear} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" aria-label="Clear selection">
+      <button type="button" onClick={onClear} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200" aria-label="Clear selection">
         <IconX size={16} />
       </button>
     </div>
@@ -284,12 +284,12 @@ function SelectedPill({ title, subtitle, onClear }: { title: string; subtitle?: 
 
 function ResultPanel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-800 dark:bg-gray-900">
+    <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-ink-line dark:bg-ink-surface">
       {children}
     </div>
   );
 }
 
 function EmptyResult({ children }: { children: React.ReactNode }) {
-  return <p className="px-3 py-2.5 text-sm text-gray-400">{children}</p>;
+  return <p className="px-3 py-2.5 text-sm text-slate-400">{children}</p>;
 }

@@ -9,6 +9,7 @@ import { IconChevronDown, IconSpinner } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { TextAreaField } from "./FormControls";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
+import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
 
 export function EssayBuilder({
   item,
@@ -24,7 +25,7 @@ export function EssayBuilder({
   const [question, setQuestion] = useState(essay?.question ?? "");
   const [description, setDescription] = useState(essay?.description ?? "");
   const [submissionMode, setSubmissionMode] = useState<"TEXT" | "DOCUMENT">(essay?.submission_mode ?? "TEXT");
-  const [dueDate, setDueDate] = useState<string>(item.assessment?.due_date ? item.assessment.due_date.slice(0, 16) : "");
+  const [dueDate, setDueDate] = useState<string>(isoToLocalInput(item.assessment?.due_date));
   const [passMark, setPassMark] = useState(String(essay?.pass_mark_percentage ?? 70));
   const [maxAttempts, setMaxAttempts] = useState(essay?.max_attempts ? String(essay.max_attempts) : "");
   const [requiresModeration, setRequiresModeration] = useState(essay?.requires_moderation ?? item.assessment?.is_final_assessment ?? false);
@@ -99,11 +100,11 @@ export function EssayBuilder({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Submission Mode</label>
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Submission Mode</label>
             <select
               value={submissionMode}
               onChange={(e) => setSubmissionMode(e.target.value as "TEXT" | "DOCUMENT")}
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
             >
               <option value="TEXT">Text Field</option>
               <option value="DOCUMENT">File Upload (PDF, Word, etc.)</option>
@@ -111,57 +112,61 @@ export function EssayBuilder({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Due Date (Optional)</label>
-            <input
-              type="datetime-local"
+            <label htmlFor={`essay-due-${item.id}`} className="text-sm font-bold text-slate-700 dark:text-slate-300">Due Date (Optional)</label>
+            <DatePicker
+              id={`essay-due-${item.id}`}
+              mode="datetime"
+              title="Essay due date"
+              presets="future"
+              defaultTime={{ hours: 23, minutes: 55 }}
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+              onChange={setDueDate}
+              placeholder="No due date"
             />
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+        <div className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-ink-line p-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 -mt-1">
             Pass mark and attempts only matter once this essay is a final assessment (below) — a
             regular essay has nothing that &ldquo;fails&rdquo; it.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Pass Mark (%)</label>
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Pass Mark (%)</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={passMark}
                 onChange={(e) => setPassMark(e.target.value)}
-                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-bold text-gray-700 dark:text-gray-300">Max Attempts (Optional)</label>
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Max Attempts (Optional)</label>
               <input
                 type="number"
                 min="1"
                 value={maxAttempts}
                 onChange={(e) => setMaxAttempts(e.target.value)}
                 placeholder="Unlimited"
-                className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+                className="rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
               />
             </div>
           </div>
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-slate-100 dark:bg-slate-800" />
           <FinalAssessmentToggle checked={isFinalAssessment} onChange={setIsFinalAssessment} />
           <label className="flex items-start gap-3 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={requiresModeration}
               onChange={(e) => setRequiresModeration(e.target.checked)}
-              className="mt-1 accent-[#2D6A4F]"
+              className="mt-1 accent-brand-600"
             />
             <span>
-              <span className="block text-sm font-bold text-gray-700 dark:text-gray-300">Requires moderation</span>
-              <span className="block text-xs text-gray-500 dark:text-gray-400">
+              <span className="block text-sm font-bold text-slate-700 dark:text-slate-300">Requires moderation</span>
+              <span className="block text-xs text-slate-500 dark:text-slate-400">
                 When governance is enabled, marks flow through Marker, Moderator, and Approver before learners see results.
               </span>
             </span>
@@ -171,7 +176,7 @@ export function EssayBuilder({
         <button
           type="submit"
           disabled={saving || !question.trim() || !description.trim()}
-          className="self-start inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+          className="self-start inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
         >
           {saving && <IconSpinner className="text-white/80" />}
           Save Essay Details
@@ -219,15 +224,15 @@ function EssaySubmissionsPanel({ itemId }: { itemId: string }) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800">
+    <div className="rounded-xl border border-slate-200 dark:border-ink-line">
       <button
         type="button"
         onClick={toggle}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white cursor-pointer"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white cursor-pointer"
       >
         Submissions
         <span
-          className="text-gray-400 transition-transform duration-150"
+          className="text-slate-400 transition-transform duration-150"
           style={{ transform: expanded ? "rotate(180deg)" : undefined }}
         >
           <IconChevronDown />
@@ -235,12 +240,12 @@ function EssaySubmissionsPanel({ itemId }: { itemId: string }) {
       </button>
 
       {expanded && (
-        <div className="border-t border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3">
+        <div className="border-t border-slate-200 dark:border-ink-line p-4 flex flex-col gap-3">
           {loading && submissions.length === 0 && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading submissions...</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Loading submissions...</p>
           )}
           {!loading && loaded && submissions.length === 0 && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No submissions yet.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">No submissions yet.</p>
           )}
           {submissions.map((submission) => (
             <EssaySubmissionRow
@@ -255,7 +260,7 @@ function EssaySubmissionsPanel({ itemId }: { itemId: string }) {
               type="button"
               onClick={() => loadPage(page + 1)}
               disabled={loading}
-              className="self-start inline-flex items-center gap-1.5 text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline cursor-pointer disabled:opacity-60"
+              className="self-start inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer disabled:opacity-60"
             >
               {loading && <IconSpinner className="text-current" />}
               Load more
@@ -320,12 +325,12 @@ function EssaySubmissionRow({
   return (
     <form
       onSubmit={handleGrade}
-      className="flex flex-col gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-4"
+      className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-ink-line p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">{submission.user_full_name}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{submission.user_email}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">{submission.user_full_name}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{submission.user_email}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {submission.result_status && (
               <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
@@ -333,19 +338,19 @@ function EssaySubmissionRow({
               </span>
             )}
             {submission.working_score !== undefined && submission.working_score !== null && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 Working score {submission.working_score}
               </span>
             )}
           </div>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+        <p className="text-xs text-slate-500 dark:text-slate-400 flex-shrink-0">
           Submitted {new Date(submission.submitted_at).toLocaleString()}
         </p>
       </div>
 
       {submission.content_text ? (
-        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap rounded-lg bg-gray-50 dark:bg-gray-800/40 p-3 max-h-48 overflow-y-auto">
+        <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap rounded-lg bg-slate-50 dark:bg-slate-800/40 p-3 max-h-48 overflow-y-auto">
           {submission.content_text}
         </p>
       ) : submission.document_download_url ? (
@@ -353,7 +358,7 @@ function EssaySubmissionRow({
           href={submission.document_download_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="self-start text-sm font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline"
+          className="self-start text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline"
         >
           Download {submission.document_file_name ?? "submission"}
         </a>
@@ -361,7 +366,7 @@ function EssaySubmissionRow({
 
       <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-3 items-start">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Score (0-100)</label>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Score (0-100)</label>
           <input
             type="number"
             min="0"
@@ -370,44 +375,44 @@ function EssaySubmissionRow({
             value={score}
             onChange={(e) => setScore(e.target.value)}
             required
-            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Feedback (Optional)</label>
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Feedback (Optional)</label>
           <textarea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             rows={2}
-            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-sm text-gray-900 dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-sm text-slate-900 dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </div>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-slate-700 dark:text-slate-300">
             <input
               type="checkbox"
               checked={isPublished}
               onChange={(e) => setIsPublished(e.target.checked)}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
             Publish to student
           </label>
-          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-gray-700 dark:text-gray-300">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-slate-700 dark:text-slate-300">
             <input
               type="checkbox"
               checked={submitForModeration}
               onChange={(e) => setSubmitForModeration(e.target.checked)}
-              className="accent-[#2D6A4F]"
+              className="accent-brand-600"
             />
             Submit for moderation
           </label>
           <select
             value={recommendation}
             onChange={(e) => setRecommendation(e.target.value as "PASS" | "FAIL")}
-            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1.5 text-xs text-gray-900 dark:text-white"
+            className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-2 py-1.5 text-xs text-slate-900 dark:text-white"
           >
             <option value="PASS">Recommend pass</option>
             <option value="FAIL">Recommend fail</option>
@@ -415,7 +420,7 @@ function EssaySubmissionRow({
           {submission.current_mark_id && (
             <a
               href={`/dashboard/approval-centre/marks/${submission.current_mark_id}`}
-              className="text-xs font-bold text-[#2D6A4F] dark:text-[#52b788] hover:underline"
+              className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline"
             >
               Open mark workflow
             </a>
@@ -424,7 +429,7 @@ function EssaySubmissionRow({
         <button
           type="submit"
           disabled={grading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors disabled:opacity-70 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors disabled:opacity-70 cursor-pointer"
         >
           {grading && <IconSpinner className="text-white/80" />}
           {submission.score !== null ? "Update grade" : "Grade"}

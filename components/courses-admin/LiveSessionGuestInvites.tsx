@@ -99,20 +99,20 @@ export function LiveSessionGuestInvites({
   }
 
   const inputClass =
-    "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]";
+    "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-ink-surface px-3 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400";
 
   return (
-    <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
+    <div className="pt-2 border-t border-slate-200 dark:border-ink-line">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex items-center justify-between text-left cursor-pointer py-1"
       >
-        <span className="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+        <span className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
           <IconUserPlus className="w-4 h-4" />
           Guest invites
           {guests && guests.length > 0 && (
-            <span className="text-gray-400 dark:text-gray-600">({guests.length})</span>
+            <span className="text-slate-400 dark:text-slate-600">({guests.length})</span>
           )}
         </span>
         <IconChevronDown className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
@@ -148,7 +148,7 @@ export function LiveSessionGuestInvites({
                     type="button"
                     onClick={() => removeRow(i)}
                     disabled={rows.length === 1}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
                     aria-label="Remove row"
                   >
                     <IconTrash />
@@ -160,7 +160,7 @@ export function LiveSessionGuestInvites({
                   type="button"
                   onClick={() => setRows((prev) => [...prev, emptyRow()])}
                   disabled={rows.length >= 100}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#2D6A4F] dark:text-[#52b788] hover:underline disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <IconPlus />
                   Add another
@@ -168,7 +168,7 @@ export function LiveSessionGuestInvites({
                 <button
                   type="submit"
                   disabled={inviting || rows.every((r) => !r.email.trim())}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#2D6A4F] hover:bg-[#1e4d38] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                 >
                   {inviting && <IconSpinner className="w-3.5 h-3.5" />}
                   Send invite{rows.filter((r) => r.email.trim()).length > 1 ? "s" : ""}
@@ -179,12 +179,12 @@ export function LiveSessionGuestInvites({
 
           <div className="space-y-1.5">
             {loading && (
-              <p className="text-xs text-gray-400 flex items-center gap-2">
+              <p className="text-xs text-slate-400 flex items-center gap-2">
                 <IconSpinner className="w-3.5 h-3.5" /> Loading invites...
               </p>
             )}
             {!loading && guests && guests.length === 0 && (
-              <p className="text-xs text-gray-400">No guests invited yet.</p>
+              <p className="text-xs text-slate-400">No guests invited yet.</p>
             )}
             {!loading &&
               guests?.map((guest) => {
@@ -192,13 +192,13 @@ export function LiveSessionGuestInvites({
                 return (
                   <div
                     key={guest.id}
-                    className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 px-3 py-2"
+                    className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                         {guest.name || guest.email}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                         {guest.name ? `${guest.email} · ` : ""}
                         {revoked
                           ? "Revoked"

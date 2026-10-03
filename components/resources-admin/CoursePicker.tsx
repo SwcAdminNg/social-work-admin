@@ -56,7 +56,7 @@ export function CoursePicker({
   return (
     <div ref={containerRef} className="relative">
       <div
-        className="flex items-center justify-between cursor-pointer w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] dark:focus:ring-[#52b788]"
+        className="flex items-center justify-between cursor-pointer w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
         onClick={() => setOpen((v) => !v)}
       >
         {value ? (
@@ -68,21 +68,21 @@ export function CoursePicker({
                 e.stopPropagation();
                 onChange(null, null);
               }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex-shrink-0"
               aria-label="Clear selected course"
             >
               <IconX size={16} />
             </button>
           </div>
         ) : (
-          <span className="text-gray-400 dark:text-gray-600">Select a course…</span>
+          <span className="text-slate-400 dark:text-slate-600">Select a course…</span>
         )}
-        <IconChevronDown className="flex-shrink-0 text-gray-400" />
+        <IconChevronDown className="flex-shrink-0 text-slate-400" />
       </div>
 
       {open && (
-        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg max-h-72 flex flex-col">
-          <div className="p-2 border-b border-gray-100 dark:border-gray-800">
+        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-xl shadow-lg max-h-72 flex flex-col">
+          <div className="p-2 border-b border-slate-100 dark:border-ink-line">
             <input
               type="text"
               autoComplete="off"
@@ -90,14 +90,14 @@ export function CoursePicker({
               placeholder="Search your courses…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-sm text-gray-900 dark:text-white focus:outline-none"
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-sm text-slate-900 dark:text-white focus:outline-none"
             />
           </div>
           <div className="overflow-y-auto p-1 flex-1">
             {loading ? (
-              <div className="p-3 text-sm text-gray-500 text-center">Loading…</div>
+              <div className="p-3 text-sm text-slate-500 text-center">Loading…</div>
             ) : courses.length === 0 ? (
-              <div className="p-3 text-sm text-gray-500 text-center">No courses found</div>
+              <div className="p-3 text-sm text-slate-500 text-center">No courses found</div>
             ) : (
               courses.map((c) => (
                 <div
@@ -107,7 +107,7 @@ export function CoursePicker({
                     setOpen(false);
                     setSearch("");
                   }}
-                  className="px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer rounded-lg truncate"
+                  className="px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer rounded-lg truncate"
                 >
                   {c.title}
                 </div>
