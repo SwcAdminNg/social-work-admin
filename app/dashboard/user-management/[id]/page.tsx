@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getUserTransactions, getUserCourses, getUserCards } from "@/lib/api/customer-support";
 import { getInstructorCvDownloadUrl, getInstructorDocuments, getUserDetails } from "@/lib/api/users";
@@ -10,6 +11,7 @@ import { DataTable } from "@/components/generic/ui/DataTable";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import type { InstructorDocument } from "@/lib/api/users.types";
+import { UserAvatar } from "@/components/users/UserAvatar";
 
 const PAGE_SIZE = 20;
 
@@ -45,7 +47,6 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function UserProfilePage() {
   const params = useParams() as { id: string };
-  const router = useRouter();
   const userId = params.id;
   const [tab, setTab] = React.useState<"transactions" | "courses" | "cards" | "documents">("transactions");
   const [page, setPage] = React.useState(1);
@@ -98,15 +99,25 @@ export default function UserProfilePage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <button onClick={() => router.back()} className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
-          &larr; Back to Users
-        </button>
+        <Link
+          href={`/dashboard/user-management/${user?.user_type === "ADMIN" ? "admins" : user?.user_type === "INSTRUCTOR" ? "instructors" : "students"}`}
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors no-underline"
+        >
+          &larr; Back to {user?.user_type === "ADMIN" ? "Admins" : user?.user_type === "INSTRUCTOR" ? "Instructors" : "Students"}
+        </Link>
       </div>
 
       <div className="flex flex-col gap-2 p-6 bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
-        <h1 className="font-display text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.username : "User Profile"}
-        </h1>
+        <div className="flex items-center gap-4">
+          {user ? (
+            <UserAvatar user={user} size="xl" />
+          ) : (
+            <div className="h-20 w-20 shrink-0 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
+          )}
+          <h1 className="font-display text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            {user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.username : "User Profile"}
+          </h1>
+        </div>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
           {user?.email && (
             <div className="flex flex-col">

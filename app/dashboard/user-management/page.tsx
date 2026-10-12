@@ -1,5 +1,5 @@
-import { UserList } from "@/components/users/UserList";
+import { redirect } from "next/navigation";
 
 export default function UserManagementPage() {
-  return <UserList />;
+  redirect("/dashboard/user-management/admins");
 }

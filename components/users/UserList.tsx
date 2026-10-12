@@ -16,6 +16,8 @@ import { ConfirmModal } from "@/components/generic/ui/ConfirmModal";
 import { toast } from "sonner";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
+import { UserAvatar } from "./UserAvatar";
+import { UserManagementTabs } from "./UserManagementTabs";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "Never logged in";
@@ -42,12 +44,28 @@ const platformOptions = [
   { value: "COM", label: "COM" },
 ];
 
-const userTypeOptions = [
-  { value: "all", label: "All User Types" },
-  { value: "USER", label: "User" },
-  { value: "INSTRUCTOR", label: "Instructor" },
-  { value: "ADMIN", label: "Admin" },
-];
+export type UserGroup = "ADMIN" | "INSTRUCTOR" | "USER";
+
+const GROUP_COPY: Record<UserGroup, { title: string; description: string; empty: string; search: string }> = {
+  ADMIN: {
+    title: "Admins",
+    description: "Everyone with administrator access to the platform.",
+    empty: "No admins found",
+    search: "Search admins by name or email…",
+  },
+  INSTRUCTOR: {
+    title: "Instructors",
+    description: "People who create and teach courses on the platform.",
+    empty: "No instructors found",
+    search: "Search instructors by name or email…",
+  },
+  USER: {
+    title: "Students",
+    description: "Learners enrolled on the platform.",
+    empty: "No students found",
+    search: "Search students by name or email…",
+  },
+};
 
 const ROLE_STYLES: Record<User["user_type"], string> = {
   ADMIN: "bg-brand-600/10 text-brand-600 dark:bg-brand-400/15 dark:text-brand-400",
@@ -96,20 +114,17 @@ function ActiveBadge({ isActive, isSuspended }: { isActive: boolean; isSuspended
   );
 }
 
-function initials(user: User) {
-  return `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() || "?";
-}
-
 function UserIdentity({ user }: { user: User }) {
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <div className="w-9 h-9 shrink-0 rounded-full bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs font-bold">
-        {initials(user)}
-      </div>
+      <UserAvatar user={user} />
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+        <Link
+          href={`/dashboard/user-management/${user.id}`}
+          className="block text-sm font-semibold text-slate-900 dark:text-white truncate no-underline hover:text-brand-600 dark:hover:text-brand-400"
+        >
           {user.first_name} {user.last_name}
-        </p>
+        </Link>
         <div className="flex items-center gap-2">
           <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
           <span className="text-[0.65rem] text-slate-400 dark:text-slate-500 hidden sm:inline-block">• Last active: {formatTimeAgo(user.last_login_at)}</span>
@@ -183,12 +198,12 @@ function UserActions({
   );
 }
 
-export function UserList() {
+export function UserList({ group }: { group: UserGroup }) {
+  const copy = GROUP_COPY[group];
   const { data: session } = useSession();
 
   const [page, setPage] = React.useState(1);
   const [platform, setPlatform] = React.useState("all");
-  const [userType, setUserType] = React.useState("all");
   const [search, setSearch] = React.useState("");
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isInviteModalOpen, setIsInviteModalOpen] = React.useState(false);
@@ -221,7 +236,7 @@ export function UserList() {
     page,
     pageSize: PAGE_SIZE,
     platform: platform === "all" ? undefined : (platform as "NG" | "COM"),
-    userType: userType === "all" ? undefined : (userType as "USER" | "INSTRUCTOR" | "ADMIN"),
+    userType: group,
     search: searchTerm || undefined,
   };
 
@@ -287,16 +302,25 @@ export function UserList() {
           <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             User Management
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            A list of all the users in your account including their name, title, email and role.
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{copy.description}</p>
         </div>
-        <button
-          onClick={() => setIsInviteModalOpen(true)}
-          className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors shadow-sm shrink-0"
-        >
-          Invite Admin
-        </button>
+        {group === "ADMIN" && (
+          <button
+            onClick={() => setIsInviteModalOpen(true)}
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:hover:bg-brand-500 rounded-xl transition-colors shadow-sm shrink-0"
+          >
+            Invite Admin
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <UserManagementTabs />
+        {meta && (
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {meta.total_items.toLocaleString()} {meta.total_items === 1 ? copy.title.replace(/s$/, "").toLowerCase() : copy.title.toLowerCase()}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -310,7 +334,7 @@ export function UserList() {
             onChange={handleSearchChange}
             autoComplete="off"
 
-            placeholder="Search by name, email…"
+            placeholder={copy.search}
             className="w-full rounded-xl border border-slate-200 dark:border-ink-line bg-white dark:bg-ink-surface pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600 dark:focus:ring-brand-400"
           />
         </form>
@@ -327,17 +351,6 @@ export function UserList() {
           />
         </div>
 
-        <div className="w-full sm:w-52">
-          <CustomDropdown
-            options={userTypeOptions}
-            value={userType}
-            onChange={(v) => {
-              setUserType(v);
-              setPage(1);
-            }}
-            ariaLabel="Filter by user type"
-          />
-        </div>
       </div>
 
       {isError && (
@@ -358,7 +371,7 @@ export function UserList() {
             emptyState={
               <EmptyState
                 icon={IconUsers}
-                title="No users found"
+                title={copy.empty}
                 description="Try adjusting your search or filters."
               />
             }

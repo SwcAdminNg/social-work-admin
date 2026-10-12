@@ -166,6 +166,10 @@ const NESTED_TITLES: [RegExp, string][] = [
   [/^\/dashboard\/certificates\/new\/?$/, "New certificate template"],
   [/^\/dashboard\/approval-centre\/revisions\/[^/]+/, "Review"],
   [/^\/dashboard\/approval-centre\/marks\/[^/]+/, "Essay mark"],
+  [/^\/dashboard\/user-management\/admins\/?$/, "Admins"],
+  [/^\/dashboard\/user-management\/instructors\/?$/, "Instructors"],
+  [/^\/dashboard\/user-management\/students\/?$/, "Students"],
+  [/^\/dashboard\/user-management\/[^/]+/, "User profile"],
   [/^\/dashboard\/profile\/?$/, "Profile"],
 ];
 

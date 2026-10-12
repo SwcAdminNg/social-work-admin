@@ -16,6 +16,7 @@ export interface User {
   is_suspended?: boolean;
   last_login_at?: string;
   cv_file_name?: string | null;
+  profile_picture_url?: string | null;
 }
 
 export interface UsersApiResponse {
