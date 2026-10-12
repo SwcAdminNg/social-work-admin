@@ -77,7 +77,9 @@ export type ApprovalCentreView =
   | "ready_to_publish"
   | "recently_approved"
   | "recently_rejected"
-  | "my_drafts";
+  | "my_drafts"
+  | "all_open"
+  | "all_decided";
 
 export type ApprovalItemKind = "COURSE_REVISION" | "ESSAY_MARK";
 
@@ -136,6 +138,8 @@ export interface ApprovalCentreCounts {
   returned_to_me: number;
   overdue: number;
   ready_to_publish: number;
+  /** Admins only: every item in flight across the platform. */
+  all_open?: number | null;
 }
 
 export interface ApprovalCentreRow {

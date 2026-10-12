@@ -43,7 +43,13 @@ const history: { key: ApprovalCentreView; label: string }[] = [
   { key: "my_drafts", label: "My drafts" },
 ];
 
-const allViews = [...queues.map((q) => q.key), ...history.map((h) => h.key)];
+// Platform-wide monitoring, offered to admins only (the API refuses everyone else).
+const monitor: { key: ApprovalCentreView; label: string }[] = [
+  { key: "all_open", label: "All in progress" },
+  { key: "all_decided", label: "All decisions" },
+];
+
+const allViews = [...queues.map((q) => q.key), ...history.map((h) => h.key), ...monitor.map((m) => m.key)];
 
 const emptyCopy: Record<ApprovalCentreView, { title: string; body: string }> = {
   awaiting_me: { title: "You're all caught up", body: "Nothing is waiting on your review right now." },
@@ -53,6 +59,8 @@ const emptyCopy: Record<ApprovalCentreView, { title: string; body: string }> = {
   recently_approved: { title: "No recent approvals", body: "Approved items will appear here." },
   recently_rejected: { title: "No recent rejections", body: "Rejected items will appear here." },
   my_drafts: { title: "No drafts", body: "Course revisions you start will appear here." },
+  all_open: { title: "Nothing in progress", body: "No course revision or essay mark is currently in the workflow." },
+  all_decided: { title: "No decisions yet", body: "Every approval, return and rejection across the platform will appear here." },
 };
 
 const toneRing = {
@@ -149,6 +157,7 @@ export function ApprovalCentre({ initialView }: { initialView?: string }) {
     queryClient.invalidateQueries({ queryKey: ["approval-centre"] });
   }
 
+  const isAdmin = counts.data?.all_open !== undefined && counts.data?.all_open !== null;
   const rows = list.data?.items ?? [];
   const awaiting = counts.data?.awaiting_me ?? 0;
   const overdue = counts.data?.overdue ?? 0;
@@ -216,7 +225,7 @@ export function ApprovalCentre({ initialView }: { initialView?: string }) {
         <div className="flex flex-col gap-3 border-b border-slate-200 p-4 dark:border-ink-line lg:flex-row lg:items-center">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">History</span>
-            {history.map((h) => (
+            {[...history, ...(isAdmin ? monitor : [])].map((h) => (
               <button
                 key={h.key}
                 type="button"
