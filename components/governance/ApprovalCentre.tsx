@@ -168,7 +168,15 @@ export function ApprovalCentre({ initialView }: { initialView?: string }) {
               : "Course revisions and essay marks that need your attention."}
           </p>
         </div>
-        <button
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/approval-centre/audit"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:bg-slate-50 dark:border-ink-line dark:bg-ink-surface dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <IconDocument />
+            <span className="hidden sm:inline">Audit trail</span>
+          </Link>
+          <button
           type="button"
           onClick={refresh}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-ink-line dark:bg-ink-surface dark:text-slate-300 dark:hover:bg-slate-800"
@@ -177,6 +185,7 @@ export function ApprovalCentre({ initialView }: { initialView?: string }) {
           <IconRefresh className={refreshing ? "animate-spin" : ""} />
           <span className="hidden sm:inline">Refresh</span>
         </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

@@ -33,7 +33,7 @@ import type {
   RiskLevel,
 } from "@/lib/api/governance.types";
 import { IconSpinner } from "@/components/dashboard/icons";
-import { Badge, DashboardCard, formatDate, humanize, riskTone } from "./GovernanceUtils";
+import { Avatar, Badge, DashboardCard, formatDate, humanize, riskTone } from "./GovernanceUtils";
 import { UserSearchSelect, type SelectedUser } from "./SearchSelects";
 import { DatePicker, formatValue } from "@/components/ui/date-picker";
 
@@ -197,7 +197,7 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
     return <p className="text-sm text-slate-500 dark:text-slate-400">Revision unavailable.</p>;
   }
 
-  const risk = revision.risk ?? revision.risk_level;
+  const risk = revision.effective_risk ?? revision.risk ?? revision.risk_level;
 
   return (
     <div className="flex flex-col gap-6">
@@ -320,24 +320,7 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
         </DashboardCard>
       )}
 
-      {tab === "timeline" && (
-        <DashboardCard className="p-5">
-          <div className="space-y-4">
-            {(revision.stages ?? []).map((stage, index) => (
-              <div key={`${stage.stage}-${stage.round ?? index}`} className="flex gap-3">
-                <div className="mt-1 h-3 w-3 rounded-full bg-brand-600" />
-                <div>
-                  <div className="font-semibold text-slate-900 dark:text-white">{humanize(stage.stage)}</div>
-                  <div className="text-sm text-slate-500 dark:text-slate-400">
-                    {humanize(stage.status)} · reviewer {stage.reviewer?.name ?? stage.assigned_to?.name ?? "unassigned"} · due {formatDate(stage.due_at)}
-                  </div>
-                  {stage.decision && <div className="text-sm text-slate-700 dark:text-slate-300">Decision: {humanize(stage.decision)}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
-      )}
+      {tab === "timeline" && <AuditTimeline revision={revision} />}
 
       {tab === "preview" && (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -395,6 +378,109 @@ export function RevisionReview({ revisionId }: { revisionId: string }) {
           </div>
         </DashboardCard>
       )}
+    </div>
+  );
+}
+
+const decisionTone: Record<string, "green" | "amber" | "red" | "blue" | "gray"> = {
+  APPROVED: "green",
+  APPROVED_WITH_MINOR_CHANGES: "green",
+  FORCE_APPROVED: "blue",
+  RETURNED_FOR_REVISION: "amber",
+  ESCALATED: "blue",
+  REJECTED: "red",
+};
+
+function conditionText(condition: unknown): string {
+  if (typeof condition === "string") return condition;
+  if (condition && typeof condition === "object" && "text" in condition) return String((condition as { text?: unknown }).text ?? "");
+  return "";
+}
+
+/**
+ * The revision's audit trail: every reviewer decision with who, when, why and the status it
+ * moved to, followed by the per-round stage ledger (who held each stage and who decided it).
+ */
+function AuditTimeline({ revision }: { revision: GovernanceRevision }) {
+  const decisions = [...(revision.decisions ?? [])].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+  const stages = [...(revision.stages ?? [])].sort(
+    (a, b) => (b.round ?? 0) - (a.round ?? 0) || (a.sequence ?? 0) - (b.sequence ?? 0),
+  );
+  const submittedBy = revision.submitted_by ?? revision.author;
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
+      <DashboardCard className="p-5">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Decision history</h2>
+        {decisions.length === 0 ? (
+          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+            No decisions yet.
+            {revision.submitted_at && ` Submitted ${formatDate(revision.submitted_at)}${submittedBy?.name ? ` by ${submittedBy.name}` : ""}.`}
+          </p>
+        ) : (
+          <ol className="mt-4 space-y-5">
+            {decisions.map((decision) => {
+              const conditions = (decision.conditions ?? []).map(conditionText).filter(Boolean);
+              return (
+                <li key={decision.id} className="flex gap-3">
+                  <Avatar name={decision.actor?.name} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{decision.actor?.name ?? "Unknown reviewer"}</span>
+                      <Badge tone={decisionTone[decision.decision] ?? "gray"}>{humanize(decision.decision)}</Badge>
+                      {decision.stage && <span className="text-xs text-slate-500 dark:text-slate-400">{humanize(decision.stage)}</span>}
+                      {decision.round ? <span className="text-xs text-slate-400">Round {decision.round}</span> : null}
+                    </div>
+                    {decision.comment && (
+                      <p className="mt-2 whitespace-pre-wrap border-l-2 border-slate-200 pl-3 text-sm text-slate-700 dark:border-ink-line dark:text-slate-300">
+                        {decision.comment}
+                      </p>
+                    )}
+                    {conditions.length > 0 && (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-700 dark:text-amber-300">
+                        {conditions.map((text, index) => (
+                          <li key={index}>{text}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                      {formatDate(decision.created_at)}
+                      {decision.from_status && decision.to_status
+                        ? ` · ${humanize(decision.from_status)} → ${humanize(decision.to_status)}`
+                        : decision.to_status
+                          ? ` · ${humanize(decision.to_status)}`
+                          : ""}
+                      {decision.version_label ? ` · v${decision.version_label}` : ""}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </DashboardCard>
+
+      <DashboardCard className="p-5">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">Review stages</h2>
+        <div className="mt-4 space-y-4">
+          {stages.map((stage, index) => (
+            <div key={stage.id ?? `${stage.stage}-${stage.round ?? index}`} className="flex gap-3">
+              <div className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-brand-600" />
+              <div className="min-w-0">
+                <div className="font-semibold text-slate-900 dark:text-white">
+                  {humanize(stage.stage)}
+                  {stage.round ? <span className="ml-2 text-xs font-medium text-slate-400">Round {stage.round}</span> : null}
+                </div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">
+                  {humanize(stage.status)} · reviewer {stage.assigned_reviewer?.name ?? stage.decided_by?.name ?? "unassigned"}
+                  {stage.decided_at ? ` · decided ${formatDate(stage.decided_at)}` : stage.due_at ? ` · due ${formatDate(stage.due_at)}` : ""}
+                </div>
+              </div>
+            </div>
+          ))}
+          {stages.length === 0 && <p className="text-sm text-slate-500 dark:text-slate-400">No stages yet.</p>}
+        </div>
+      </DashboardCard>
     </div>
   );
 }

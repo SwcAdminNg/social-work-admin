@@ -8,6 +8,7 @@ import type {
   CourseVersionDetail,
   DecisionValue,
   EssayMark,
+  AuditLogEntry,
   GovernanceRevision,
   GovernanceRole,
   PaginatedResult,
@@ -154,14 +155,32 @@ export async function listApprovalCentre(params: {
   return toPaginated(res, query.page, query.page_size);
 }
 
+export async function listAuditLog(params: {
+  course_id?: string;
+  revision_id?: string;
+  actor_id?: string;
+  entity_type?: string;
+  action?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  page_size?: number;
+} = {}): Promise<PaginatedResult<AuditLogEntry>> {
+  const query = { page: 1, page_size: 25, ...params };
+  const res = await request<AuditLogEntry[]>(`/api/governance/audit${buildQuery(query)}`);
+  return toPaginated(res, query.page, query.page_size);
+}
+
 export async function getRevision(id: string): Promise<GovernanceRevision> {
   const res = await request<GovernanceRevision>(`/api/governance/revisions/${id}`);
   return res.data;
 }
 
 export async function getRevisionDiff(id: string): Promise<RevisionDiffChange[]> {
-  const res = await request<RevisionDiffChange[]>(`/api/governance/revisions/${id}/diff`);
-  return res.data ?? [];
+  // The API wraps the list: { revision_id, computed_risk, changes: [...] }.
+  const res = await request<RevisionDiffChange[] | { changes?: RevisionDiffChange[] }>(`/api/governance/revisions/${id}/diff`);
+  const data = res.data;
+  return Array.isArray(data) ? data : (data?.changes ?? []);
 }
 
 export async function getRevisionTree(id: string): Promise<RevisionTree> {

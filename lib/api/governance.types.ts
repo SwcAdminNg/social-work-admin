@@ -161,14 +161,49 @@ export interface RevisionStage {
   id?: string;
   stage: string;
   status?: string | null;
-  reviewer?: PersonRef | null;
-  assigned_to?: PersonRef | null;
+  sequence?: number;
+  assigned_reviewer?: PersonRef | null;
+  decided_by?: PersonRef | null;
   due_at?: string | null;
   decided_at?: string | null;
-  decision?: string | null;
+  conditions?: unknown[];
   is_overdue?: boolean;
   round?: number;
+}
+
+/** One reviewer decision, as recorded by the API (the revision's audit history). */
+export interface RevisionDecisionEntry {
+  id: string;
+  created_at: string;
+  stage?: string | null;
+  round?: number | null;
+  decision: DecisionValue | string;
+  actor?: PersonRef | null;
   comment?: string | null;
+  conditions?: unknown[];
+  from_status?: string | null;
+  to_status?: string | null;
+  version_label?: string | null;
+}
+
+/** A row of the governance audit log (GET /governance/audit). */
+export interface AuditLogEntry {
+  id: string;
+  occurred_at: string;
+  actor_id?: string | null;
+  actor?: PersonRef | null;
+  actor_permissions?: string[];
+  entity_type: string;
+  entity_id: string;
+  course_id?: string | null;
+  course_title?: string | null;
+  revision_id?: string | null;
+  version_label?: string | null;
+  action: string;
+  from_status?: string | null;
+  to_status?: string | null;
+  comment?: string | null;
+  metadata_json?: Record<string, unknown> | null;
 }
 
 export interface GovernanceRevision {
@@ -180,6 +215,11 @@ export interface GovernanceRevision {
   current_stage?: string | null;
   risk?: RiskLevel | null;
   risk_level?: RiskLevel | null;
+  effective_risk?: RiskLevel | null;
+  round?: number;
+  author?: PersonRef | null;
+  submitted_by?: PersonRef | null;
+  decisions?: RevisionDecisionEntry[];
   risk_reasons?: string[];
   proposed_version_label?: string | null;
   current_version_label?: string | null;
