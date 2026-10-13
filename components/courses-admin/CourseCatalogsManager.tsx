@@ -1,297 +1,335 @@
 "use client";
 
-import { useState, useTransition, useCallback, useEffect } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { FolderTree, Layers, MoreHorizontal, Pencil, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
-import { getCatalogs, createCatalog } from "@/lib/api/courses-client";
-import type { CourseCatalog, CreateCatalogPayload, CourseCategory } from "@/lib/api/courses.types";
-import {
-  IconFolder,
-  IconPlus,
-  IconSpinner,
-  IconX,
-} from "@/components/dashboard/icons";
+import { createCatalog, deleteCatalog, getCatalogs, updateCatalog } from "@/lib/api/courses-client";
+import type { CourseCatalog, CourseCategory } from "@/lib/api/courses.types";
+import { Badge, Button, Callout, EmptyState, Input, PageHeader, StatCard, cn } from "@/components/ui/primitives";
+import { ConfirmDialog, Menu } from "@/components/ui/overlays";
 import { CATEGORY_OPTIONS, categoryLabel } from "./constants";
+import { CatalogEditorSheet, type CatalogFormValues } from "./catalogs/CatalogEditorSheet";
+import { CatalogIcon } from "./catalogs/catalog-icons";
 
 interface CourseCatalogsManagerProps {
   initialData: CourseCatalog[];
 }
 
+type EditorState = { open: boolean; catalog: CourseCatalog | null; preset?: CourseCategory[]; nonce: number };
+
+const MAX_CHIPS = 4;
+
+function errorMessage(err: unknown, fallback: string) {
+  return err instanceof ApiError || err instanceof Error ? err.message || fallback : fallback;
+}
+
 export function CourseCatalogsManager({ initialData }: CourseCatalogsManagerProps) {
   const [catalogs, setCatalogs] = useState<CourseCatalog[]>(initialData);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [editor, setEditor] = useState<EditorState>({ open: false, catalog: null, nonce: 0 });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<CourseCatalog | null>(null);
 
-  // Form state
-  const [name, setName] = useState("");
-  const [iconName, setIconName] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<Set<CourseCategory>>(new Set());
-
-  const [saving, startSave] = useTransition();
-
-  const refetchCatalogs = useCallback(async () => {
+  const refetch = useCallback(async () => {
     try {
-      const fresh = await getCatalogs();
-      setCatalogs(fresh);
+      setCatalogs(await getCatalogs());
     } catch {
-      // Non-fatal
+      // The list we already have is still valid; a failed refresh isn't worth interrupting for.
     }
   }, []);
 
-  useEffect(() => {
-    refetchCatalogs();
-  }, [refetchCatalogs]);
+  const covered = useMemo(() => new Set(catalogs.flatMap((c) => c.categories)), [catalogs]);
+  const uncovered = useMemo(() => CATEGORY_OPTIONS.filter((o) => !covered.has(o.value)), [covered]);
 
-  function handleCategoryToggle(cat: CourseCategory) {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) {
-        next.delete(cat);
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return catalogs;
+    return catalogs.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.description ?? "").toLowerCase().includes(q) ||
+        c.categories.some((cat) => categoryLabel(cat).toLowerCase().includes(q)),
+    );
+  }, [catalogs, query]);
+
+  function openCreate(preset?: CourseCategory[]) {
+    setEditor((e) => ({ open: true, catalog: null, preset, nonce: e.nonce + 1 }));
+  }
+
+  function openEdit(catalog: CourseCatalog) {
+    setEditor((e) => ({ open: true, catalog, nonce: e.nonce + 1 }));
+  }
+
+  async function handleSave(values: CatalogFormValues) {
+    setSaving(true);
+    try {
+      if (editor.catalog) {
+        await updateCatalog(editor.catalog.id, {
+          name: values.name,
+          description: values.description,
+          icon_name: values.icon_name,
+          categories: values.categories,
+        });
+        toast.success(`“${values.name}” updated.`);
       } else {
-        next.add(cat);
+        await createCatalog({
+          name: values.name,
+          categories: values.categories,
+          icon_name: values.icon_name || undefined,
+          description: values.description || undefined,
+        });
+        toast.success(`“${values.name}” created.`);
       }
-      return next;
-    });
+      setEditor((e) => ({ ...e, open: false }));
+      await refetch();
+    } catch (err) {
+      toast.error(errorMessage(err, "Couldn't save the catalog. Please try again."));
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) {
-      toast.error("Name is required.");
-      return;
+  async function handleDelete(catalog: CourseCatalog) {
+    try {
+      await deleteCatalog(catalog.id);
+      setCatalogs((prev) => prev.filter((c) => c.id !== catalog.id));
+      setEditor((e) => (e.catalog?.id === catalog.id ? { ...e, open: false } : e));
+      toast.success(`“${catalog.name}” deleted. No courses were removed.`);
+    } catch (err) {
+      toast.error(errorMessage(err, "Couldn't delete the catalog. Please try again."));
+      throw err; // keep the confirmation open
     }
-    if (selectedCategories.size === 0) {
-      toast.error("Please select at least one category.");
-      return;
-    }
-
-    startSave(async () => {
-      try {
-        const payload: CreateCatalogPayload = {
-          name: name.trim(),
-          categories: Array.from(selectedCategories),
-          icon_name: iconName.trim() || undefined,
-          description: description.trim() || undefined,
-        };
-        await createCatalog(payload);
-        toast.success("Catalog created successfully.");
-        
-        // Reset form
-        setName("");
-        setIconName("");
-        setDescription("");
-        setSelectedCategories(new Set());
-        setIsCreateOpen(false);
-
-        // Refetch
-        await refetchCatalogs();
-      } catch (err) {
-        toast.error(err instanceof ApiError ? err.message : "Failed to create catalog.");
-      }
-    });
   }
+
+  const hasCatalogs = catalogs.length > 0;
 
   return (
-    <>
-      <div className="flex flex-col gap-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="font-display text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Course Catalogs
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Group multiple categories into user-friendly collections for the platform.
-            </p>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        eyebrow="Learning catalogue"
+        title="Course catalogs"
+        description="Group categories into collections learners can browse on the student site. A catalog only organises courses — editing or deleting one never changes the courses themselves."
+        actions={
+          <Button icon={Plus} onClick={() => openCreate()}>
+            New catalog
+          </Button>
+        }
+      />
+
+      {hasCatalogs && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <StatCard
+            label="Catalogs"
+            value={catalogs.length}
+            icon={FolderTree}
+            hint={`${catalogs.reduce((n, c) => n + (c.total_courses ?? 0), 0)} course listings across all catalogs`}
+          />
+          <StatCard
+            label="Categories covered"
+            value={
+              <>
+                {covered.size}
+                <span className="text-base font-bold text-slate-400"> / {CATEGORY_OPTIONS.length}</span>
+              </>
+            }
+            icon={Layers}
+            tone={uncovered.length ? "warning" : "success"}
+            hint={uncovered.length ? `${uncovered.length} not in any catalog yet` : "Every category is in a catalog"}
+          />
+        </div>
+      )}
+
+      {hasCatalogs && uncovered.length > 0 && (
+        <Callout
+          tone="warning"
+          icon={Sparkles}
+          title="Some categories aren’t in any catalog"
+          actions={
+            <Button size="sm" variant="outline" onClick={() => openCreate(uncovered.map((o) => o.value))}>
+              Create a catalog for these
+            </Button>
+          }
+        >
+          Courses in these categories won’t appear under a catalog on the student site:{" "}
+          <span className="font-medium text-slate-800 dark:text-slate-100">
+            {uncovered.map((o) => o.label).join(", ")}
+          </span>
+          .
+        </Callout>
+      )}
+
+      {hasCatalogs && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-sm">
+            <Input
+              type="search"
+              aria-label="Search catalogs"
+              placeholder="Search catalogs or categories"
+              leading={<Search className="h-4 w-4" />}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400" aria-live="polite">
+            {query.trim() ? `${visible.length} of ${catalogs.length} catalogs` : `${catalogs.length} catalogs`}
+          </p>
+        </div>
+      )}
+
+      {!hasCatalogs ? (
+        <EmptyState
+          icon={FolderTree}
+          title="Create your first catalog"
+          description="Catalogs group categories — for example “Child protection” or “Practice skills” — so learners can find related courses together."
+          action={
+            <Button icon={Plus} onClick={() => openCreate()}>
+              New catalog
+            </Button>
+          }
+        />
+      ) : visible.length === 0 ? (
+        <EmptyState
+          compact
+          icon={Search}
+          title={`No catalogs match “${query.trim()}”`}
+          description="Try a different name or category."
+          action={
+            <Button variant="outline" size="sm" onClick={() => setQuery("")}>
+              Clear search
+            </Button>
+          }
+        />
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {visible.map((catalog) => (
+            <li key={catalog.id}>
+              <CatalogCard
+                catalog={catalog}
+                onEdit={() => openEdit(catalog)}
+                onDelete={() => setDeleting(catalog)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <CatalogEditorSheet
+        key={editor.nonce}
+        open={editor.open}
+        onOpenChange={(open) => setEditor((e) => ({ ...e, open }))}
+        catalog={editor.catalog}
+        presetCategories={editor.preset}
+        allCatalogs={catalogs}
+        saving={saving}
+        onSave={handleSave}
+        onDelete={editor.catalog ? () => setDeleting(editor.catalog) : undefined}
+      />
+
+      <ConfirmDialog
+        open={!!deleting}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title={deleting ? `Delete “${deleting.name}”?` : "Delete catalog?"}
+        description="This removes the catalog from the student site. It can’t be undone."
+        confirmLabel="Delete catalog"
+        onConfirm={async () => {
+          if (deleting) await handleDelete(deleting);
+        }}
+      >
+        {deleting && (
+          <ul className="space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+            <li className="flex gap-2">
+              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500" aria-hidden />
+              <span>
+                <strong className="font-semibold text-slate-900 dark:text-white">No courses are deleted.</strong>{" "}
+                {deleting.total_courses ?? 0} published course{(deleting.total_courses ?? 0) === 1 ? "" : "s"} in its{" "}
+                {deleting.categories.length} categor{deleting.categories.length === 1 ? "y" : "ies"} stay available.
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500" aria-hidden />
+              <span>Learners will no longer find them grouped under this catalog, and links to it will stop working.</span>
+            </li>
+          </ul>
+        )}
+      </ConfirmDialog>
+    </div>
+  );
+}
+
+function CatalogCard({
+  catalog,
+  onEdit,
+  onDelete,
+}: {
+  catalog: CourseCatalog;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const courses = catalog.total_courses ?? 0;
+  const shown = catalog.categories.slice(0, MAX_CHIPS);
+  const extra = catalog.categories.length - shown.length;
+
+  return (
+    <article
+      className={cn(
+        "group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-200",
+        "hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[0_18px_40px_-24px_rgba(45,106,79,0.45)]",
+        "dark:border-ink-line dark:bg-ink-surface dark:hover:border-brand-500/40",
+      )}
+    >
+      <div className="flex items-start gap-3.5">
+        <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-200/60 dark:bg-brand-400/12 dark:text-brand-300 dark:ring-brand-400/20">
+          <CatalogIcon name={catalog.icon_name} className="h-6 w-6" />
+        </span>
+        <div className="min-w-0 flex-1">
+          {/* The title is the card's primary action; its hit area stretches over the card. */}
           <button
             type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-green-900/20 transition-all duration-200 cursor-pointer self-start"
+            onClick={onEdit}
+            className="block w-full cursor-pointer truncate text-left font-display text-base font-bold text-slate-900 outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-brand-400/60 dark:text-white"
           >
-            <IconPlus />
-            Create Catalog
+            {catalog.name}
           </button>
+          <p className="mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+            {courses} published course{courses === 1 ? "" : "s"}
+          </p>
         </div>
-
-        {/* List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {catalogs.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-16 gap-3 text-center bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl">
-              <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-600">
-                <IconFolder />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                  No catalogs created
-                </p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                  Click "Create Catalog" to group your courses.
-                </p>
-              </div>
-            </div>
-          ) : (
-            catalogs.map((catalog) => (
-              <div
-                key={catalog.id}
-                className="bg-white dark:bg-ink-surface border border-slate-200 dark:border-ink-line rounded-2xl p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors flex flex-col"
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-brand-600/10 dark:bg-brand-400/15 text-brand-600 dark:text-brand-400 flex items-center justify-center flex-shrink-0">
-                      <IconFolder />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-display text-base font-bold text-slate-900 dark:text-white truncate">
-                        {catalog.name}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {catalog.icon_name || "No icon"}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                    {catalog.total_courses ?? 0} course{(catalog.total_courses ?? 0) !== 1 && "s"}
-                  </span>
-                </div>
-
-                {catalog.description && (
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">
-                    {catalog.description}
-                  </p>
-                )}
-
-                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-ink-line">
-                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">
-                    Categories
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {catalog.categories.map((cat) => (
-                      <span
-                        key={cat}
-                        className="px-2 py-1 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 text-[0.7rem] font-medium rounded-lg border border-slate-200 dark:border-slate-700"
-                      >
-                        {categoryLabel(cat)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        <div className="relative z-10 -mr-1.5 -mt-1">
+          <Menu
+            trigger={
+              <Button variant="ghost" size="sm" iconOnly icon={MoreHorizontal} aria-label={`Actions for ${catalog.name}`} />
+            }
+            items={[
+              { label: "Edit", icon: Pencil, onSelect: onEdit },
+              "separator",
+              { label: "Delete…", icon: Trash2, onSelect: onDelete, danger: true },
+            ]}
+          />
         </div>
       </div>
 
-      {/* Create Modal */}
-      {isCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsCreateOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="relative w-full max-w-lg bg-white dark:bg-ink-surface rounded-2xl shadow-2xl border border-slate-200 dark:border-ink-line flex flex-col max-h-[90vh]">
-            <form onSubmit={handleCreate} className="flex flex-col h-full overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-ink-line flex-shrink-0">
-                <h2 className="font-display text-base font-bold text-slate-900 dark:text-white">
-                  Create Course Catalog
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                  <IconX size={18} />
-                </button>
-              </div>
+      <p
+        className={cn(
+          "mt-3.5 line-clamp-2 min-h-[2.75rem] text-sm leading-[1.4rem]",
+          catalog.description ? "text-slate-600 dark:text-slate-300" : "italic text-slate-400 dark:text-slate-500",
+        )}
+      >
+        {catalog.description || "No description yet."}
+      </p>
 
-              <div className="p-5 overflow-y-auto flex flex-col gap-4">
-                <div>
-                  <label htmlFor="catalog-name" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="catalog-name"
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. IT & Information Management"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600/40 transition"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="catalog-icon" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Icon Name
-                  </label>
-                  <input
-                    id="catalog-icon"
-                    type="text"
-                    value={iconName}
-                    onChange={(e) => setIconName(e.target.value)}
-                    placeholder="e.g. computer-desktop"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600/40 transition"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="catalog-desc" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Description
-                  </label>
-                  <textarea
-                    id="catalog-desc"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Brief description of this catalog..."
-                    rows={3}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-600/40 transition resize-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Mapped Categories <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                    {CATEGORY_OPTIONS.map((opt) => (
-                      <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.has(opt.value)}
-                          onChange={() => handleCategoryToggle(opt.value)}
-                          className="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-600"
-                        />
-                        <span className="text-sm text-slate-700 dark:text-slate-300">
-                          {opt.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-5 py-4 border-t border-slate-100 dark:border-ink-line flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/30 flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors cursor-pointer"
-                >
-                  {saving && <IconSpinner className="w-4 h-4" />}
-                  {saving ? "Creating..." : "Create Catalog"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+      <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
+        {shown.map((cat) => (
+          <Badge key={cat} tone="neutral" size="xs">
+            {categoryLabel(cat)}
+          </Badge>
+        ))}
+        {extra > 0 && (
+          <Badge tone="brand" size="xs" title={catalog.categories.slice(MAX_CHIPS).map(categoryLabel).join(", ")}>
+            +{extra} more
+          </Badge>
+        )}
+      </div>
+    </article>
   );
 }

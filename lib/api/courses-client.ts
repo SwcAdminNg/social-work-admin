@@ -11,6 +11,7 @@ import type {
   ReplyToReviewPayload,
   HideReviewPayload,
   CreateCatalogPayload,
+  UpdateCatalogPayload,
   CreateCoursePayload,
   CreateItemPayload,
   CreateItemResult,
@@ -602,6 +603,15 @@ export async function createCatalog(payload: CreateCatalogPayload): Promise<Cour
   }
   const envelope = data as ApiEnvelope<CourseCatalog>;
   return envelope.data;
+}
+
+export async function updateCatalog(id: string, payload: UpdateCatalogPayload): Promise<CourseCatalog> {
+  const res = await request<CourseCatalog>(`/catalogs/${id}`, { method: "PATCH", body: payload });
+  return res.data;
+}
+
+export async function deleteCatalog(id: string): Promise<void> {
+  await request(`/catalogs/${id}`, { method: "DELETE" });
 }
 
 // Course Reviews

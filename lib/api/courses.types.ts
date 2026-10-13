@@ -538,6 +538,14 @@ export interface CreateCatalogPayload {
   description?: string;
 }
 
+/** Partial: omit a field to leave it alone; send "" for icon_name/description to clear it. */
+export interface UpdateCatalogPayload {
+  name?: string;
+  categories?: CourseCategory[];
+  icon_name?: string;
+  description?: string;
+}
+
 export interface CourseReview {
   id: string;
   course_id: string;
