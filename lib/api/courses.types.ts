@@ -213,6 +213,7 @@ export interface CourseItem {
   order_index: number;
   is_preview: boolean;
   estimated_minutes: number | null;
+  item_description?: string | null;
   video: CourseVideo | null;
   document: CourseDocument | null;
   assessment: CourseAssessment | null;
@@ -298,6 +299,7 @@ export interface CreateItemPayload {
   order_index: number;
   is_preview: boolean;
   estimated_minutes?: number | null;
+  item_description?: string | null;
   file_name?: string | null;
   assessment_type?: AssessmentType;
   due_date?: string | null;
@@ -320,6 +322,7 @@ export interface UpdateItemPayload {
   order_index?: number;
   is_preview?: boolean;
   estimated_minutes?: number | null;
+  item_description?: string | null;
   downloadable?: boolean;
   url?: string;
   label?: string | null;
