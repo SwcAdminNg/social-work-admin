@@ -43,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: data.user.email,
           username: data.user.username,
           userType: data.user.user_type,
+          image: data.user.profile_picture_url ?? null,
           accessToken: data.tokens.access_token,
           refreshToken: data.tokens.refresh_token,
           accessTokenExpires: Date.now() + data.tokens.expires_in * 1000,
@@ -58,10 +59,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (trigger === "update" && session) {
-        token.accessToken = session.accessToken;
-        token.refreshToken = session.refreshToken;
-        token.accessTokenExpires = session.accessTokenExpires;
-        token.error = undefined;
+        // Two kinds of update share this hook: a token refresh, and a new
+        // profile photo (which must not clobber the tokens).
+        if ("profile_picture_url" in session) {
+          token.picture = (session.profile_picture_url as string | null) ?? null;
+        }
+        if (session.accessToken) {
+          token.accessToken = session.accessToken;
+          token.refreshToken = session.refreshToken;
+          token.accessTokenExpires = session.accessTokenExpires;
+          token.error = undefined;
+        }
       }
 
       if (Date.now() > token.accessTokenExpires) {
@@ -78,6 +86,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         lastName: token.lastName,
         username: token.username,
         userType: token.userType,
+        image: (token.picture as string | null | undefined) ?? null,
       };
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;

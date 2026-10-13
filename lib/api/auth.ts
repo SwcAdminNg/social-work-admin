@@ -19,6 +19,7 @@ export interface AuthUser {
   user_type: string;
   is_active: boolean;
   last_login_at: string;
+  profile_picture_url?: string | null;
 }
 
 export interface AuthTokens {

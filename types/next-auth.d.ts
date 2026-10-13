@@ -38,6 +38,7 @@ declare module "@auth/core/jwt" {
     refreshToken: string;
     accessTokenExpires: number;
     keepLoggedIn: boolean;
+    picture?: string | null;
     error?: string;
   }
 }

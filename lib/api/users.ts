@@ -12,6 +12,36 @@ import {
   InstructorDocument,
 } from "./users.types";
 
+export type ProfilePictureUploadRequest = {
+  file_name: string;
+  content_type: string;
+};
+
+export type ProfilePictureUploadData = {
+  upload_url: string;
+  profile_picture_url: string;
+};
+
+/** Reserves a storage slot for the signed-in user's photo; the browser then PUTs the file to `upload_url`. */
+export async function requestProfilePictureUpload(
+  payload: ProfilePictureUploadRequest,
+): Promise<ApiResponse<ProfilePictureUploadData>> {
+  const res = await fetch("/api/users/me/profile-picture-upload-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    const message =
+      body && typeof body === "object" && "message" in body
+        ? String((body as { message?: unknown }).message)
+        : res.statusText;
+    throw new ApiError(message || "Couldn't prepare the upload.", res.status, body);
+  }
+  return body as ApiResponse<ProfilePictureUploadData>;
+}
+
 export type GetUsersParams = {
   page?: number;
   pageSize?: number;

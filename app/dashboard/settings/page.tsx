@@ -1,3 +1,4 @@
+import { ProfilePictureCard } from "@/components/settings/ProfilePictureCard";
 import { UserProfileForm } from "@/components/settings/UserProfileForm";
 import { TwoFactorSettings } from "@/components/settings/TwoFactorSettings";
 
@@ -9,6 +10,7 @@ export default function SettingsPage() {
         <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your account settings and preferences.</p>
       </div>
 
+      <ProfilePictureCard />
       <UserProfileForm />
       <TwoFactorSettings />
     </div>

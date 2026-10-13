@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUser } from "@/lib/api/users";
 import { ChevronDown, LogOut, Menu, MessageSquare, Settings } from "lucide-react";
 import { badgeLabel, useCommunityUnreadCount } from "@/components/community-admin/UnreadBadge";
 import { getPageTitle } from "./nav-items";
@@ -25,6 +27,13 @@ export function DashboardHeader() {
   const { data: session } = useSession();
   const { setMobileOpen, toggleCollapsed } = useSidebar();
   const unreadMessages = useCommunityUnreadCount();
+  // Shares the settings page's cache, so a new photo shows here immediately -
+  // and sessions that predate the photo feature still pick theirs up.
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => getCurrentUser(),
+    staleTime: 5 * 60_000,
+  });
   const [profileOpen, setProfileOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null);
@@ -38,7 +47,7 @@ export function DashboardHeader() {
     user?.email?.split("@")[0] ||
     "Admin";
   const avatarInitial = displayName.trim().charAt(0).toUpperCase() || "A";
-  const avatarUrl = user?.image;
+  const avatarUrl = currentUser?.data?.profile_picture_url ?? user?.image;
   const avatarImageUrl = avatarUrl && avatarUrl !== failedAvatarUrl ? avatarUrl : null;
 
   useEffect(() => {
