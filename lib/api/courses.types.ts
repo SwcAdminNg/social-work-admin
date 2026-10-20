@@ -16,7 +16,7 @@ export type CourseCategory =
   | "LIFESTYLE"
   | "LANGUAGE";
 
-export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT" | "LINKS" | "LIVE_SESSION";
+export type CourseItemType = "VIDEO" | "DOCUMENT" | "ASSESSMENT" | "LINKS" | "LIVE_SESSION" | "SCORM";
 
 export type AssessmentType = "QUIZ" | "ESSAY" | "QUIZ_GROUP";
 export type EssaySubmissionMode = "TEXT" | "DOCUMENT";

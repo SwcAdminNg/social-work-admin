@@ -17,6 +17,7 @@ import { useCourseEditor } from "../editor/CourseEditorContext";
 import { useDraft } from "../editor/useDraft";
 import { FileDrop } from "./FileDrop";
 import { itemKind, KIND_META } from "./itemMeta";
+import { ScormPanel } from "./ScormPanel";
 import { useUploads } from "./uploads";
 import { UploadProgressCard, VideoPanel } from "./VideoUpload";
 
@@ -26,6 +27,7 @@ type Draft = {
   item_description: string;
   is_preview: boolean;
   downloadable: boolean;
+  scorm_completion_from_package: boolean;
   url: string;
   label: string;
   description: string;
@@ -38,6 +40,7 @@ function draftFrom(item: Item): Draft {
     item_description: item.item_description ?? "",
     is_preview: !!item.is_preview,
     downloadable: !!item.document?.downloadable,
+    scorm_completion_from_package: item.scorm?.completion_from_package !== false,
     url: item.link?.url ?? "",
     label: item.link?.label ?? "",
     description: item.link?.description ?? "",
@@ -221,6 +224,9 @@ function ItemEditorBody({
           break;
         case "downloadable":
           payload.downloadable = v.downloadable;
+          break;
+        case "scorm_completion_from_package":
+          payload.scorm_completion_from_package = v.scorm_completion_from_package;
           break;
         case "url": {
           try {
@@ -409,6 +415,17 @@ function ItemEditorBody({
               downloadable={v.downloadable}
               onDownloadable={(val) => draft.set("downloadable", val)}
               onReplaced={onOpenItem}
+            />
+          </PanelCard>
+        )}
+
+        {kind === "SCORM" && (
+          <PanelCard title="Interactive package">
+            <ScormPanel
+              item={item}
+              readOnly={readOnly}
+              completionFromPackage={v.scorm_completion_from_package}
+              onCompletionFromPackage={(val) => draft.set("scorm_completion_from_package", val)}
             />
           </PanelCard>
         )}

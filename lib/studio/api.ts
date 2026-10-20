@@ -1,6 +1,7 @@
 // Browser-side client for the authoring + governance API. Every call goes
 // through the admin's authenticated `/api/<segment>/*` proxies (courses, governance, essay-marks).
 import type {
+  Item,
   AiGeneratePayload,
   AiGenerateResult,
   ApprovalCounts,
@@ -235,6 +236,17 @@ export const studioApi = {
   refreshVideoUpload: (itemId: string) => post<VideoUploadCredentials>(`/courses/items/${itemId}/video/refresh-upload`),
   finalizeDocument: (itemId: string, payload: { mime_type?: string; file_size_bytes?: number }) =>
     post(`/courses/items/${itemId}/document/finalize`, payload),
+  /** After the package zip is PUT to storage: validates and unpacks it (synchronous, a few seconds). */
+  finalizeScorm: (itemId: string, payload: { file_size_bytes?: number }) =>
+    post<Item>(`/courses/items/${itemId}/scorm/finalize`, payload),
+  /** Credentials to upload a replacement zip for an existing package lesson. */
+  refreshScormUpload: (itemId: string, fileName: string) =>
+    post<{ upload_url: string; storage_key: string }>(`/courses/items/${itemId}/scorm/refresh-upload${qs({ file_name: fileName })}`),
+  /** Short-lived learner-style launch URL for the package (browse mode, nothing saved). */
+  scormPreview: (itemId: string) =>
+    get<{ launch_url: string; launch_path: string; scorm_version?: string | null; expires_at: string }>(
+      `/courses/items/${itemId}/scorm/preview`,
+    ),
   updateAssessment: (itemId: string, payload: AssessmentUpdatePayload) =>
     patch(`/courses/items/${itemId}/assessment`, payload),
 

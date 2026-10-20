@@ -13,7 +13,7 @@ import { useCourseEditor } from "../editor/CourseEditorContext";
 
 export type UploadState = {
   itemId: string;
-  kind: "video" | "document";
+  kind: "video" | "document" | "scorm";
   fileName: string;
   progress: number;
   phase: "preparing" | "uploading" | "finalizing" | "error";
@@ -24,9 +24,11 @@ export type UploadState = {
 export type UploadApi = {
   refreshVideoUpload: (id: string) => Promise<VideoUploadCredentials>;
   finalizeDocument: (id: string, payload: { mime_type?: string; file_size_bytes?: number }) => Promise<unknown>;
+  /** Optional: only curriculum items can hold interactive packages. */
+  finalizeScorm?: (id: string, payload: { file_size_bytes?: number }) => Promise<unknown>;
 };
 
-type RunFn = <T>(fn: () => Promise<T>, opts?: { success?: string; refresh?: boolean }) => Promise<T | undefined>;
+type RunFn = <T>(fn: () => Promise<T>, opts?: { success?: string; refresh?: boolean; silent?: boolean }) => Promise<T | undefined>;
 
 type UploadsValue = {
   uploads: Record<string, UploadState>;
@@ -35,6 +37,8 @@ type UploadsValue = {
   startVideo: (itemId: string, file: File, opts?: { credentials?: VideoUploadCredentials | null; title?: string }) => void;
   /** PUT to a signed URL, then finalize the document item. */
   startDocument: (itemId: string, file: File, uploadUrl: string) => Promise<boolean>;
+  /** PUT the package zip to a signed URL, then finalize (validate + unpack) the SCORM item. */
+  startScorm: (itemId: string, file: File, uploadUrl: string) => Promise<boolean>;
   cancel: (itemId: string) => void;
   dismiss: (itemId: string) => void;
   busy: boolean;
@@ -138,6 +142,38 @@ export function UploadsProvider({
     [patch, run, api],
   );
 
+  const startScorm = useCallback<UploadsValue["startScorm"]>(
+    async (itemId, file, uploadUrl) => {
+      patch(itemId, { itemId, kind: "scorm", fileName: file.name, progress: 0, phase: "uploading", error: undefined });
+      try {
+        await uploadToSignedUrl(uploadUrl, file, (p) => patch(itemId, { progress: p }));
+      } catch (err) {
+        patch(itemId, { phase: "error", error: (err as Error).message });
+        toast.error(`Package upload failed: ${file.name}`);
+        return false;
+      }
+      // Finalize validates the zip and unpacks it; a bad package comes back as
+      // a 400 whose message says what to fix.
+      patch(itemId, { phase: "finalizing", progress: 100 });
+      try {
+        await run(
+          async () => {
+            await (api.finalizeScorm ?? studioApi.finalizeScorm)(itemId, { file_size_bytes: file.size });
+            return true;
+          },
+          { success: "Package uploaded and ready to play", silent: true },
+        );
+      } catch (err) {
+        patch(itemId, { phase: "error", error: (err as Error).message || "We couldn't unpack the package. Try another zip." });
+        toast.error(`Package rejected: ${file.name}`);
+        return false;
+      }
+      patch(itemId, null);
+      return true;
+    },
+    [patch, run, api],
+  );
+
   const cancel = useCallback(
     (itemId: string) => {
       const u = tusUploads.current[itemId];
@@ -166,11 +202,12 @@ export function UploadsProvider({
       get: (id) => uploads[id],
       startVideo,
       startDocument,
+      startScorm,
       cancel,
       dismiss: (id) => patch(id, null),
       busy,
     }),
-    [uploads, startVideo, startDocument, cancel, patch, busy],
+    [uploads, startVideo, startDocument, startScorm, cancel, patch, busy],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -179,6 +216,7 @@ export function UploadsProvider({
 const COURSE_UPLOAD_API: UploadApi = {
   refreshVideoUpload: studioApi.refreshVideoUpload,
   finalizeDocument: studioApi.finalizeDocument,
+  finalizeScorm: studioApi.finalizeScorm,
 };
 
 /** Uploads wired to the course item endpoints and the course editor's write wrapper. */
