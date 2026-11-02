@@ -17,6 +17,7 @@ import { Pagination } from "@/components/generic/ui/Pagination";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
 import { Select } from "@/components/ui/select";
+import { CONTACT_SOURCE_PAGES, formatSourcePage } from "@/lib/api/contact-pages";
 
 interface ContactMessagesListProps {
   initialData: PaginatedResult<ContactMessage>;
@@ -30,6 +31,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
     search: "",
     platform: "",
     category: "",
+    source_page: "",
     start_date: "",
     end_date: "",
   });
@@ -67,6 +69,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
       search: "",
       platform: "",
       category: "",
+      source_page: "",
       start_date: "",
       end_date: "",
     };
@@ -116,6 +119,15 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
       ),
     },
     {
+      key: "source_page",
+      header: "Page",
+      render: (msg) => (
+        <span className="text-sm text-slate-700 dark:text-slate-300" title={msg.source_page || undefined}>
+          {formatSourcePage(msg.source_page)}
+        </span>
+      ),
+    },
+    {
       key: "platform",
       header: "Platform",
       render: (msg) => (
@@ -135,13 +147,13 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
             Contact Messages
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            View and manage all incoming messages from the "Contact Us" form.
+            View and manage all incoming enquiries from the website forms, with the page each was sent from.
           </p>
         </div>
 
         {/* Filters */}
         <form onSubmit={applyFilters} className="bg-white dark:bg-ink-surface p-4 border border-slate-200 dark:border-ink-line rounded-2xl flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Search</label>
               <input
@@ -174,6 +186,20 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 <option value="mentorship">Mentorship</option>
                 <option value="pricing">Pricing</option>
                 <option value="courses">Courses</option>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Page</label>
+              <Select
+                value={filters.source_page ?? ""}
+                onChange={(value) => handleFilterChange("source_page", value)}
+              >
+                <option value="">All Pages</option>
+                {CONTACT_SOURCE_PAGES.map((page) => (
+                  <option key={page.path} value={page.path}>
+                    {page.label}
+                  </option>
+                ))}
               </Select>
             </div>
             <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
@@ -294,12 +320,14 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                       {selectedMessage.email}
                     </a>
                   </p>
-                  {selectedMessage.phone_number && (
+                  {selectedMessage.phone_number ? (
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                       <a href={`tel:${selectedMessage.phone_number}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         {selectedMessage.phone_number}
                       </a>
                     </p>
+                  ) : (
+                    <p className="text-xs text-slate-400 dark:text-slate-500">No phone number given</p>
                   )}
                 </div>
 
@@ -317,6 +345,12 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                   </p>
                   <p className="text-sm text-slate-700 dark:text-slate-300">
                     <span className="font-semibold">Platform:</span> {selectedMessage.platform}
+                  </p>
+                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <span className="font-semibold">Sent from:</span> {formatSourcePage(selectedMessage.source_page)}
+                    {selectedMessage.source_page && (
+                      <span className="ml-1 text-xs text-slate-400 dark:text-slate-500">({selectedMessage.source_page})</span>
+                    )}
                   </p>
                 </div>
               </div>

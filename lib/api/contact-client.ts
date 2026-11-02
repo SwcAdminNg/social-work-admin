@@ -5,6 +5,7 @@ import type { ContactMessage } from "./contact.types";
 export interface ContactMessagesFilters {
   platform?: string;
   category?: string;
+  source_page?: string;
   search?: string;
   start_date?: string;
   end_date?: string;
@@ -22,6 +23,7 @@ export async function getContactMessages(
   if (filters) {
     if (filters.platform) searchParams.set("platform", filters.platform);
     if (filters.category) searchParams.set("category", filters.category);
+    if (filters.source_page) searchParams.set("source_page", filters.source_page);
     if (filters.search) searchParams.set("search", filters.search);
     if (filters.start_date) searchParams.set("start_date", filters.start_date);
     if (filters.end_date) searchParams.set("end_date", filters.end_date);
