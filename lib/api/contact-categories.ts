@@ -6,6 +6,7 @@ export const CONTACT_CATEGORIES: { value: string; label: string }[] = [
   { value: "account_support", label: "Account or Learning Support" },
   { value: "partnership", label: "Partnership or Organisational Enquiry" },
   { value: "other", label: "Other" },
+  { value: "mentor_application", label: "Mentor Application" },
   { value: "general", label: "General" },
   { value: "pricing", label: "Pricing" },
 ];

@@ -13,6 +13,8 @@ export interface ContactMessage {
   subject?: string;
   // Short reference shown to the visitor on the website, e.g. "SWCL-1A2B3C4D".
   reference?: string;
+  // Extra labelled answers from richer forms (e.g. the mentorship forms), in order.
+  details?: { label: string; value: string }[] | null;
   // Path of the public page whose form sent the message, e.g. "/contact".
   source_page?: string | null;
 }

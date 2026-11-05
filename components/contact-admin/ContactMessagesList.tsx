@@ -390,6 +390,22 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 </div>
               )}
 
+              {selectedMessage.details && selectedMessage.details.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
+                    Form Answers
+                  </p>
+                  <dl className="grid grid-cols-1 sm:grid-cols-[minmax(0,12rem)_1fr] gap-x-4 gap-y-2 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-ink-line">
+                    {selectedMessage.details.map((detail, index) => (
+                      <div key={`${detail.label}-${index}`} className="contents">
+                        <dt className="text-sm font-semibold text-slate-600 dark:text-slate-400">{detail.label}</dt>
+                        <dd className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words m-0">{detail.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
               <div>
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
                   Message Content
