@@ -9,6 +9,7 @@ import { ApiError } from "@/lib/api/client";
 import { AuthPageShell } from "./shared/AuthPageShell";
 import { FloatingInput } from "./shared/FloatingInput";
 import { PasswordToggle } from "./shared/PasswordToggle";
+import { PasskeyButton, PasskeyContinueCard, usePasskeySignIn } from "./shared/PasskeySignIn";
 import { IconArrowRight, IconCheck, IconLock, IconMail, IconSpinner } from "./shared/icons";
 import { TwoFactorVerifyStep } from "./twoFactor/TwoFactorVerifyStep";
 import { TwoFactorSetupStep } from "./twoFactor/TwoFactorSetupStep";
@@ -31,6 +32,16 @@ export default function Login() {
 
   const identifierRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const passkey = usePasskeySignIn({
+    identifier,
+    keepLoggedIn,
+    onError: (message) => setError(message),
+    onSession: async (sessionData) => {
+      setError(null);
+      await completeSignIn(sessionData as AuthSessionData);
+    },
+  });
 
   const completeSignIn = async (data: AuthSessionData) => {
     const result = await signIn("credentials", {
@@ -126,6 +137,21 @@ export default function Login() {
           </div>
 
           {/* Form */}
+          {passkey.continueAccount && (
+            <>
+              <PasskeyContinueCard
+                account={passkey.continueAccount}
+                busy={passkey.busy}
+                onContinue={() => passkey.start(passkey.continueAccount?.email)}
+                onUseAnother={() => identifierRef.current?.focus()}
+              />
+              <div className="flex items-center gap-3 mb-5" aria-hidden="true">
+                <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+                <span className="text-[0.75rem] text-gray-500 font-medium">or sign in with your password</span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+              </div>
+            </>
+          )}
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             {/* Error message */}
             {error && (
@@ -146,7 +172,7 @@ export default function Login() {
               value={identifier}
               onChange={setIdentifier}
               icon={<IconMail />}
-              autoComplete="username"
+              autoComplete="username webauthn"
               required
             />
 
@@ -230,6 +256,17 @@ export default function Login() {
               )}
             </button>
           </form>
+
+          {passkey.availableForTyped && !passkey.continueAccount && (
+            <>
+              <div className="flex items-center gap-3 my-5" aria-hidden="true">
+                <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+                <span className="text-[0.75rem] text-gray-500 font-medium">or</span>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+              </div>
+              <PasskeyButton busy={passkey.busy} disabled={loading} onClick={() => passkey.start(identifier)} />
+            </>
+          )}
         </>
       )}
     </AuthPageShell>

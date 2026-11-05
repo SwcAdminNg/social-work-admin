@@ -1,6 +1,7 @@
 import { ProfilePictureCard } from "@/components/settings/ProfilePictureCard";
 import { UserProfileForm } from "@/components/settings/UserProfileForm";
 import { TwoFactorSettings } from "@/components/settings/TwoFactorSettings";
+import { PasskeySettings } from "@/components/settings/PasskeySettings";
 
 export default function SettingsPage() {
   return (
@@ -12,6 +13,7 @@ export default function SettingsPage() {
 
       <ProfilePictureCard />
       <UserProfileForm />
+      <PasskeySettings />
       <TwoFactorSettings />
     </div>
   );

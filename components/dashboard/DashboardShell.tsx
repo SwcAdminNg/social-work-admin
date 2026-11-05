@@ -5,6 +5,7 @@ import { SidebarProvider, useSidebar } from "./SidebarContext";
 import { Sidebar } from "./Sidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { SessionManager } from "@/components/auth/SessionManager";
+import { PasskeyPrompt } from "./PasskeyPrompt";
 
 function Content({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
@@ -19,6 +20,7 @@ function Content({ children }: { children: React.ReactNode }) {
       <main className="flex-1 bg-[#f7f7fb] p-4 sm:p-6 dark:bg-ink-page">
         {children}
       </main>
+      <PasskeyPrompt />
     </div>
   );
 }
