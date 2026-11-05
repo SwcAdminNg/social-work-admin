@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheck,
   BookOpenCheck,
+  Fingerprint,
   FileCheck2,
   FolderTree,
   LayoutDashboard,
@@ -126,6 +127,12 @@ export const dashboardNavGroups: NavGroup[] = [
         label: "Groups",
         href: "/dashboard/groups",
         icon: UserRoundCog,
+        adminOnly: true,
+      },
+      {
+        label: "Passkeys",
+        href: "/dashboard/passkeys",
+        icon: Fingerprint,
         adminOnly: true,
       },
     ],

@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/dashboard/EmptyState";
 import { Pagination } from "@/components/generic/ui/Pagination";
 import type { InstructorDocument } from "@/lib/api/users.types";
 import { UserAvatar } from "@/components/users/UserAvatar";
+import { UserPasskeys } from "@/components/passkeys-admin/UserPasskeys";
 
 const PAGE_SIZE = 20;
 
@@ -163,6 +164,8 @@ export default function UserProfilePage() {
           )}
         </div>
       </div>
+
+      <UserPasskeys userId={userId} />
 
       <div className="flex items-center gap-1 rounded-xl bg-slate-100 dark:bg-ink-surface p-1 self-start">
         <button
