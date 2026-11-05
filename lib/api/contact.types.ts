@@ -8,7 +8,11 @@ export interface ContactMessage {
   message: string;
   platform: string;
   category?: string;
+  // Human-readable enquiry type from the API, e.g. "Account or Learning Support".
+  category_label?: string | null;
   subject?: string;
+  // Short reference shown to the visitor on the website, e.g. "SWCL-1A2B3C4D".
+  reference?: string;
   // Path of the public page whose form sent the message, e.g. "/contact".
   source_page?: string | null;
 }

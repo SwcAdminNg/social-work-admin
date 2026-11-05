@@ -18,6 +18,13 @@ import { EmptyState } from "@/components/dashboard/EmptyState";
 import { DateRangePicker, type DateRangeValue } from "@/components/ui/date-picker";
 import { Select } from "@/components/ui/select";
 import { CONTACT_SOURCE_PAGES, formatSourcePage } from "@/lib/api/contact-pages";
+import { CONTACT_CATEGORIES, formatCategory } from "@/lib/api/contact-categories";
+
+function replyHref(msg: ContactMessage): string {
+  const topic = msg.subject || formatCategory(msg.category, msg.category_label);
+  const subject = `Re: ${topic}${msg.reference ? ` (${msg.reference})` : ""}`;
+  return `mailto:${msg.email}?subject=${encodeURIComponent(subject)}`;
+}
 
 interface ContactMessagesListProps {
   initialData: PaginatedResult<ContactMessage>;
@@ -115,7 +122,16 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
       key: "category",
       header: "Category",
       render: (msg) => (
-        <span className="capitalize">{msg.category || "General"}</span>
+        <span className="text-sm">{formatCategory(msg.category, msg.category_label)}</span>
+      ),
+    },
+    {
+      key: "reference",
+      header: "Reference",
+      render: (msg) => (
+        <span className="font-mono text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
+          {msg.reference ?? "—"}
+        </span>
       ),
     },
     {
@@ -158,7 +174,7 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
               <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Search</label>
               <input
                 type="text"
-                placeholder="Name, email..."
+                placeholder="Name, email or SWCL-…"
                 className="px-3 py-2 text-sm bg-white dark:bg-ink-page/60 border border-slate-200 dark:border-ink-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)] placeholder:text-slate-400 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-400/15 text-slate-900 dark:text-white"
                 value={filters.search}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
@@ -182,10 +198,11 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 onChange={(value) => handleFilterChange("category", value)}
               >
                 <option value="">All Categories</option>
-                <option value="general">General</option>
-                <option value="mentorship">Mentorship</option>
-                <option value="pricing">Pricing</option>
-                <option value="courses">Courses</option>
+                {CONTACT_CATEGORIES.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -295,6 +312,12 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                 </h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Sent on {formatDate(selectedMessage.created_at)}
+                  {selectedMessage.reference && (
+                    <>
+                      {" · "}
+                      <span className="font-mono text-xs">{selectedMessage.reference}</span>
+                    </>
+                  )}
                 </p>
               </div>
               <button
@@ -340,8 +363,9 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                       <span className="font-semibold">Company:</span> {selectedMessage.company_name}
                     </p>
                   )}
-                  <p className="text-sm text-slate-700 dark:text-slate-300 capitalize">
-                    <span className="font-semibold">Category:</span> {selectedMessage.category || "General"}
+                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <span className="font-semibold">Enquiry type:</span>{" "}
+                    {formatCategory(selectedMessage.category, selectedMessage.category_label)}
                   </p>
                   <p className="text-sm text-slate-700 dark:text-slate-300">
                     <span className="font-semibold">Platform:</span> {selectedMessage.platform}
@@ -375,6 +399,16 @@ export function ContactMessagesList({ initialData }: ContactMessagesListProps) {
                     {selectedMessage.message}
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <a
+                  href={replyHref(selectedMessage)}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 rounded-lg transition-colors"
+                >
+                  <IconMail />
+                  Reply by email
+                </a>
               </div>
             </div>
             
