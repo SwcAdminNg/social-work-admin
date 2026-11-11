@@ -471,6 +471,45 @@ export interface EssaySubmission {
   working_score?: number | null;
 }
 
+/** One learner's quiz attempt as they saw it: AI-reworded wording on retries. */
+export interface QuizAttemptReviewOption {
+  id: string;
+  text: string;
+  original_text: string;
+  is_correct: boolean;
+  selected: boolean;
+}
+
+export interface QuizAttemptReviewQuestion {
+  id: string;
+  section_title?: string | null;
+  text: string;
+  original_text: string;
+  allow_multiple_answers: boolean;
+  options: QuizAttemptReviewOption[];
+  /** 0-1; partial credit on "any of" multi-answer questions. */
+  earned: number;
+}
+
+export interface QuizAttemptReview {
+  attempt_id: string;
+  user_id: string;
+  user_full_name: string;
+  user_email: string;
+  attempt_number: number;
+  status: "SUBMITTED" | "IN_PROGRESS";
+  started_at?: string | null;
+  submitted_at?: string | null;
+  score?: number | null;
+  passed?: boolean | null;
+  auto_submitted: boolean;
+  is_reset: boolean;
+  paraphrased: boolean;
+  paraphrase_model?: string | null;
+  version_recorded: boolean;
+  questions: QuizAttemptReviewQuestion[];
+}
+
 export interface GradeEssayPayload {
   score: number;
   feedback?: string | null;

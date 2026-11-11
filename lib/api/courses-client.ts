@@ -25,6 +25,7 @@ import type {
   CreateQuizGroupSectionPayload,
   CreateSectionPayload,
   EssaySubmission,
+  QuizAttemptReview,
   FeaturedCourse,
   FeaturedCoursesResponse,
   FinalizeDocumentPayload,
@@ -493,6 +494,17 @@ export async function listEssaySubmissions(
 ): Promise<PaginatedResult<EssaySubmission>> {
   const res = await request<EssaySubmission[]>(
     `/items/${itemId}/essay/submissions${buildQuery(params)}`,
+    { method: "GET" },
+  );
+  return { items: res.data, meta: res.meta! };
+}
+
+export async function listQuizAttempts(
+  itemId: string,
+  params: { page?: number; page_size?: number } = {},
+): Promise<PaginatedResult<QuizAttemptReview>> {
+  const res = await request<QuizAttemptReview[]>(
+    `/items/${itemId}/quiz/attempts${buildQuery(params)}`,
     { method: "GET" },
   );
   return { items: res.data, meta: res.meta! };

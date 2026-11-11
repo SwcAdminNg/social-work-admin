@@ -20,6 +20,7 @@ import { IconAlertTriangle, IconChevronDown, IconPlus, IconSpinner, IconTrash } 
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { QuizAttemptsPanel } from "./QuizAttemptsPanel";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
 import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
@@ -240,6 +241,8 @@ export function QuizGroupBuilder({
           Add section
         </button>
       )}
+
+      <QuizAttemptsPanel itemId={item.id} />
     </div>
   );
 }

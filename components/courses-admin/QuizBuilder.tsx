@@ -8,6 +8,7 @@ import type { CourseItem, CreateQuizOptionPayload } from "@/lib/api/courses.type
 import { IconPlus, IconSpinner, IconTrash } from "@/components/dashboard/icons";
 import type { CourseEditorAction } from "./courseEditorReducer";
 import { QuizQuestionCard } from "./QuizQuestionCard";
+import { QuizAttemptsPanel } from "./QuizAttemptsPanel";
 import { FinalAssessmentBadge, FinalAssessmentToggle } from "./FinalAssessmentControls";
 import { QuizAiAutocomplete } from "./QuizAiAutocomplete";
 import { DatePicker, isoToLocalInput } from "@/components/ui/date-picker";
@@ -295,6 +296,8 @@ export function QuizBuilder({
           Add question
         </button>
       )}
+
+      <QuizAttemptsPanel itemId={item.id} />
     </div>
   );
 }
